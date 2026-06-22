@@ -1,0 +1,2436 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calla Kallos — فلوريست دبي الفاخر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Scheherazade+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* =============================================
+   CALLA KALLOS — CUSTOM THEME CSS
+   Brand Palette extracted from brand images
+   ============================================= */
+
+/* --- DESIGN TOKENS --- */
+:root {
+  /* Primary Palette — Forest Green (from logo) */
+  --ck-plum:          #2E3B1F;   /* deep forest green — primary brand */
+  --ck-plum-dark:     #1C2512;   /* darkest green — hero bg, footer */
+  --ck-plum-mid:      #3D5028;   /* mid green — hover states */
+  --ck-plum-light:    #5A7040;   /* light green — soft accents */
+  --ck-plum-tint:     #D6E8C4;   /* pale green tint — subtle bg */
+
+  /* Accent Palette */
+  --ck-champagne:     #C8B88A;   /* warm gold — ribbons, CTAs */
+  --ck-champagne-lt:  #E8DCC8;   /* light gold — borders */
+  --ck-cream:         #F5F0E8;   /* warm cream — page bg */
+  --ck-cream-dark:    #EBE4D6;   /* darker cream — section alternates */
+  --ck-ivory:         #FDFAF5;   /* near white */
+
+  /* Typography */
+  --ck-text:          #1C2512;   /* deep green text */
+  --ck-text-muted:    #4A5C38;   /* muted body */
+  --ck-text-hint:     #8A9E78;   /* hints and placeholders */
+
+  /* Semantic */
+  --ck-success:       #3A7C49;
+  --ck-danger:        #A03030;
+  --ck-offer:         #5A7040;   /* special offer badge */
+
+  /* Typography Families */
+  --font-display:     'Cormorant Garamond', Georgia, serif;
+  --font-body:        'Jost', system-ui, sans-serif;
+  --font-arabic:      'Scheherazade New', 'Traditional Arabic', serif;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+
+  /* Borders & Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-pill: 24px;
+
+  /* Transitions */
+  --transition: 0.25s ease;
+}
+
+/* --- RESET & BASE --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--ck-cream);
+  color: var(--ck-text);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* RTL support */
+[lang="ar"] body, body.rtl {
+  font-family: var(--font-arabic);
+  direction: rtl;
+}
+
+/* --- UTILITY CLASSES (include in WP child theme style.css) --- */
+.ck-serif { font-family: var(--font-display); }
+.ck-arabic { font-family: var(--font-arabic); }
+.ck-section-pad { padding: var(--space-xl) var(--space-xl); }
+.ck-container { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-xl); }
+.ck-bg-cream { background: var(--ck-cream); }
+.ck-bg-plum { background: var(--ck-plum); }
+.ck-bg-dark { background: var(--ck-plum-dark); }
+.ck-text-cream { color: var(--ck-cream); }
+.ck-text-champagne { color: var(--ck-champagne); }
+.hidden { display: none !important; }
+
+/* =============================================
+   ANNOUNCEMENT BAR
+   ============================================= */
+.ck-announce {
+  background: var(--ck-plum-dark);
+  padding: 9px var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.ck-announce-text {
+  font-size: 12px;
+  color: rgba(247,237,216,0.75);
+  letter-spacing: 0.06em;
+  text-align: center;
+  flex: 1;
+}
+.ck-announce-text strong { color: var(--ck-champagne); font-weight: 500; }
+.ck-announce-lang { display: flex; gap: var(--space-sm); }
+.lang-btn {
+  background: transparent;
+  border: 1px solid rgba(212,184,150,0.3);
+  color: rgba(247,237,216,0.6);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-body);
+  letter-spacing: 0.06em;
+  transition: var(--transition);
+}
+.lang-btn.active, .lang-btn:hover {
+  background: rgba(212,184,150,0.2);
+  border-color: var(--ck-champagne);
+  color: var(--ck-champagne);
+}
+
+/* =============================================
+   NAVIGATION
+   ============================================= */
+.ck-nav {
+  background: var(--ck-plum);
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xl);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(212,184,150,0.12);
+}
+.ck-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: 32px;
+}
+.ck-logo-img {
+  height: 72px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+.ck-logo-text {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--ck-cream);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  line-height: 1;
+}
+.ck-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  list-style: none;
+}
+.ck-nav-menu a {
+  color: rgba(247,237,216,0.7);
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: var(--transition);
+  font-weight: 400;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+}
+.ck-nav-menu a:hover {
+  color: var(--ck-cream);
+  border-bottom-color: var(--ck-champagne);
+}
+.ck-nav-actions { display: flex; align-items: center; gap: var(--space-md); }
+.ck-icon-btn {
+  background: none;
+  border: none;
+  color: rgba(247,237,216,0.8);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  position: relative;
+  transition: var(--transition);
+  line-height: 1;
+}
+.ck-icon-btn:hover { color: var(--ck-cream); }
+.ck-cart-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--ck-champagne);
+  color: var(--ck-plum-dark);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =============================================
+   HERO
+   ============================================= */
+.ck-hero {
+  background: var(--ck-plum-dark);
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: 55% 45%;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.ck-hero::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0;
+  width: 50%;
+  height: 100%;
+  background: rgba(46, 59, 31, 0.82);
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
+  z-index: 1;
+}
+.ck-hero-content {
+  padding: var(--space-2xl) var(--space-xl) var(--space-2xl) var(--space-2xl);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+.ck-hero-text { flex: 1; min-width: 0; }
+.ck-hero-logo-deco {
+  flex-shrink: 0;
+  width: 280px;
+  opacity: 1;
+  filter: brightness(0) invert(1);
+  pointer-events: none;
+  user-select: none;
+  align-self: center;
+}
+.ck-hero-eyebrow {
+  color: var(--ck-champagne);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-md);
+  font-weight: 400;
+}
+.ck-hero-title {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--ck-cream);
+  margin-bottom: var(--space-md);
+}
+.ck-hero-title em {
+  font-style: italic;
+  color: var(--ck-champagne);
+  display: block;
+}
+.ck-hero-title-ar {
+  font-family: var(--font-arabic);
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ck-cream);
+  margin-bottom: var(--space-md);
+  direction: rtl;
+}
+.ck-hero-sub {
+  color: rgba(247,237,216,0.65);
+  font-size: 14px;
+  margin-bottom: var(--space-xl);
+  max-width: 440px;
+  font-weight: 300;
+}
+.ck-hero-btns { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+.ck-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  font-family: var(--font-body);
+  text-decoration: none;
+}
+.ck-btn-primary {
+  background: var(--ck-champagne);
+  color: var(--ck-plum-dark);
+}
+.ck-btn-primary:hover { background: var(--ck-cream); }
+.ck-btn-ghost {
+  background: transparent;
+  color: var(--ck-cream);
+  border: 1px solid rgba(247,237,216,0.3);
+}
+.ck-btn-ghost:hover { border-color: var(--ck-champagne); color: var(--ck-champagne); }
+
+.ck-hero-visual {
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+.ck-hero-badge {
+  background: rgba(247,237,216,0.1);
+  border: 1px solid rgba(212,184,150,0.3);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  text-align: center;
+}
+.ck-hero-badge-num {
+  font-family: var(--font-display);
+  font-size: 64px;
+  color: var(--ck-champagne);
+  font-weight: 300;
+  line-height: 1;
+}
+.ck-hero-badge-label { color: rgba(247,237,216,0.5); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; }
+.ck-hero-visual { position: relative; z-index: 2; }
+.ck-customers-bg {
+  position: absolute;
+  right: 0; top: 0;
+  width: 50%;
+  height: 100%;
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
+  z-index: 0;
+  overflow: hidden;
+}
+.ck-cust-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 1.8s ease-in-out, transform 0s;
+}
+.ck-cust-img.active {
+  opacity: 1;
+  transform: scale(1.08);
+  transition: opacity 1.8s ease-in-out, transform 5s ease-out;
+}
+.ck-hero-badge { position: relative; z-index: 2; }
+
+/* =============================================
+   OCCASIONS STRIP
+   ============================================= */
+.ck-occasions-strip {
+  background: var(--ck-cream);
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--ck-champagne-lt);
+}
+.ck-occ-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ck-text-muted);
+  margin-bottom: var(--space-sm);
+}
+.ck-occ-row { display: flex; gap: var(--space-sm); overflow-x: auto; padding-bottom: var(--space-xs); }
+.ck-occ-row::-webkit-scrollbar { height: 2px; }
+.ck-occ-row::-webkit-scrollbar-thumb { background: var(--ck-plum-light); border-radius: 2px; }
+.ck-occ-tag {
+  white-space: nowrap;
+  background: white;
+  border: 1px solid rgba(46,59,31,0.15);
+  color: var(--ck-plum);
+  font-size: 12px;
+  padding: 6px 18px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 400;
+}
+.ck-occ-tag:hover, .ck-occ-tag.active {
+  background: var(--ck-plum);
+  color: var(--ck-cream);
+  border-color: var(--ck-plum);
+}
+
+/* =============================================
+   SECTION HEADERS
+   ============================================= */
+.ck-section-hd {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+}
+.ck-section-title-wrap {}
+.ck-section-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ck-champagne);
+  margin-bottom: 6px;
+}
+/* Override when on dark bg */
+.ck-bg-plum .ck-section-eyebrow,
+.ck-bg-dark .ck-section-eyebrow { color: var(--ck-champagne); }
+.ck-bg-cream .ck-section-eyebrow { color: var(--ck-plum-light); }
+.ck-section-h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--ck-plum-dark);
+  line-height: 1.2;
+}
+.ck-section-h2-ar {
+  font-family: var(--font-arabic);
+  font-size: 22px;
+  color: var(--ck-text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+  direction: rtl;
+}
+.ck-view-all {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ck-plum);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ck-champagne);
+  padding-bottom: 2px;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.ck-view-all:hover { color: var(--ck-plum-dark); }
+
+/* =============================================
+   PRODUCT CARDS
+   ============================================= */
+.ck-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-lg);
+}
+.ck-product-card {
+  background: white;
+  border: 1px solid rgba(46,59,31,0.1);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+.ck-product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(46,59,31,0.12);
+}
+.ck-product-thumb {
+  position: relative;
+  height: 240px;
+  background: var(--ck-plum-tint);
+  overflow: hidden;
+}
+.ck-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.ck-product-card:hover .ck-product-thumb img { transform: scale(1.05); }
+.ck-product-thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: var(--ck-plum-light);
+  opacity: 0.4;
+}
+
+/* Product badges */
+.ck-badge-wrap {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ck-badge {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  display: inline-block;
+  line-height: 1.5;
+}
+.ck-badge-new     { background: var(--ck-plum); color: var(--ck-cream); }
+.ck-badge-sale    { background: var(--ck-offer); color: white; }
+.ck-badge-popular { background: var(--ck-champagne); color: var(--ck-plum-dark); }
+.ck-badge-limited { background: var(--ck-plum-dark); color: var(--ck-cream); }
+.ck-badge-custom  { background: var(--ck-success); color: white; }
+
+.ck-product-wish {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid rgba(46,59,31,0.1);
+}
+.ck-product-wish:hover { background: var(--ck-plum-tint); }
+.ck-product-wish svg { width: 16px; height: 16px; stroke: var(--ck-plum); fill: none; }
+.ck-product-wish.wished svg { fill: var(--ck-plum); }
+
+.ck-product-info { padding: 14px var(--space-md); }
+.ck-product-cat {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ck-text-hint);
+  margin-bottom: 4px;
+}
+.ck-product-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ck-plum-dark);
+  margin-bottom: 2px;
+}
+.ck-product-name-ar {
+  font-family: var(--font-arabic);
+  font-size: 13px;
+  color: var(--ck-text-muted);
+  direction: rtl;
+  margin-bottom: var(--space-sm);
+}
+.ck-product-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+}
+.ck-price {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ck-plum);
+}
+.ck-price-old {
+  font-size: 12px;
+  color: var(--ck-text-hint);
+  text-decoration: line-through;
+  margin-left: 6px;
+}
+.ck-add-to-cart {
+  background: var(--ck-plum);
+  color: var(--ck-cream);
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  font-size: 18px;
+  line-height: 1;
+}
+.ck-add-to-cart:hover { background: var(--ck-plum-mid); }
+
+/* =============================================
+   FEATURES STRIP
+   ============================================= */
+.ck-features-strip {
+  background: var(--ck-plum);
+  padding: var(--space-xl);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-lg);
+}
+.ck-feature-item { text-align: center; }
+.ck-feature-icon {
+  font-size: 28px;
+  color: var(--ck-champagne);
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+.ck-feature-title {
+  font-size: 13px;
+  color: var(--ck-cream);
+  font-weight: 500;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+.ck-feature-sub { font-size: 11px; color: rgba(247,237,216,0.5); }
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.ck-footer {
+  background: var(--ck-plum-dark);
+  padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+}
+.ck-footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+.ck-footer-logo {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--ck-cream);
+  margin-bottom: var(--space-sm);
+}
+.ck-footer-tagline {
+  font-size: 13px;
+  color: rgba(247,237,216,0.45);
+  line-height: 1.7;
+  max-width: 260px;
+}
+.ck-footer-tagline-ar {
+  font-family: var(--font-arabic);
+  font-size: 14px;
+  color: rgba(247,237,216,0.35);
+  direction: rtl;
+  margin-top: var(--space-sm);
+}
+.ck-footer-col-title {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ck-champagne);
+  margin-bottom: var(--space-md);
+}
+.ck-footer-col a {
+  display: block;
+  color: rgba(247,237,216,0.5);
+  text-decoration: none;
+  font-size: 13px;
+  margin-bottom: 8px;
+  transition: var(--transition);
+}
+.ck-footer-col a:hover { color: var(--ck-cream); }
+.ck-footer-bottom {
+  border-top: 1px solid rgba(247,237,216,0.08);
+  padding-top: var(--space-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+.ck-footer-copy { font-size: 11px; color: rgba(247,237,216,0.25); }
+.ck-payment-badges { display: flex; gap: 6px; }
+.ck-pay-badge {
+  font-size: 9px;
+  padding: 3px 8px;
+  border: 1px solid rgba(247,237,216,0.12);
+  border-radius: 3px;
+  color: rgba(247,237,216,0.3);
+  letter-spacing: 0.08em;
+}
+
+/* =============================================
+   ADMIN PANEL
+   ============================================= */
+#adminSection { display: none; }
+#adminSection.active { display: block; }
+
+.ck-admin-wrapper {
+  min-height: 100vh;
+  background: #141F0C;
+  color: var(--ck-cream);
+  font-family: var(--font-body);
+}
+.ck-admin-nav {
+  background: #0D1508;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xl);
+  border-bottom: 1px solid rgba(200,184,138,0.1);
+}
+.ck-admin-brand {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ck-champagne);
+  letter-spacing: 0.08em;
+}
+.ck-admin-brand span { font-size: 11px; color: rgba(212,184,150,0.4); margin-left: 8px; letter-spacing: 0.12em; text-transform: uppercase; }
+.ck-admin-user { font-size: 12px; color: rgba(212,184,150,0.5); display: flex; align-items: center; gap: 8px; }
+
+.ck-admin-layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 56px); }
+
+.ck-admin-sidebar {
+  background: #111A09;
+  padding: var(--space-lg) 0;
+  border-right: 1px solid rgba(200,184,138,0.08);
+}
+.ck-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px var(--space-lg);
+  color: rgba(212,184,150,0.5);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 2px solid transparent;
+}
+.ck-sidebar-item:hover { color: var(--ck-champagne); background: rgba(212,184,150,0.05); }
+.ck-sidebar-item.active { color: var(--ck-champagne); border-left-color: var(--ck-champagne); background: rgba(212,184,150,0.06); }
+.ck-sidebar-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; flex-shrink: 0; }
+
+.ck-admin-main { padding: var(--space-xl); overflow-y: auto; }
+
+/* Admin stats */
+.ck-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+.ck-stat-card {
+  background: rgba(46,59,31,0.25);
+  border: 1px solid rgba(212,184,150,0.12);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+.ck-stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(212,184,150,0.4); margin-bottom: 6px; }
+.ck-stat-val { font-size: 24px; font-weight: 500; color: var(--ck-cream); font-family: var(--font-display); }
+.ck-stat-sub { font-size: 11px; color: var(--ck-success); margin-top: 2px; }
+
+/* Admin table */
+.ck-admin-panel-block {
+  background: rgba(46,59,31,0.15);
+  border: 1px solid rgba(212,184,150,0.1);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-xl);
+}
+.ck-panel-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(212,184,150,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ck-panel-title { font-size: 14px; font-weight: 500; color: var(--ck-champagne); letter-spacing: 0.04em; }
+.ck-admin-btn {
+  background: var(--ck-champagne);
+  color: var(--ck-plum-dark);
+  border: none;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ck-admin-btn:hover { background: var(--ck-cream); }
+.ck-admin-btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(212,184,150,0.25);
+  color: rgba(212,184,150,0.7);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: var(--transition);
+}
+.ck-admin-btn-ghost:hover { border-color: var(--ck-champagne); color: var(--ck-champagne); }
+.ck-admin-btn-danger {
+  background: rgba(160,48,48,0.3);
+  border: 1px solid rgba(160,48,48,0.4);
+  color: #F5A0A0;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: var(--transition);
+}
+
+/* Product table */
+.ck-product-table { width: 100%; border-collapse: collapse; }
+.ck-product-table th {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212,184,150,0.4);
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-bottom: 1px solid rgba(212,184,150,0.08);
+}
+.ck-product-table td {
+  padding: 12px var(--space-md);
+  font-size: 13px;
+  color: rgba(247,237,216,0.8);
+  border-bottom: 1px solid rgba(212,184,150,0.06);
+  vertical-align: middle;
+}
+.ck-product-table tr:hover td { background: rgba(212,184,150,0.04); }
+.ck-product-table tr:last-child td { border-bottom: none; }
+.ck-table-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  background: rgba(46,59,31,0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ck-plum-light);
+  font-size: 20px;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.ck-stock-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.ck-stock-in { background: var(--ck-success); }
+.ck-stock-low { background: #C08030; }
+.ck-stock-out { background: var(--ck-danger); }
+.ck-table-actions { display: flex; gap: 6px; }
+
+/* Modal / Form */
+.ck-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,4,8,0.75);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+.ck-modal-overlay.open { display: flex; }
+.ck-modal {
+  background: #1F0E18;
+  border: 1px solid rgba(212,184,150,0.15);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.ck-modal-head {
+  padding: var(--space-lg);
+  border-bottom: 1px solid rgba(212,184,150,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ck-modal-title { font-size: 16px; color: var(--ck-champagne); font-family: var(--font-display); font-weight: 400; }
+.ck-modal-close { background: none; border: none; color: rgba(212,184,150,0.4); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
+.ck-modal-close:hover { color: var(--ck-champagne); }
+.ck-modal-body { padding: var(--space-lg); }
+.ck-modal-footer { padding: var(--space-md) var(--space-lg); border-top: 1px solid rgba(212,184,150,0.1); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Form fields */
+.ck-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-md); }
+.ck-form-row.full { grid-template-columns: 1fr; }
+.ck-form-group { display: flex; flex-direction: column; gap: 5px; }
+.ck-form-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212,184,150,0.5);
+}
+.ck-form-label span { color: rgba(160,48,48,0.8); margin-left: 2px; }
+.ck-input, .ck-select, .ck-textarea {
+  background: rgba(46,59,31,0.2);
+  border: 1px solid rgba(212,184,150,0.15);
+  border-radius: var(--radius-sm);
+  color: var(--ck-cream);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 9px 12px;
+  transition: var(--transition);
+  outline: none;
+  width: 100%;
+}
+.ck-input:focus, .ck-select:focus, .ck-textarea:focus {
+  border-color: var(--ck-champagne);
+  background: rgba(46,59,31,0.3);
+}
+.ck-select { cursor: pointer; }
+.ck-select option { background: #1F0E18; }
+.ck-textarea { min-height: 80px; resize: vertical; }
+
+/* Badge selector */
+.ck-badge-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.ck-badge-opt {
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid rgba(212,184,150,0.15);
+  color: rgba(212,184,150,0.5);
+  background: transparent;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.ck-badge-opt.selected { border-color: var(--ck-champagne); color: var(--ck-champagne); background: rgba(212,184,150,0.1); }
+.ck-badge-opt[data-val="new"].selected { background: var(--ck-plum); color: var(--ck-cream); border-color: var(--ck-plum); }
+.ck-badge-opt[data-val="sale"].selected { background: var(--ck-offer); color: white; border-color: var(--ck-offer); }
+.ck-badge-opt[data-val="popular"].selected { background: var(--ck-champagne); color: var(--ck-plum-dark); border-color: var(--ck-champagne); }
+
+/* Image upload */
+.ck-img-upload {
+  border: 1px dashed rgba(212,184,150,0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.ck-img-upload:hover { border-color: var(--ck-champagne); background: rgba(212,184,150,0.04); }
+.ck-img-upload input { display: none; }
+.ck-img-upload-icon { font-size: 28px; color: rgba(212,184,150,0.3); margin-bottom: 6px; }
+.ck-img-upload-text { font-size: 12px; color: rgba(212,184,150,0.4); }
+.ck-img-preview { width: 100%; height: 140px; object-fit: cover; border-radius: var(--radius-md); margin-top: 8px; display: none; }
+
+/* Login */
+.ck-login-screen {
+  min-height: 100vh;
+  background: var(--ck-plum-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ck-login-card {
+  background: #1F0E18;
+  border: 1px solid rgba(212,184,150,0.12);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-xl);
+  width: 100%;
+  max-width: 380px;
+}
+.ck-login-logo {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+.ck-login-logo-text {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--ck-cream);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+}
+.ck-login-sub { font-size: 12px; color: rgba(212,184,150,0.4); letter-spacing: 0.08em; margin-top: 4px; }
+.ck-login-err { color: #F5A0A0; font-size: 12px; margin-top: 8px; text-align: center; display: none; }
+.ck-login-err.show { display: block; }
+
+/* Toast */
+.ck-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ck-plum-dark);
+  color: var(--ck-cream);
+  border: 1px solid rgba(212,184,150,0.2);
+  padding: 11px 22px;
+  border-radius: 4px;
+  font-size: 13px;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ck-toast.show { transform: translateX(-50%) translateY(0); }
+.ck-toast-success { border-color: rgba(74,124,89,0.4); }
+
+/* =============================================
+   CART DRAWER
+   ============================================= */
+.ck-drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(42,21,32,0.5);
+  z-index: 200;
+}
+.ck-drawer-overlay.open { display: block; }
+.ck-cart-drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 340px;
+  height: 100%;
+  background: white;
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(46,59,31,0.12);
+}
+.ck-cart-drawer.open { transform: translateX(0); }
+.ck-cart-drawer-head {
+  background: var(--ck-plum);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ck-cart-drawer-title { color: var(--ck-cream); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ck-cart-close { background: none; border: none; color: rgba(247,237,216,0.7); font-size: 20px; cursor: pointer; line-height: 1; }
+.ck-cart-list { flex: 1; overflow-y: auto; padding: var(--space-md); }
+.ck-cart-entry {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(46,59,31,0.08);
+}
+.ck-cart-entry-img {
+  width: 58px;
+  height: 58px;
+  background: var(--ck-plum-tint);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--ck-plum-light);
+  flex-shrink: 0;
+}
+.ck-cart-entry-name { font-size: 13px; font-weight: 500; color: var(--ck-plum-dark); }
+.ck-cart-entry-price { font-size: 12px; color: var(--ck-plum); margin-top: 3px; }
+.ck-cart-entry-rm { font-size: 11px; color: var(--ck-text-hint); cursor: pointer; margin-top: 4px; }
+.ck-cart-entry-rm:hover { color: var(--ck-danger); }
+.ck-cart-footer { padding: var(--space-md) var(--space-lg); border-top: 1px solid rgba(46,59,31,0.1); }
+.ck-cart-total-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--ck-plum-dark); margin-bottom: var(--space-md); }
+.ck-checkout-btn {
+  width: 100%;
+  background: var(--ck-plum);
+  color: var(--ck-cream);
+  border: none;
+  padding: 14px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: var(--transition);
+}
+.ck-checkout-btn:hover { background: var(--ck-plum-mid); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ck-hero { grid-template-columns: 1fr; }
+  .ck-hero::after { display: none; }
+  .ck-hero-title { font-size: 36px; }
+  .ck-nav-menu { display: none; }
+  .ck-footer-grid { grid-template-columns: 1fr 1fr; }
+  .ck-admin-layout { grid-template-columns: 1fr; }
+  .ck-admin-sidebar { display: none; }
+  .ck-form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== STOREFRONT ========== -->
+<div id="storeSection">
+  <div class="ck-announce">
+    <div class="ck-announce-lang">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('ar')">عربي</button>
+    </div>
+    <div class="ck-announce-text" id="announceText">
+      🌸 <strong>Free delivery</strong> within Dubai on orders over AED 300 &nbsp;|&nbsp; Same-day delivery available until 4pm
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="lang-btn" onclick="showAdminLogin()" style="font-size:10px;">⚙ Admin</button>
+    </div>
+  </div>
+
+  <nav class="ck-nav">
+    <a href="#" class="ck-logo">
+      <img src="Images/logo-2-transparent.png" alt="Calla Kallos" class="ck-logo-img">
+    </a>
+    <ul class="ck-nav-menu">
+      <li><a href="#section-shop" data-en="Shop" data-ar="تسوق">Shop</a></li>
+      <li><a href="#section-occasions" data-en="Occasions" data-ar="المناسبات">Occasions</a></li>
+      <li><a href="#section-about" data-en="About" data-ar="عن المتجر">About</a></li>
+      <li><a href="#section-contact" data-en="Contact" data-ar="تواصل">Contact</a></li>
+    </ul>
+    <div class="ck-nav-actions">
+      <button class="ck-icon-btn" aria-label="Search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+      </button>
+      <button class="ck-icon-btn" aria-label="Wishlist">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <button class="ck-icon-btn" onclick="toggleCart()" aria-label="Cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="ck-cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="ck-hero">
+    <div class="ck-customers-bg">
+      <img src="Images/C1.jpg" alt="" class="ck-cust-img">
+      <img src="Images/C2.jpg" alt="" class="ck-cust-img">
+      <img src="Images/C3.jpg" alt="" class="ck-cust-img">
+      <img src="Images/C4.jpg" alt="" class="ck-cust-img">
+      <img src="Images/C5.jpg" alt="" class="ck-cust-img">
+    </div>
+    <div class="ck-hero-content">
+      <div class="ck-hero-text">
+        <p class="ck-hero-eyebrow" data-en="✦ Dubai's Luxury Florist" data-ar="✦ فلوريست دبي الفاخر">✦ Dubai's Luxury Florist</p>
+        <h1 class="ck-hero-title" id="heroTitle">Every bloom,<br><em>a story to tell.</em></h1>
+        <h1 class="ck-hero-title-ar" id="heroTitleAr" style="display:none">كل زهرة<br><em style="font-style:normal;color:var(--ck-champagne)">تحكي قصة</em></h1>
+        <p class="ck-hero-sub" id="heroSub">Handcrafted floral arrangements for weddings, gifting, and every cherished moment — delivered across Dubai with same-day care.</p>
+        <div class="ck-hero-btns">
+          <button class="ck-btn ck-btn-primary" data-en="Shop Collection →" data-ar="تسوق الآن ←">Shop Collection →</button>
+          <button class="ck-btn ck-btn-ghost" data-en="Custom Orders" data-ar="طلب مخصص">Custom Orders</button>
+        </div>
+      </div>
+      <img src="Images/logo-2-transparent.png" alt="" class="ck-hero-logo-deco">
+    </div>
+    <div class="ck-hero-visual">
+      <div class="ck-hero-badge">
+        <div class="ck-hero-badge-num">500+</div>
+        <div class="ck-hero-badge-label" data-en="Happy Customers Weekly" data-ar="عميل سعيد أسبوعياً">Happy Customers Weekly</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ck-occasions-strip" id="section-occasions">
+    <div class="ck-occ-label" data-en="Shop by Occasion" data-ar="تسوق حسب المناسبة">Shop by Occasion</div>
+    <div class="ck-occ-row" id="occRow">
+      <div class="ck-occ-tag active" data-en="All" data-ar="الكل">All</div>
+      <div class="ck-occ-tag" data-en="Anniversary" data-ar="ذكرى سنوية">Anniversary</div>
+      <div class="ck-occ-tag" data-en="Birthday" data-ar="عيد ميلاد">Birthday</div>
+      <div class="ck-occ-tag" data-en="Wedding" data-ar="زفاف">Wedding</div>
+      <div class="ck-occ-tag" data-en="Valentine's Day" data-ar="عيد الحب">Valentine's Day</div>
+      <div class="ck-occ-tag" data-en="Graduation" data-ar="تخرج">Graduation</div>
+      <div class="ck-occ-tag" data-en="Eid Special" data-ar="عيد خاص">Eid Special</div>
+      <div class="ck-occ-tag" data-en="Baby Shower" data-ar="استقبال المولود">Baby Shower</div>
+      <div class="ck-occ-tag" data-en="Sympathy" data-ar="تعازي">Sympathy</div>
+      <div class="ck-occ-tag" data-en="Corporate" data-ar="شركات">Corporate</div>
+    </div>
+  </div>
+
+  <section id="section-shop" style="padding: 48px 40px; background: var(--ck-ivory);">
+    <div class="ck-section-hd">
+      <div class="ck-section-title-wrap">
+        <div class="ck-section-eyebrow" style="color:var(--ck-plum-light);" data-en="Freshly Arranged" data-ar="معروضنا المميز">Freshly Arranged</div>
+        <h2 class="ck-section-h2" data-en="Best Sellers" data-ar="الأكثر مبيعاً">Best Sellers</h2>
+        <div class="ck-section-h2-ar" id="bestSellerAr" style="display:none">الأكثر مبيعاً هذا الأسبوع</div>
+      </div>
+      <a href="#" class="ck-view-all" data-en="View all products →" data-ar="عرض كل المنتجات ←">View all products →</a>
+    </div>
+    <div class="ck-products-grid" id="productsGrid">
+      <!-- Products rendered by JS -->
+    </div>
+  </section>
+
+  <div class="ck-features-strip">
+    <div class="ck-feature-item">
+      <span class="ck-feature-icon">🚚</span>
+      <div class="ck-feature-title" data-en="Same-Day Delivery" data-ar="توصيل في نفس اليوم">Same-Day Delivery</div>
+      <div class="ck-feature-sub" data-en="Dubai-wide, 3hr windows" data-ar="دبي كاملة، نافذة 3 ساعات">Dubai-wide, 3hr windows</div>
+    </div>
+    <div class="ck-feature-item">
+      <span class="ck-feature-icon">🌸</span>
+      <div class="ck-feature-title" data-en="100% Fresh Blooms" data-ar="زهور طازجة 100٪">100% Fresh Blooms</div>
+      <div class="ck-feature-sub" data-en="Sourced daily, quality guaranteed" data-ar="مصدرها يومي، جودة مضمونة">Sourced daily, quality guaranteed</div>
+    </div>
+    <div class="ck-feature-item">
+      <span class="ck-feature-icon">🎀</span>
+      <div class="ck-feature-title" data-en="Custom Arrangements" data-ar="تنسيقات مخصصة">Custom Arrangements</div>
+      <div class="ck-feature-sub" data-en="Bespoke to your vision" data-ar="مصممة حسب رؤيتك">Bespoke to your vision</div>
+    </div>
+    <div class="ck-feature-item">
+      <span class="ck-feature-icon">🔒</span>
+      <div class="ck-feature-title" data-en="Secure Payments" data-ar="مدفوعات آمنة">Secure Payments</div>
+      <div class="ck-feature-sub" data-en="Visa, MC, Apple Pay, COD" data-ar="فيزا، ماستر، آبل باي، كاش">Visa, MC, Apple Pay, COD</div>
+    </div>
+  </div>
+
+  <!-- ========== ABOUT SECTION ========== -->
+  <section id="section-about" style="background:var(--ck-plum-dark);padding:72px 40px;">
+    <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;">
+      <div>
+        <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ck-champagne);margin-bottom:14px;">Our Story</div>
+        <h2 style="font-family:var(--font-display);font-size:40px;font-weight:300;color:var(--ck-cream);line-height:1.2;margin-bottom:20px;">Blooms crafted<br><em style="color:var(--ck-champagne);font-style:italic;">with intention.</em></h2>
+        <p style="color:rgba(247,237,216,0.65);font-size:14px;line-height:1.8;margin-bottom:16px;">Calla Kallos was born from a love of beauty and a belief that flowers have the power to speak what words cannot. Based in the heart of Dubai, we design every arrangement as a unique work of art — thoughtfully composed, impeccably wrapped, and delivered with same-day care.</p>
+        <p style="color:rgba(247,237,216,0.65);font-size:14px;line-height:1.8;margin-bottom:28px;">From intimate gifting moments to grand wedding installations, our team brings your vision to life using the freshest seasonal blooms sourced daily from trusted growers worldwide.</p>
+        <a href="#section-shop" style="display:inline-block;background:var(--ck-champagne);color:var(--ck-plum-dark);padding:12px 28px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border-radius:2px;font-family:var(--font-body);font-weight:500;">Explore Our Collection</a>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:rgba(212,184,150,0.08);border:1px solid rgba(212,184,150,0.15);border-radius:6px;padding:28px 20px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:42px;font-weight:300;color:var(--ck-champagne);">500+</div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,237,216,0.45);margin-top:6px;">Happy Customers Weekly</div>
+        </div>
+        <div style="background:rgba(212,184,150,0.08);border:1px solid rgba(212,184,150,0.15);border-radius:6px;padding:28px 20px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:42px;font-weight:300;color:var(--ck-champagne);">5★</div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,237,216,0.45);margin-top:6px;">Google & Instagram Rating</div>
+        </div>
+        <div style="background:rgba(212,184,150,0.08);border:1px solid rgba(212,184,150,0.15);border-radius:6px;padding:28px 20px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:42px;font-weight:300;color:var(--ck-champagne);">3hr</div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,237,216,0.45);margin-top:6px;">Same-Day Delivery Windows</div>
+        </div>
+        <div style="background:rgba(212,184,150,0.08);border:1px solid rgba(212,184,150,0.15);border-radius:6px;padding:28px 20px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:42px;font-weight:300;color:var(--ck-champagne);">100%</div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,237,216,0.45);margin-top:6px;">Fresh Blooms, Every Order</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CONTACT SECTION ========== -->
+  <section id="section-contact" style="background:var(--ck-cream);padding:72px 40px;">
+    <div style="max-width:900px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:48px;">
+        <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ck-plum-light);margin-bottom:12px;">Get In Touch</div>
+        <h2 style="font-family:var(--font-display);font-size:40px;font-weight:300;color:var(--ck-plum-dark);">We'd love to hear from you</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+        <!-- Contact Details -->
+        <div>
+          <h3 style="font-family:var(--font-display);font-size:20px;font-weight:400;color:var(--ck-plum-dark);margin-bottom:20px;">Contact Details</h3>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;align-items:center;gap:12px;color:var(--ck-text-muted);font-size:14px;">
+              <span style="width:36px;height:36px;background:var(--ck-plum-tint);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">📍</span>
+              <span>Dubai, United Arab Emirates</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px;">
+              <span style="width:36px;height:36px;background:var(--ck-plum-tint);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">📞</span>
+              <a id="contactPhone" href="#" style="color:var(--ck-plum);text-decoration:none;">+971 XX XXX XXXX</a>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px;">
+              <span style="width:36px;height:36px;background:var(--ck-plum-tint);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✉</span>
+              <a id="contactEmail" href="#" style="color:var(--ck-plum);text-decoration:none;">hello@callakallos.com</a>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px;">
+              <span style="width:36px;height:36px;background:var(--ck-plum-tint);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">💬</span>
+              <a id="contactWhatsapp" href="#" style="color:var(--ck-plum);text-decoration:none;">WhatsApp Orders</a>
+            </div>
+          </div>
+          <div style="margin-top:28px;padding:20px;background:var(--ck-plum-tint);border-radius:6px;">
+            <div style="font-size:12px;font-weight:500;color:var(--ck-plum-dark);letter-spacing:.05em;margin-bottom:6px;">DELIVERY HOURS</div>
+            <div style="font-size:13px;color:var(--ck-text-muted);line-height:1.7;">Mon – Sat: 9:00 AM – 8:00 PM<br>Sunday: 10:00 AM – 6:00 PM<br>Same-day orders accepted until 4:00 PM</div>
+          </div>
+        </div>
+        <!-- Contact Form -->
+        <div>
+          <h3 style="font-family:var(--font-display);font-size:20px;font-weight:400;color:var(--ck-plum-dark);margin-bottom:20px;">Send a Message</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <input class="ck-input" placeholder="Your Name" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
+            <input class="ck-input" placeholder="Email or Phone" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
+            <select class="ck-select" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);padding:10px 14px;">
+              <option value="">What are you enquiring about?</option>
+              <option>Custom Arrangement</option>
+              <option>Wedding / Event</option>
+              <option>Corporate Order</option>
+              <option>Delivery Query</option>
+              <option>Other</option>
+            </select>
+            <textarea class="ck-textarea" placeholder="Your message…" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);min-height:100px;"></textarea>
+            <button class="ck-btn ck-btn-primary" onclick="toast('Message sent! We\'ll be in touch shortly ✓')" style="width:100%;justify-content:center;">Send Message →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="ck-footer">
+    <div class="ck-footer-grid">
+      <div>
+        <div class="ck-footer-logo">Calla Kallos</div>
+        <p class="ck-footer-tagline" data-en="Luxury floral arrangements crafted with love, delivered across Dubai." data-ar="">Luxury floral arrangements crafted with love, delivered across Dubai.</p>
+        <p class="ck-footer-tagline-ar" id="footerTagAr" style="display:none">تنسيقات زهور فاخرة تُصنع بحب وتُوصَّل عبر دبي</p>
+      </div>
+      <div class="ck-footer-col">
+        <div class="ck-footer-col-title" data-en="Shop" data-ar="تسوق">Shop</div>
+        <a href="#" data-en="Hand Bouquets" data-ar="باقات يدوية">Hand Bouquets</a>
+        <a href="#" data-en="Gift Hampers" data-ar="سلات هدايا">Gift Hampers</a>
+        <a href="#" data-en="Box Flowers" data-ar="زهور في صناديق">Box Flowers</a>
+        <a href="#" data-en="Wedding Flowers" data-ar="زهور الأفراح">Wedding Flowers</a>
+        <a href="#" data-en="Corporate" data-ar="شركات">Corporate</a>
+      </div>
+      <div class="ck-footer-col">
+        <div class="ck-footer-col-title" data-en="Occasions" data-ar="المناسبات">Occasions</div>
+        <a href="#" data-en="Anniversary" data-ar="ذكرى سنوية">Anniversary</a>
+        <a href="#" data-en="Birthday" data-ar="عيد ميلاد">Birthday</a>
+        <a href="#" data-en="Valentine's" data-ar="عيد الحب">Valentine's</a>
+        <a href="#" data-en="Eid Special" data-ar="عيد خاص">Eid Special</a>
+        <a href="#" data-en="Sympathy" data-ar="تعازي">Sympathy</a>
+      </div>
+      <div class="ck-footer-col">
+        <div class="ck-footer-col-title" data-en="Contact" data-ar="تواصل معنا">Contact</div>
+        <a href="#">📍 Dubai, UAE</a>
+        <a href="#" id="footerPhone">📞 +971 XX XXX XXXX</a>
+        <a href="#" id="footerEmail">✉ hello@callakallos.com</a>
+        <a href="#" data-en="Instagram" data-ar="إنستغرام">Instagram</a>
+        <a href="#" id="footerWhatsapp" data-en="WhatsApp Orders" data-ar="طلبات واتساب">WhatsApp Orders</a>
+      </div>
+    </div>
+    <div class="ck-footer-bottom">
+      <span class="ck-footer-copy" id="footerCopy">© 2025 Calla Kallos — All rights reserved.</span>
+      <div class="ck-payment-badges">
+        <span class="ck-pay-badge">VISA</span>
+        <span class="ck-pay-badge">MC</span>
+        <span class="ck-pay-badge">AMEX</span>
+        <span class="ck-pay-badge">APPLE PAY</span>
+        <span class="ck-pay-badge">COD</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ========== ADMIN LOGIN ========== -->
+<div id="loginSection" style="display:none;">
+  <div class="ck-login-screen">
+    <div class="ck-login-card">
+      <div class="ck-login-logo">
+        <div class="ck-login-logo-text">Calla Kallos</div>
+        <div class="ck-login-sub">ADMIN PORTAL</div>
+      </div>
+      <div class="ck-form-group" style="margin-bottom:14px;">
+        <label class="ck-form-label">Username</label>
+        <input class="ck-input" id="loginUser" type="text" placeholder="admin">
+      </div>
+      <div class="ck-form-group" style="margin-bottom:20px;">
+        <label class="ck-form-label">Password</label>
+        <input class="ck-input" id="loginPass" type="password" placeholder="••••••••">
+      </div>
+      <button class="ck-admin-btn" onclick="doLogin()" style="width:100%;justify-content:center;padding:12px;">Sign In</button>
+      <div class="ck-login-err" id="loginErr">Incorrect username or password</div>
+      <div style="margin-top:16px;text-align:center;">
+        <button onclick="showStore()" style="background:none;border:none;color:rgba(212,184,150,0.35);font-size:12px;cursor:pointer;">← Back to store</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN DASHBOARD ========== -->
+<div id="adminSection">
+  <div class="ck-admin-wrapper">
+    <div class="ck-admin-nav">
+      <div class="ck-admin-brand">Calla Kallos <span>Admin</span></div>
+      <div class="ck-admin-user">
+        Rinu Kurian &nbsp;|&nbsp;
+        <button onclick="showStore()" style="background:none;border:1px solid rgba(212,184,150,0.2);color:rgba(212,184,150,0.5);font-size:11px;padding:4px 10px;border-radius:2px;cursor:pointer;">View Store</button>
+        <button onclick="showStore()" style="background:none;border:none;color:rgba(212,184,150,0.35);font-size:11px;cursor:pointer;margin-left:4px;">Logout</button>
+      </div>
+    </div>
+    <div class="ck-admin-layout">
+      <div class="ck-admin-sidebar">
+        <div class="ck-sidebar-item active" onclick="adminTab('dashboard')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="ck-sidebar-item" onclick="adminTab('products')">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 17l-6.5 3.5 2-7L2 9h7z"/></svg>
+          Products
+        </div>
+        <div class="ck-sidebar-item" onclick="adminTab('offers')">
+          <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Offers & Badges
+        </div>
+        <div class="ck-sidebar-item" onclick="adminTab('orders')">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+          Orders
+        </div>
+        <div class="ck-sidebar-item" onclick="adminTab('settings')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Settings
+        </div>
+      </div>
+      <div class="ck-admin-main" id="adminMain">
+        <!-- content inserted by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cart Drawer -->
+<div class="ck-drawer-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="ck-cart-drawer" id="cartDrawer">
+  <div class="ck-cart-drawer-head">
+    <span class="ck-cart-drawer-title" id="cartTitle">YOUR CART</span>
+    <button class="ck-cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="ck-cart-list" id="cartList"></div>
+  <div class="ck-cart-footer">
+    <div class="ck-cart-total-row">
+      <span id="cartTotalLabel">Total</span>
+      <span id="cartTotalVal">AED 0</span>
+    </div>
+    <button class="ck-checkout-btn" id="checkoutBtn">Proceed to Checkout →</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="ck-toast" id="toast"></div>
+
+<!-- Add/Edit Product Modal -->
+<div class="ck-modal-overlay" id="productModal">
+  <div class="ck-modal">
+    <div class="ck-modal-head">
+      <span class="ck-modal-title" id="modalTitle">Add New Product</span>
+      <button class="ck-modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="ck-modal-body">
+      <div style="margin-bottom:16px;">
+        <label class="ck-form-label">Product Image</label>
+        <div class="ck-img-upload" onclick="document.getElementById('imgInput').click()">
+          <input type="file" id="imgInput" accept="image/*" onchange="previewImg(this)">
+          <div class="ck-img-upload-icon">📷</div>
+          <div class="ck-img-upload-text">Click to upload product photo (JPG, PNG)</div>
+          <img id="imgPreview" class="ck-img-preview" alt="Preview">
+        </div>
+      </div>
+      <div class="ck-form-row">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Product Name (English) <span>*</span></label>
+          <input class="ck-input" id="fldName" placeholder="Rose Velvet Luxe">
+        </div>
+        <div class="ck-form-group">
+          <label class="ck-form-label">اسم المنتج (عربي)</label>
+          <input class="ck-input" id="fldNameAr" placeholder="باقة الورود الفاخرة" style="direction:rtl;">
+        </div>
+      </div>
+      <div class="ck-form-row full">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Description (English)</label>
+          <textarea class="ck-textarea" id="fldDesc" placeholder="A luxurious hand-tied bouquet…"></textarea>
+        </div>
+      </div>
+      <div class="ck-form-row full">
+        <div class="ck-form-group">
+          <label class="ck-form-label">وصف المنتج (عربي)</label>
+          <textarea class="ck-textarea" id="fldDescAr" placeholder="باقة فاخرة مربوطة يدوياً…" style="direction:rtl;"></textarea>
+        </div>
+      </div>
+      <div class="ck-form-row">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Price (AED) <span>*</span></label>
+          <input class="ck-input" id="fldPrice" type="number" placeholder="350">
+        </div>
+        <div class="ck-form-group">
+          <label class="ck-form-label">Compare-at Price (AED)</label>
+          <input class="ck-input" id="fldOldPrice" type="number" placeholder="420 (for sale display)">
+        </div>
+      </div>
+      <div class="ck-form-row">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Category <span>*</span></label>
+          <select class="ck-select" id="fldCat">
+            <option value="">— Select —</option>
+            <option>Hand Bouquet</option>
+            <option>Box of Flowers</option>
+            <option>Exotic Flowers</option>
+            <option>Gift Hamper</option>
+            <option>Flower Vase</option>
+            <option>Premium Luxury</option>
+            <option>Wedding Flowers</option>
+          </select>
+        </div>
+        <div class="ck-form-group">
+          <label class="ck-form-label">Occasion</label>
+          <select class="ck-select" id="fldOcc">
+            <option value="">— Select —</option>
+            <option>Anniversary</option>
+            <option>Birthday</option>
+            <option>Wedding</option>
+            <option>Valentine's Day</option>
+            <option>Graduation</option>
+            <option>Eid Special</option>
+            <option>Baby Shower</option>
+            <option>Corporate</option>
+          </select>
+        </div>
+      </div>
+      <div class="ck-form-group" style="margin-bottom:14px;">
+        <label class="ck-form-label">Product Badges / Offer Tags</label>
+        <div class="ck-badge-selector" id="badgeSelector">
+          <button class="ck-badge-opt" data-val="new" onclick="toggleBadge(this)">🆕 New Arrival</button>
+          <button class="ck-badge-opt" data-val="popular" onclick="toggleBadge(this)">⭐ Best Seller</button>
+          <button class="ck-badge-opt" data-val="sale" onclick="toggleBadge(this)">🏷 On Sale</button>
+          <button class="ck-badge-opt" data-val="limited" onclick="toggleBadge(this)">⏳ Limited</button>
+          <button class="ck-badge-opt" data-val="custom" onclick="toggleBadge(this)">✏ Custom Order</button>
+        </div>
+      </div>
+      <input type="hidden" id="editIdx" value="-1">
+    </div>
+    <div class="ck-modal-footer">
+      <button class="ck-admin-btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="ck-admin-btn" onclick="saveProduct()">💾 Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  DATA STORE
+// ============================================================
+let lang = 'en';
+let cart = [];
+let products = [
+  { id:1, name:'Rose Velvet Luxe', nameAr:'باقة الورود المخملية', cat:'Hand Bouquet', occ:'Anniversary', price:350, oldPrice:420, badges:['popular'], emoji:'🌹', stock:'in', desc:'A sumptuous hand-tied bouquet of deep burgundy roses, wrapped in signature plum packaging with a champagne satin ribbon.', descAr:'باقة ورد بورجندي فاخرة مربوطة يدوياً' },
+  { id:2, name:'Calla Blanc Elegance', nameAr:'أناقة كالا البيضاء', cat:'Exotic Flowers', occ:'Wedding', price:420, oldPrice:null, badges:[], emoji:'🤍', stock:'in', desc:'Pristine white calla lilies arranged with sculptural elegance. Perfect for weddings and luxury gifting.', descAr:'زنبق كالا أبيض نقي' },
+  { id:3, name:'Peony Blush Gift Box', nameAr:'صندوق الفاوانيا الوردي', cat:'Box of Flowers', occ:'Birthday', price:380, oldPrice:null, badges:['new'], emoji:'💝', stock:'in', desc:'Soft pink peonies nestled in our signature deep plum gift box, tied with a champagne bow.', descAr:'فاوانيا وردية ناعمة في صندوق هدايا' },
+  { id:4, name:'Midnight Garden Bouquet', nameAr:'باقة حديقة الليل', cat:'Premium Luxury', occ:'Anniversary', price:495, oldPrice:null, badges:['limited'], emoji:'💜', stock:'low', desc:'An opulent arrangement of dark roses and seasonal blooms in dramatic deep tones. A statement piece.', descAr:'تنسيق فاخر من الورود الداكنة' },
+];
+let nextId = 5;
+
+let orders = [
+  { id:1042, date:'2026-06-18', time:'14:30', customer:'Ahmed Khalid',     email:'ahmed.k@gmail.com',   phone:'+971 50 123 4567', product:'Rose Velvet Luxe',        amount:350, location:'Dubai Marina, Marina Walk, Villa 12',          status:'Delivered',  orderCount:5 },
+  { id:1041, date:'2026-06-18', time:'11:15', customer:'Sara Mohammed',    email:'sara.m@hotmail.com',  phone:'+971 50 987 6543', product:'Peony Blush Gift Box',    amount:380, location:'Jumeirah 2, Beach Road, Apt 4B',                status:'In Transit', orderCount:7 },
+  { id:1040, date:'2026-06-17', time:'16:45', customer:'Priya Raj',        email:'priya.r@gmail.com',   phone:'+971 50 112 2334', product:'Midnight Garden Bouquet', amount:495, location:'Downtown Dubai, Burj Khalifa Area, Tower 2',    status:'Preparing',  orderCount:1 },
+  { id:1039, date:'2026-06-17', time:'09:20', customer:'Maria Lopez',      email:'maria.l@gmail.com',   phone:'+971 50 765 4321', product:'Calla Blanc Elegance',    amount:420, location:'Business Bay, Executive Towers, Block C',       status:'Delivered',  orderCount:3 },
+  { id:1038, date:'2026-06-16', time:'13:00', customer:'Fatima Al Zaabi',  email:'fatima.z@icloud.com', phone:'+971 55 234 5678', product:'Rose Velvet Luxe',        amount:350, location:'Al Barsha, Mall of Emirates area, Villa 7',     status:'Delivered',  orderCount:4 },
+  { id:1037, date:'2026-06-16', time:'10:30', customer:'Ahmed Khalid',     email:'ahmed.k@gmail.com',   phone:'+971 50 123 4567', product:'Peony Blush Gift Box',    amount:380, location:'Dubai Marina, Marina Walk, Villa 12',          status:'Delivered',  orderCount:5 },
+  { id:1036, date:'2026-06-15', time:'09:00', customer:'Lina Nasser',      email:'lina.n@gmail.com',    phone:'+971 52 345 6789', product:'Midnight Garden Bouquet', amount:495, location:'Mirdif, Uptown Mirdif, Apt 301',               status:'Delivered',  orderCount:2 },
+  { id:1035, date:'2026-06-14', time:'15:20', customer:'Sara Mohammed',    email:'sara.m@hotmail.com',  phone:'+971 50 987 6543', product:'Rose Velvet Luxe',        amount:350, location:'Jumeirah 2, Beach Road, Apt 4B',                status:'Delivered',  orderCount:7 },
+];
+let regularOffers = {};  // keyed by email
+
+// ============================================================
+//  LANGUAGE
+// ============================================================
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (l==='en'?'EN':'عربي')));
+  document.querySelectorAll('[data-en]').forEach(el => {
+    if (el.tagName === 'INPUT' || el.tagName === 'BUTTON') el.textContent = l==='en' ? el.dataset.en : el.dataset.ar;
+    else el.textContent = l==='en' ? el.dataset.en : el.dataset.ar;
+  });
+  // Toggle hero
+  document.getElementById('heroTitle').style.display = l==='en'?'block':'none';
+  document.getElementById('heroTitleAr').style.display = l==='ar'?'block':'none';
+  document.getElementById('heroSub').textContent = l==='en'
+    ? 'Handcrafted floral arrangements for weddings, gifting, and every cherished moment — delivered across Dubai with same-day care.'
+    : 'تنسيقات زهور مصنوعة يدوياً للأفراح والهدايا وكل لحظة عزيزة — توصيل في دبي في نفس اليوم';
+  document.getElementById('footerTagAr').style.display = l==='ar'?'block':'none';
+  document.querySelector('[data-en="Free delivery"]') && null;
+  document.getElementById('announceText').innerHTML = l==='en'
+    ? '🌸 <strong>Free delivery</strong> within Dubai on orders over AED 300 &nbsp;|&nbsp; Same-day delivery available until 4pm'
+    : '🌸 <strong>توصيل مجاني</strong> في دبي على الطلبات فوق 300 درهم &nbsp;|&nbsp; التوصيل في نفس اليوم متاح حتى الرابعة';
+  document.getElementById('footerCopy').textContent = l==='en'
+    ? '© 2025 Calla Kallos — All rights reserved.'
+    : '© 2025 كالا كالوس — جميع الحقوق محفوظة';
+  document.getElementById('cartTitle').textContent = l==='en' ? 'YOUR CART' : 'سلة التسوق';
+  document.getElementById('cartTotalLabel').textContent = l==='en' ? 'Total' : 'المجموع';
+  document.getElementById('checkoutBtn').textContent = l==='en' ? 'Proceed to Checkout →' : 'الذهاب للدفع ←';
+  document.getElementById('bestSellerAr').style.display = l==='ar'?'block':'none';
+  renderProducts();
+}
+
+// ============================================================
+//  PRODUCT RENDERING
+// ============================================================
+function badgeHTML(badges) {
+  const map = { new:'ck-badge-new', sale:'ck-badge-sale', popular:'ck-badge-popular', limited:'ck-badge-limited', custom:'ck-badge-custom' };
+  const labels = { en:{ new:'New', sale:'Sale', popular:'Best Seller', limited:'Limited', custom:'Custom'}, ar:{ new:'جديد', sale:'تخفيض', popular:'الأكثر مبيعاً', limited:'محدود', custom:'مخصص'} };
+  return badges.map(b => `<span class="ck-badge ${map[b]||'ck-badge-new'}">${labels[lang][b]||b}</span>`).join('');
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+  grid.innerHTML = products.map(p => `
+    <div class="ck-product-card" onclick="addToCart(${p.id})">
+      <div class="ck-product-thumb">
+        ${p.imgData ? `<img src="${p.imgData}" alt="${p.name}">` : `<div class="ck-product-thumb-placeholder">${p.emoji||'🌸'}</div>`}
+        <div class="ck-badge-wrap">${badgeHTML(p.badges)}</div>
+        <div class="ck-product-wish" onclick="event.stopPropagation()">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="ck-product-info">
+        <div class="ck-product-cat">${p.cat}</div>
+        <div class="ck-product-name">${lang==='ar'&&p.nameAr ? p.nameAr : p.name}</div>
+        ${p.nameAr && lang==='en' ? `<div class="ck-product-name-ar">${p.nameAr}</div>` : ''}
+        <div class="ck-product-footer-row">
+          <div>
+            <span class="ck-price">AED ${p.price}</span>
+            ${p.oldPrice ? `<span class="ck-price-old">AED ${p.oldPrice}</span>` : ''}
+          </div>
+          <button class="ck-add-to-cart" onclick="event.stopPropagation();addToCart(${p.id})">+</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+//  CART
+// ============================================================
+function addToCart(id) {
+  const p = products.find(x => x.id===id);
+  if (!p) return;
+  const entry = cart.find(x => x.id===id);
+  if (entry) entry.qty++;
+  else cart.push({ ...p, qty:1 });
+  updateCartUI();
+  toast(`${lang==='ar'?'أُضيف إلى السلة':'Added to cart'}: ${lang==='ar'&&p.nameAr?p.nameAr:p.name}`);
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id!==id);
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const total = cart.reduce((s,x) => s + x.price*x.qty, 0);
+  document.getElementById('cartCount').textContent = cart.reduce((s,x)=>s+x.qty,0);
+  document.getElementById('cartTotalVal').textContent = `AED ${total.toLocaleString()}`;
+  const list = document.getElementById('cartList');
+  if (!list) return;
+  list.innerHTML = cart.length ? cart.map(c => `
+    <div class="ck-cart-entry">
+      <div class="ck-cart-entry-img">${c.emoji||'🌸'}</div>
+      <div>
+        <div class="ck-cart-entry-name">${lang==='ar'&&c.nameAr?c.nameAr:c.name}</div>
+        <div class="ck-cart-entry-price">AED ${c.price} × ${c.qty}</div>
+        <div class="ck-cart-entry-rm" onclick="removeFromCart(${c.id})">✕ ${lang==='ar'?'إزالة':'Remove'}</div>
+      </div>
+    </div>
+  `).join('') : `<div style="padding:40px;text-align:center;color:var(--ck-text-hint);font-size:14px;">${lang==='ar'?'السلة فارغة':'Your cart is empty'}</div>`;
+}
+
+function toggleCart() {
+  document.getElementById('cartDrawer').classList.toggle('open');
+  document.getElementById('cartOverlay').classList.toggle('open');
+  updateCartUI();
+}
+
+// ============================================================
+//  OCCASION FILTER
+// ============================================================
+document.querySelectorAll('.ck-occ-tag').forEach(tag => {
+  tag.addEventListener('click', function() {
+    document.querySelectorAll('.ck-occ-tag').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    const occ = this.dataset.en || this.textContent;
+    const filtered = occ === 'All' ? products : products.filter(p => p.occ === occ || p.cat === occ);
+    const grid = document.getElementById('productsGrid');
+    if (grid) {
+      const temp = products;
+      products = filtered;
+      renderProducts();
+      products = temp;
+    }
+  });
+});
+
+// ============================================================
+//  TOAST
+// ============================================================
+let toastTimer;
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = (type==='success' ? '✓ ' : '⚠ ') + msg;
+  el.className = `ck-toast show ${type==='success'?'ck-toast-success':''}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ============================================================
+//  ADMIN AUTH
+// ============================================================
+function showAdminLogin() {
+  document.getElementById('storeSection').style.display = 'none';
+  document.getElementById('loginSection').style.display = 'block';
+  document.getElementById('adminSection').classList.remove('active');
+}
+function showStore() {
+  document.getElementById('storeSection').style.display = 'block';
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('adminSection').classList.remove('active');
+}
+function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === 'admin' && p === 'admin') {
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('adminSection').classList.add('active');
+    adminTab('dashboard');
+  } else {
+    document.getElementById('loginErr').classList.add('show');
+  }
+}
+
+// ============================================================
+//  ADMIN TABS
+// ============================================================
+function adminTab(tab) {
+  document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
+    const tabs = ['dashboard','products','offers','orders','settings'];
+    el.classList.toggle('active', tabs[i]===tab);
+  });
+  const main = document.getElementById('adminMain');
+  if (tab==='dashboard') main.innerHTML = dashboardHTML();
+  else if (tab==='products') main.innerHTML = productsHTML();
+  else if (tab==='offers') main.innerHTML = offersHTML();
+  else if (tab==='orders') { main.innerHTML = ordersHTML(); renderOrdersTable(); }
+  else if (tab==='settings') { main.innerHTML = settingsHTML(); populateSettingsInputs(); }
+}
+
+function dashboardHTML() {
+  const totalRev = products.reduce((s,p)=>s+p.price,0)*8;
+  return `
+    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">Good morning, Rinu 🌸</h2>
+    <div class="ck-admin-stats">
+      <div class="ck-stat-card"><div class="ck-stat-label">Products</div><div class="ck-stat-val">${products.length}</div><div class="ck-stat-sub">Active listings</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Orders Today</div><div class="ck-stat-val">8</div><div class="ck-stat-sub">↑ 2 from yesterday</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Revenue (MTD)</div><div class="ck-stat-val">AED ${(totalRev).toLocaleString()}</div><div class="ck-stat-sub">↑ 18% this month</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Pending Delivery</div><div class="ck-stat-val">3</div><div class="ck-stat-sub">Within today's slots</div></div>
+    </div>
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header"><span class="ck-panel-title">Quick Actions</span></div>
+      <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="ck-admin-btn" onclick="adminTab('products');setTimeout(openAddModal,50)">+ Add New Product</button>
+        <button class="ck-admin-btn" onclick="adminTab('offers')">🏷 Manage Offers</button>
+        <button class="ck-admin-btn-ghost" onclick="adminTab('orders')">📦 View Orders</button>
+        <button class="ck-admin-btn-ghost" onclick="adminTab('settings')">⚙ Store Settings</button>
+      </div>
+    </div>
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header"><span class="ck-panel-title">Recent Orders</span></div>
+      <table class="ck-product-table">
+        <thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>#1042</td><td>Ahmed K.</td><td>Rose Velvet Luxe</td><td>AED 350</td><td><span style="color:#4A7C59;">✓ Delivered</span></td></tr>
+          <tr><td>#1041</td><td>Sara M.</td><td>Peony Blush Gift Box</td><td>AED 380</td><td><span style="color:#C08030;">⏳ In Transit</span></td></tr>
+          <tr><td>#1040</td><td>Priya R.</td><td>Midnight Garden</td><td>AED 495</td><td><span style="color:#C08030;">⏳ Preparing</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function productsHTML() {
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">Products</h2>
+      <button class="ck-admin-btn" onclick="openAddModal()">+ Add New Product</button>
+    </div>
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header">
+        <span class="ck-panel-title">All Products (${products.length})</span>
+        <input class="ck-input" style="width:200px;padding:6px 10px;" placeholder="Search products…" oninput="filterTable(this.value)">
+      </div>
+      <table class="ck-product-table" id="productTable">
+        <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Badges</th><th>Stock</th><th>Actions</th></tr></thead>
+        <tbody>${productRows()}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function productRows() {
+  return products.map((p,i) => `
+    <tr>
+      <td>
+        <div style="display:inline-flex;align-items:center;gap:10px;">
+          <span class="ck-table-thumb">${p.imgData?`<img src="${p.imgData}" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">`:p.emoji||'🌸'}</span>
+          <div>
+            <div style="font-weight:500;color:var(--ck-cream);">${p.name}</div>
+            ${p.nameAr?`<div style="font-size:11px;color:rgba(212,184,150,0.4);direction:rtl;">${p.nameAr}</div>`:''}
+          </div>
+        </div>
+      </td>
+      <td>${p.cat}</td>
+      <td>AED ${p.price}${p.oldPrice?`<br><span style="font-size:11px;text-decoration:line-through;color:rgba(212,184,150,0.3);">AED ${p.oldPrice}</span>`:''}</td>
+      <td>${p.badges.length ? p.badges.map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '<span style="color:rgba(212,184,150,0.25);font-size:11px;">none</span>'}</td>
+      <td><span class="ck-stock-dot ck-stock-${p.stock}"></span>${p.stock==='in'?'In Stock':p.stock==='low'?'Low Stock':'Out of Stock'}</td>
+      <td>
+        <div class="ck-table-actions">
+          <button class="ck-admin-btn-ghost" onclick="openEditModal(${i})" style="padding:5px 10px;font-size:11px;">Edit</button>
+          <button class="ck-admin-btn-danger" onclick="deleteProduct(${i})">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterTable(q) {
+  const rows = document.querySelectorAll('#productTable tbody tr');
+  rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'; });
+}
+
+function deleteProduct(i) {
+  if (confirm(`Delete "${products[i].name}"?`)) {
+    const deletedId = products[i].id;
+    products.splice(i, 1);
+    localStorage.removeItem(LS_IMG_KEY + deletedId);
+    adminTab('products');
+    renderProducts();
+    persistMeta();
+    toast('Product deleted');
+  }
+}
+
+function offersHTML() {
+  const offerProducts = products.filter(p => p.badges.length > 0);
+  return `
+    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">Offers & Badges</h2>
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">Badge Guide</span></div>
+      <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <span class="ck-badge ck-badge-new">New</span> <span style="color:rgba(212,184,150,0.5);font-size:12px;margin-right:12px;">New Arrivals</span>
+        <span class="ck-badge ck-badge-popular">Best Seller</span> <span style="color:rgba(212,184,150,0.5);font-size:12px;margin-right:12px;">Top sellers</span>
+        <span class="ck-badge ck-badge-sale">Sale</span> <span style="color:rgba(212,184,150,0.5);font-size:12px;margin-right:12px;">Price reduced</span>
+        <span class="ck-badge ck-badge-limited">Limited</span> <span style="color:rgba(212,184,150,0.5);font-size:12px;margin-right:12px;">Limited stock</span>
+        <span class="ck-badge ck-badge-custom">Custom</span> <span style="color:rgba(212,184,150,0.5);font-size:12px;">Made to order</span>
+      </div>
+    </div>
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header"><span class="ck-panel-title">Products with Active Badges (${offerProducts.length})</span></div>
+      <table class="ck-product-table">
+        <thead><tr><th>Product</th><th>Price</th><th>Active Badges</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${products.map((p,i) => `
+            <tr>
+              <td>${p.emoji||'🌸'} ${p.name}</td>
+              <td>AED ${p.price}</td>
+              <td>${p.badges.length ? p.badges.map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '—'}</td>
+              <td><button class="ck-admin-btn-ghost" onclick="openEditModal(${i})" style="padding:5px 10px;font-size:11px;">Edit Badges</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function ordersHTML() {
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">Orders</h2>
+      <button class="ck-admin-btn" onclick="exportOrdersCSV()">⬇ Export to Excel</button>
+    </div>
+    <div class="ck-admin-panel-block" style="margin-bottom:16px;">
+      <div style="padding:14px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <input class="ck-input" style="width:190px;padding:6px 10px;" placeholder="Search name, email, phone…" id="orderSearch" oninput="renderOrdersTable()">
+        <select class="ck-select" id="orderStatusFilter" onchange="renderOrdersTable()" style="width:155px;padding:6px 10px;">
+          <option value="">All Statuses</option>
+          <option>Pending</option>
+          <option>Preparing</option>
+          <option>In Transit</option>
+          <option>Delivered</option>
+          <option>Cancelled</option>
+        </select>
+        <select class="ck-select" id="orderCustomerFilter" onchange="renderOrdersTable()" style="width:185px;padding:6px 10px;">
+          <option value="">All Customers</option>
+          <option value="regular">Regular (3+ orders)</option>
+          <option value="new">New Customers</option>
+        </select>
+        <select class="ck-select" id="orderSortFilter" onchange="renderOrdersTable()" style="width:185px;padding:6px 10px;">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="amount-high">Amount: High → Low</option>
+          <option value="amount-low">Amount: Low → High</option>
+          <option value="regular">Regular Customers First</option>
+        </select>
+      </div>
+    </div>
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header">
+        <span class="ck-panel-title" id="ordersCountLabel">All Orders</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ck-product-table" id="ordersTable">
+          <thead>
+            <tr>
+              <th>#</th><th>Date & Time</th><th>Customer</th><th>Email</th><th>Phone</th>
+              <th>Product</th><th>Amount</th><th>Delivery Location</th><th>Status</th><th>Save</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header"><span class="ck-panel-title">Regular Customer Offers</span></div>
+      <div style="padding:16px;">
+        <p style="color:rgba(212,184,150,0.5);font-size:12px;margin-bottom:16px;">Customers with 3 or more orders. Add a personal offer code or discount note visible to this customer.</p>
+        <div id="regularCustomersList"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderOrdersTable() {
+  const search  = (document.getElementById('orderSearch')||{value:''}).value.toLowerCase();
+  const status  = (document.getElementById('orderStatusFilter')||{value:''}).value;
+  const custF   = (document.getElementById('orderCustomerFilter')||{value:''}).value;
+  const sort    = (document.getElementById('orderSortFilter')||{value:'newest'}).value;
+
+  let list = orders.filter(o => {
+    const q = search ? (o.customer+o.email+o.phone+o.product).toLowerCase().includes(search) : true;
+    const s = status ? o.status === status : true;
+    const c = custF==='regular' ? o.orderCount>=3 : custF==='new' ? o.orderCount<3 : true;
+    return q && s && c;
+  });
+
+  if (sort==='oldest')       list.sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  else if (sort==='amount-high') list.sort((a,b)=> b.amount-a.amount);
+  else if (sort==='amount-low')  list.sort((a,b)=> a.amount-b.amount);
+  else if (sort==='regular') list.sort((a,b)=> b.orderCount-a.orderCount);
+  else list.sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+
+  const label = document.getElementById('ordersCountLabel');
+  if (label) label.textContent = `Orders (${list.length})`;
+
+  const tbody = document.getElementById('ordersTableBody');
+  if (!tbody) return;
+
+  const statusColors = { Delivered:'#4A7C59', 'In Transit':'#C08030', Preparing:'#C08030', Pending:'#888', Cancelled:'#C04040' };
+  const statusOpts = ['Pending','Preparing','In Transit','Delivered','Cancelled'];
+
+  tbody.innerHTML = list.map(o => {
+    const isRegular = o.orderCount >= 3;
+    const selOpts = statusOpts.map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
+    return `<tr>
+      <td>#${o.id}</td>
+      <td style="white-space:nowrap;">${o.date}<br><span style="font-size:11px;color:rgba(212,184,150,0.4);">${o.time}</span></td>
+      <td>
+        <div style="font-weight:500;color:var(--ck-cream);">${o.customer}</div>
+        ${isRegular ? `<span style="font-size:10px;background:var(--ck-champagne);color:var(--ck-plum-dark);padding:1px 6px;border-radius:2px;letter-spacing:.06em;">REGULAR ×${o.orderCount}</span>` : ''}
+      </td>
+      <td style="font-size:12px;">${o.email}</td>
+      <td style="white-space:nowrap;">${o.phone}</td>
+      <td style="font-size:13px;">${o.product}</td>
+      <td style="white-space:nowrap;">AED ${o.amount}</td>
+      <td style="font-size:12px;max-width:160px;">${o.location}</td>
+      <td>
+        <select class="ck-select" id="status_${o.id}" style="padding:4px 8px;font-size:12px;width:130px;">
+          ${selOpts}
+        </select>
+      </td>
+      <td>
+        <button class="ck-admin-btn" onclick="saveOrderStatus(${o.id})" style="padding:5px 12px;font-size:11px;">Save</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  renderRegularOffers();
+}
+
+function saveOrderStatus(id) {
+  const sel = document.getElementById('status_'+id);
+  if (!sel) return;
+  const o = orders.find(x => x.id===id);
+  if (o) { o.status = sel.value; persistMeta(); toast('Order #'+id+' status updated ✓'); }
+}
+
+function exportOrdersCSV() {
+  const headers = ['Order #','Date','Time','Customer','Email','Phone','Product','Amount (AED)','Delivery Location','Status','Order Count'];
+  const rows = orders.map(o => [
+    '#'+o.id, o.date, o.time, o.customer, o.email, o.phone,
+    o.product, o.amount, '"'+o.location+'"', o.status, o.orderCount
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'calla_kallos_orders_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('Orders exported ✓');
+}
+
+function renderRegularOffers() {
+  const regulars = [...new Map(orders.filter(o=>o.orderCount>=3).map(o=>[o.email,o])).values()];
+  const cont = document.getElementById('regularCustomersList');
+  if (!cont) return;
+  if (!regulars.length) { cont.innerHTML = '<p style="color:rgba(212,184,150,0.3);font-size:13px;">No regular customers yet.</p>'; return; }
+  cont.innerHTML = regulars.map(o => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(212,184,150,0.08);flex-wrap:wrap;">
+      <div style="flex:1;min-width:180px;">
+        <div style="color:var(--ck-cream);font-size:13px;font-weight:500;">${o.customer}</div>
+        <div style="color:rgba(212,184,150,0.4);font-size:11px;">${o.email} · ${o.orderCount} orders</div>
+      </div>
+      <input class="ck-input" id="offer_${o.email.replace(/[@.]/g,'_')}" style="width:220px;padding:6px 10px;font-size:12px;" placeholder="e.g. LOYAL10 — 10% off next order" value="${regularOffers[o.email]||''}">
+      <button class="ck-admin-btn" onclick="saveRegularOffer('${o.email}')" style="padding:6px 14px;font-size:11px;">Save Offer</button>
+    </div>
+  `).join('');
+}
+
+function saveRegularOffer(email) {
+  const key = email.replace(/[@.]/g,'_');
+  const inp = document.getElementById('offer_'+key);
+  if (!inp) return;
+  regularOffers[email] = inp.value.trim();
+  persistMeta();
+  toast('Offer saved for '+email+' ✓');
+}
+
+function settingsHTML() {
+  const root = getComputedStyle(document.documentElement);
+  const cv = n => root.getPropertyValue(n).trim();
+  return `
+    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">Store Settings</h2>
+
+    <!-- Store Info -->
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">Store Info</span></div>
+      <div style="padding:20px;">
+        <div class="ck-form-row">
+          <div class="ck-form-group"><label class="ck-form-label">Store Name</label><input class="ck-input" id="settingStoreName" value="Calla Kallos"></div>
+          <div class="ck-form-group"><label class="ck-form-label">WhatsApp Number</label><input class="ck-input" id="settingWhatsapp" placeholder="+971 XX XXX XXXX"></div>
+        </div>
+        <div class="ck-form-row">
+          <div class="ck-form-group"><label class="ck-form-label">Email</label><input class="ck-input" id="settingEmail" placeholder="hello@callakallos.com"></div>
+          <div class="ck-form-group"><label class="ck-form-label">Phone Number</label><input class="ck-input" id="settingPhone" placeholder="+971 XX XXX XXXX"></div>
+        </div>
+        <div class="ck-form-row full"><div class="ck-form-group"><label class="ck-form-label">Announcement Bar Text (EN)</label><input class="ck-input" id="settingAnnounce" value="Free delivery within Dubai on orders over AED 300 | Same-day delivery available until 4pm"></div></div>
+        <div class="ck-form-row full"><div class="ck-form-group"><label class="ck-form-label">إعلان الشريط العلوي (عربي)</label><input class="ck-input" id="settingAnnounceAr" style="direction:rtl;" value="توصيل مجاني في دبي على الطلبات فوق 300 درهم"></div></div>
+        <div style="margin-top:12px;"><button class="ck-admin-btn" onclick="saveSettings()">Save Settings</button></div>
+      </div>
+    </div>
+
+    <!-- Colour Theme -->
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">Website Colour Theme</span></div>
+      <div style="padding:20px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:20px;">
+          ${[
+            ['--ck-plum',       'Primary (Plum)'],
+            ['--ck-plum-dark',  'Dark Plum / Hero BG'],
+            ['--ck-champagne',  'Champagne / Accent'],
+            ['--ck-cream',      'Cream / Page BG'],
+            ['--ck-plum-tint',  'Blush Tint'],
+            ['--ck-plum-light', 'Soft Accent'],
+          ].map(([v,label]) => `
+            <div>
+              <label class="ck-form-label" style="margin-bottom:6px;display:block;">${label}</label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="color" value="${cssToHex(cv(v))}" oninput="liveTheme('${v}',this.value)"
+                  style="width:40px;height:32px;border:1px solid rgba(212,184,150,0.2);background:none;cursor:pointer;border-radius:3px;padding:2px;">
+                <span id="label_${v.replace(/--/g,'').replace(/-/g,'_')}" style="font-size:11px;color:rgba(212,184,150,0.5);">${cv(v)}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="ck-admin-btn" onclick="saveTheme()">💾 Save Theme</button>
+          <button class="ck-admin-btn-ghost" onclick="resetTheme()">↺ Reset to Default</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Slideshow Images -->
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">Hero Slideshow Images</span></div>
+      <div style="padding:20px;">
+        <p style="color:rgba(212,184,150,0.5);font-size:12px;margin-bottom:16px;">Upload images for the hero section slideshow (C1–C5). Images are cropped to fill the trapezoid.</p>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+          ${[1,2,3,4,5].map(n => `
+            <div style="text-align:center;">
+              <div onclick="document.getElementById('heroUpload${n}').click()"
+                style="width:100%;aspect-ratio:9/16;background:rgba(255,255,255,0.05);border:1px dashed rgba(212,184,150,0.25);border-radius:4px;overflow:hidden;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;">
+                <img id="heroThumb${n}" src="Images/C${n}.jpg" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+                <div id="heroPlaceholder${n}" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                  <div style="font-size:20px;">📷</div>
+                  <div style="font-size:10px;color:rgba(212,184,150,0.3);margin-top:4px;">C${n}</div>
+                </div>
+              </div>
+              <input type="file" id="heroUpload${n}" accept="image/*" style="display:none" onchange="replaceHeroImage(${n},this)">
+              <div style="font-size:11px;color:rgba(212,184,150,0.4);margin-top:6px;">Slot ${n}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment -->
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header"><span class="ck-panel-title">Payment Gateways</span></div>
+      <div style="padding:20px;">
+        <div class="ck-form-row">
+          <div class="ck-form-group"><label class="ck-form-label">PayTabs Merchant ID</label><input class="ck-input" placeholder="PT-XXXXXX"></div>
+          <div class="ck-form-group"><label class="ck-form-label">PayTabs Secret Key</label><input class="ck-input" type="password" placeholder="••••••••"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:6px;color:rgba(212,184,150,0.6);font-size:13px;cursor:pointer;"><input type="checkbox" checked> Cash on Delivery</label>
+          <label style="display:flex;align-items:center;gap:6px;color:rgba(212,184,150,0.6);font-size:13px;cursor:pointer;"><input type="checkbox" checked> Apple Pay</label>
+          <label style="display:flex;align-items:center;gap:6px;color:rgba(212,184,150,0.6);font-size:13px;cursor:pointer;"><input type="checkbox"> Tabby (BNPL)</label>
+        </div>
+        <div style="margin-top:14px;"><button class="ck-admin-btn" onclick="toast('Payment settings saved ✓')">Save</button></div>
+      </div>
+    </div>
+  `;
+}
+
+function cssToHex(v) {
+  if (!v) return '#5c2d48';
+  if (v.startsWith('#')) return v.length===4 ? '#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3] : v;
+  const m = v.match(/(\d+),\s*(\d+),\s*(\d+)/);
+  if (!m) return '#5c2d48';
+  return '#'+[m[1],m[2],m[3]].map(n=>parseInt(n).toString(16).padStart(2,'0')).join('');
+}
+
+const defaultTheme = {
+  '--ck-plum':'#2E3B1F','--ck-plum-dark':'#1C2512','--ck-champagne':'#C8B88A',
+  '--ck-cream':'#F5F0E8','--ck-plum-tint':'#D6E8C4','--ck-plum-light':'#5A7040'
+};
+let savedTheme = {...defaultTheme};
+
+function liveTheme(varName, hex) {
+  document.documentElement.style.setProperty(varName, hex);
+  const labelKey = varName.replace(/--/g,'').replace(/-/g,'_');
+  const lbl = document.getElementById('label_'+labelKey);
+  if (lbl) lbl.textContent = hex;
+}
+
+function saveTheme() {
+  Object.keys(defaultTheme).forEach(v => {
+    savedTheme[v] = getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  });
+  persistMeta();
+  toast('Theme saved ✓');
+}
+
+function resetTheme() {
+  Object.entries(defaultTheme).forEach(([v,c]) => {
+    document.documentElement.style.setProperty(v, c);
+  });
+  toast('Theme reset to default');
+  adminTab('settings');
+}
+
+function replaceHeroImage(n, input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    const thumb = document.getElementById('heroThumb'+n);
+    if (thumb) { thumb.src = src; thumb.style.display='block'; }
+    const imgs = document.querySelectorAll('.ck-cust-img');
+    if (imgs[n-1]) imgs[n-1].src = src;
+    persistHeroImage(n-1, src);
+    toast('Slot '+n+' image updated ✓');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ============================================================
+//  PRODUCT MODAL
+// ============================================================
+let selectedBadges = [];
+
+function openAddModal() {
+  selectedBadges = [];
+  document.getElementById('editIdx').value = -1;
+  document.getElementById('modalTitle').textContent = 'Add New Product';
+  ['fldName','fldNameAr','fldDesc','fldDescAr','fldPrice','fldOldPrice'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fldCat').value = '';
+  document.getElementById('fldOcc').value = '';
+  document.getElementById('imgPreview').style.display = 'none';
+  document.querySelectorAll('.ck-badge-opt').forEach(b => b.classList.remove('selected'));
+  document.getElementById('productModal').classList.add('open');
+}
+
+function openEditModal(i) {
+  const p = products[i];
+  selectedBadges = [...p.badges];
+  document.getElementById('editIdx').value = i;
+  document.getElementById('modalTitle').textContent = 'Edit Product';
+  document.getElementById('fldName').value = p.name;
+  document.getElementById('fldNameAr').value = p.nameAr || '';
+  document.getElementById('fldDesc').value = p.desc || '';
+  document.getElementById('fldDescAr').value = p.descAr || '';
+  document.getElementById('fldPrice').value = p.price;
+  document.getElementById('fldOldPrice').value = p.oldPrice || '';
+  document.getElementById('fldCat').value = p.cat;
+  document.getElementById('fldOcc').value = p.occ || '';
+  if (p.imgData) { const img = document.getElementById('imgPreview'); img.src = p.imgData; img.style.display='block'; }
+  else document.getElementById('imgPreview').style.display = 'none';
+  document.querySelectorAll('.ck-badge-opt').forEach(b => b.classList.toggle('selected', selectedBadges.includes(b.dataset.val)));
+  document.getElementById('productModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+}
+
+function toggleBadge(el) {
+  const val = el.dataset.val;
+  if (selectedBadges.includes(val)) { selectedBadges = selectedBadges.filter(b=>b!==val); el.classList.remove('selected'); }
+  else { selectedBadges.push(val); el.classList.add('selected'); }
+}
+
+function previewImg(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Compress to max 600px and JPEG 70% before storing
+    const tempImg = new Image();
+    tempImg.onload = () => {
+      const MAX = 600;
+      const scale = Math.min(1, MAX / Math.max(tempImg.width, tempImg.height));
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(tempImg.width  * scale);
+      canvas.height = Math.round(tempImg.height * scale);
+      canvas.getContext('2d').drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.72);
+      const preview = document.getElementById('imgPreview');
+      preview.src = compressed;
+      preview.style.display = 'block';
+    };
+    tempImg.src = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function saveProduct() {
+  const name = document.getElementById('fldName').value.trim();
+  const price = parseFloat(document.getElementById('fldPrice').value);
+  const cat = document.getElementById('fldCat').value;
+  if (!name || !price || !cat) { toast('Please fill required fields', 'error'); return; }
+  const imgPreview = document.getElementById('imgPreview');
+  const imgData = imgPreview.style.display !== 'none' ? imgPreview.src : null;
+  const product = {
+    id: nextId++,
+    name,
+    nameAr: document.getElementById('fldNameAr').value.trim(),
+    desc: document.getElementById('fldDesc').value.trim(),
+    descAr: document.getElementById('fldDescAr').value.trim(),
+    price,
+    oldPrice: parseFloat(document.getElementById('fldOldPrice').value) || null,
+    cat,
+    occ: document.getElementById('fldOcc').value,
+    badges: [...selectedBadges],
+    emoji: '🌸',
+    stock: 'in',
+    imgData,
+  };
+  const idx = parseInt(document.getElementById('editIdx').value);
+  if (idx >= 0) { product.id = products[idx].id; products[idx] = product; toast('Product updated ✓'); }
+  else { products.push(product); toast('Product added ✓'); }
+  closeModal();
+  adminTab('products');
+  renderProducts();
+  persistImage(product.id, imgData);
+  persistMeta();
+}
+
+// Store settings state (persists while page is open)
+let storeSettings = {
+  storeName: 'Calla Kallos',
+  whatsapp: '',
+  email: 'hello@callakallos.com',
+  phone: '+971 XX XXX XXXX',
+  announce: 'Free delivery within Dubai on orders over AED 300 | Same-day delivery available until 4pm',
+  announceAr: 'توصيل مجاني في دبي على الطلبات فوق 300 درهم'
+};
+
+function saveSettings() {
+  const get = id => (document.getElementById(id)||{value:''}).value.trim();
+  storeSettings.storeName  = get('settingStoreName') || storeSettings.storeName;
+  storeSettings.whatsapp   = get('settingWhatsapp')  || storeSettings.whatsapp;
+  storeSettings.email      = get('settingEmail')     || storeSettings.email;
+  storeSettings.phone      = get('settingPhone')     || storeSettings.phone;
+  storeSettings.announce   = get('settingAnnounce')  || storeSettings.announce;
+  storeSettings.announceAr = get('settingAnnounceAr')|| storeSettings.announceAr;
+  applyStoreSettings();
+  persistMeta();
+  toast('Settings saved ✓');
+}
+
+function populateSettingsInputs() {
+  const s = storeSettings;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  set('settingStoreName',  s.storeName);
+  set('settingWhatsapp',   s.whatsapp);
+  set('settingEmail',      s.email);
+  set('settingPhone',      s.phone);
+  set('settingAnnounce',   s.announce);
+  set('settingAnnounceAr', s.announceAr);
+}
+
+function applyStoreSettings() {
+  const s = storeSettings;
+  const fp = document.getElementById('footerPhone');
+  const fe = document.getElementById('footerEmail');
+  const fw = document.getElementById('footerWhatsapp');
+  if (fp && s.phone)    fp.textContent = '📞 ' + s.phone;
+  if (fe && s.email)    fe.textContent = '✉ ' + s.email;
+  if (fw && s.whatsapp) fw.textContent = (lang==='ar' ? 'طلبات واتساب' : 'WhatsApp: ') + s.whatsapp;
+  // Also update contact section
+  const cp = document.getElementById('contactPhone');
+  const ce = document.getElementById('contactEmail');
+  const cw = document.getElementById('contactWhatsapp');
+  if (cp && s.phone)    cp.textContent = s.phone;
+  if (ce && s.email)    ce.textContent = s.email;
+  if (cw && s.whatsapp) cw.textContent = 'WhatsApp: ' + s.whatsapp;
+  const ann = document.getElementById('announceText');
+  if (ann) {
+    if (lang === 'ar') {
+      ann.innerHTML = '🌸 <strong>توصيل مجاني</strong> ' + s.announceAr;
+    } else {
+      ann.innerHTML = '🌸 ' + s.announce.replace('Free delivery', '<strong>Free delivery</strong>');
+    }
+  }
+}
+
+// ============================================================
+//  LOCALSTORAGE PERSISTENCE
+//  Images stored in separate keys to avoid quota issues.
+// ============================================================
+const LS_KEY      = 'ck_data_v2';
+const LS_IMG_KEY  = 'ck_img_v2_';    // + productId
+const LS_HERO_KEY = 'ck_hero_v2_';   // + slot index
+
+function persistMeta() {
+  // Save everything except imgData (stored separately)
+  const theme = Object.fromEntries(
+    Object.keys(defaultTheme).map(v => [v, getComputedStyle(document.documentElement).getPropertyValue(v).trim()])
+  );
+  const productsStripped = products.map(p => ({ ...p, imgData: undefined }));
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      products: productsStripped, orders, regularOffers, storeSettings, theme
+    }));
+  } catch(e) { console.warn('Meta save failed:', e); }
+}
+
+function persistImage(productId, imgData) {
+  if (!imgData) { localStorage.removeItem(LS_IMG_KEY + productId); return; }
+  try { localStorage.setItem(LS_IMG_KEY + productId, imgData); }
+  catch(e) { toast('⚠ Image too large for storage', 'error'); }
+}
+
+function persistHeroImage(slot, src) {
+  try { localStorage.setItem(LS_HERO_KEY + slot, src); }
+  catch(e) { console.warn('Hero image save failed:', e); }
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (Array.isArray(d.products) && d.products.length)  products      = d.products;
+    if (Array.isArray(d.orders)   && d.orders.length)    orders        = d.orders;
+    if (d.regularOffers) regularOffers = d.regularOffers;
+    if (d.storeSettings) Object.assign(storeSettings, d.storeSettings);
+    if (d.theme) Object.entries(d.theme).forEach(([v,c]) => document.documentElement.style.setProperty(v, c));
+
+    // Restore product images
+    products.forEach(p => {
+      const img = localStorage.getItem(LS_IMG_KEY + p.id);
+      if (img) p.imgData = img;
+    });
+
+    // Restore hero slideshow images
+    [0,1,2,3,4].forEach(i => {
+      const src = localStorage.getItem(LS_HERO_KEY + i);
+      if (src) {
+        const el = document.querySelectorAll('.ck-cust-img')[i];
+        if (el) el.src = src;
+      }
+    });
+
+    applyStoreSettings();
+  } catch(e) { console.warn('Load failed:', e); }
+}
+
+// init
+loadFromStorage();
+renderProducts();
+
+// Customer image slideshow
+(function() {
+  const imgs = document.querySelectorAll('.ck-cust-img');
+  let current = 0;
+  imgs[current].classList.add('active');
+  setInterval(function() {
+    imgs[current].classList.remove('active');
+    current = (current + 1) % imgs.length;
+    imgs[current].classList.add('active');
+  }, 5000);
+})();
+</script>
+</body>
+</html>

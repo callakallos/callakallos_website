@@ -1,0 +1,150 @@
+/*
+ * CALLA KALLOS — WORDPRESS CHILD THEME CSS
+ * Copy this into: wp-content/themes/your-child-theme/style.css
+ * or paste into Appearance > Customize > Additional CSS
+ *
+ * Brand Palette extracted from brand photography:
+ * Deep Plum, Champagne, Blush Rose, Warm Cream
+ */
+
+/* ── DESIGN TOKENS ─────────────────────────────── */
+:root {
+  --ck-plum:         #5C2D48;   /* primary brand color */
+  --ck-plum-dark:    #3D1A30;   /* darkest — hero, footer bg */
+  --ck-plum-mid:     #7A3D60;   /* hover states */
+  --ck-plum-light:   #A0607A;   /* soft accents */
+  --ck-plum-tint:    #EDD0DA;   /* blush fills */
+  --ck-champagne:    #D4B896;   /* ribbon accent, CTAs */
+  --ck-champagne-lt: #EDE0CC;   /* light champagne borders */
+  --ck-cream:        #F7EDD8;   /* warm cream page bg */
+  --ck-cream-dark:   #EDE0CC;   /* alternate sections */
+  --ck-ivory:        #FFFAF5;   /* near-white */
+  --ck-text:         #2A1520;   /* primary text */
+  --ck-text-muted:   #7A5C68;   /* body text */
+  --ck-text-hint:    #B09AA8;   /* placeholders */
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Jost', system-ui, sans-serif;
+  --font-arabic:  'Scheherazade New', 'Traditional Arabic', serif;
+}
+
+/* ── GLOBAL ─────────────────────────────────────── */
+body { font-family: var(--font-body); background: var(--ck-cream); color: var(--ck-text); }
+h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 300; color: var(--ck-plum-dark); }
+a { color: var(--ck-plum); }
+a:hover { color: var(--ck-plum-mid); }
+body.rtl, html[lang="ar"] body { font-family: var(--font-arabic); direction: rtl; }
+
+/* ── WOOCOMMERCE — HEADER ───────────────────────── */
+.site-header,
+#masthead,
+header.site-header { background: var(--ck-plum) !important; }
+.site-title a,
+.custom-logo-link { color: var(--ck-cream) !important; font-family: var(--font-display); }
+.main-navigation a,
+#primary-menu a { color: rgba(247,237,216,0.75); text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; }
+.main-navigation a:hover { color: var(--ck-cream); border-bottom: 1px solid var(--ck-champagne); }
+.woocommerce-store-notice { background: var(--ck-plum-dark) !important; color: var(--ck-cream); }
+
+/* ── WOOCOMMERCE — BUTTONS ──────────────────────── */
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.woocommerce #respond input#submit,
+.button.alt,
+.wp-block-button__link {
+  background: var(--ck-champagne) !important;
+  color: var(--ck-plum-dark) !important;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  border-radius: 2px !important;
+  border: none !important;
+  padding: 12px 28px !important;
+  transition: background 0.25s ease;
+}
+.woocommerce a.button:hover,
+.woocommerce button.button:hover { background: var(--ck-cream) !important; }
+.woocommerce a.button.alt,
+.woocommerce button.button.alt { background: var(--ck-plum) !important; color: var(--ck-cream) !important; }
+.woocommerce a.button.alt:hover { background: var(--ck-plum-mid) !important; }
+
+/* ── WOOCOMMERCE — PRODUCT CARDS ────────────────── */
+ul.products li.product { border: 1px solid rgba(92,45,72,0.1); border-radius: 4px; background: white; overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+ul.products li.product:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(92,45,72,0.12); }
+ul.products li.product .woocommerce-LoopProduct-link { text-decoration: none; }
+ul.products li.product .woocommerce-loop-product__title { font-family: var(--font-display); font-size: 18px; font-weight: 400; color: var(--ck-plum-dark); }
+ul.products li.product .price { color: var(--ck-plum); font-size: 16px; font-weight: 500; }
+ul.products li.product .price del { color: var(--ck-text-hint); font-size: 13px; }
+
+/* ── WOOCOMMERCE — BADGES ───────────────────────── */
+.woocommerce span.onsale {
+  background: #8A1C3C !important;
+  color: white !important;
+  font-size: 10px !important;
+  letter-spacing: 0.06em;
+  border-radius: 2px !important;
+  padding: 3px 9px !important;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+}
+/* Custom badge classes — add via product custom fields */
+.ck-badge-new    { background: var(--ck-plum); color: var(--ck-cream); }
+.ck-badge-popular{ background: var(--ck-champagne); color: var(--ck-plum-dark); }
+.ck-badge-limited{ background: var(--ck-plum-dark); color: var(--ck-cream); }
+
+/* ── WOOCOMMERCE — SINGLE PRODUCT ───────────────── */
+.single-product div.product .price { color: var(--ck-plum); font-size: 22px; }
+.single-product div.product h1.product_title { font-family: var(--font-display); font-size: 36px; font-weight: 300; color: var(--ck-plum-dark); }
+.single-product div.product .woocommerce-product-details__short-description { color: var(--ck-text-muted); font-size: 15px; line-height: 1.7; }
+.single-product .woocommerce-tabs .tabs li.active a { border-bottom-color: var(--ck-plum); color: var(--ck-plum); }
+
+/* ── WOOCOMMERCE — CART & CHECKOUT ─────────────── */
+.woocommerce-cart table.cart,
+.woocommerce-checkout form.checkout { background: white; border: 1px solid rgba(92,45,72,0.1); border-radius: 4px; }
+.woocommerce form .form-row input.input-text,
+.woocommerce form .form-row textarea { border: 1px solid rgba(92,45,72,0.15); border-radius: 2px; padding: 10px 14px; }
+.woocommerce form .form-row input.input-text:focus { border-color: var(--ck-plum); outline: none; box-shadow: 0 0 0 2px rgba(92,45,72,0.1); }
+.woocommerce-checkout #payment { background: var(--ck-cream); border-radius: 4px; }
+.woocommerce-checkout #payment ul.payment_methods { border-bottom: 1px solid var(--ck-champagne-lt); }
+#place_order { background: var(--ck-plum) !important; color: var(--ck-cream) !important; width: 100%; font-size: 14px !important; letter-spacing: 0.1em; padding: 16px !important; }
+#place_order:hover { background: var(--ck-plum-mid) !important; }
+
+/* ── WOOCOMMERCE — ORDER CONFIRMED ─────────────── */
+.woocommerce-order-received h2,
+.woocommerce-thankyou-order-received { color: var(--ck-plum-dark); font-family: var(--font-display); }
+.woocommerce-order-details { border: 1px solid rgba(92,45,72,0.1); border-radius: 4px; }
+
+/* ── ANNOUNCEMENT BAR ───────────────────────────── */
+.woocommerce-store-notice,
+.site-topbar,
+.top-bar { background: var(--ck-plum-dark) !important; color: var(--ck-cream); font-size: 12px; letter-spacing: 0.06em; }
+
+/* ── FOOTER ─────────────────────────────────────── */
+.site-footer,
+#colophon { background: var(--ck-plum-dark) !important; color: rgba(247,237,216,0.5); }
+.site-footer a { color: rgba(247,237,216,0.5); }
+.site-footer a:hover { color: var(--ck-cream); }
+.site-footer h4, .site-footer .widget-title { color: var(--ck-champagne); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; font-family: var(--font-body); }
+
+/* ── WPML LANGUAGE SWITCHER ─────────────────────── */
+.wpml-ls-legacy-list-horizontal a { color: rgba(247,237,216,0.6); font-size: 11px; }
+.wpml-ls-legacy-list-horizontal .wpml-ls-current-language a { color: var(--ck-champagne); }
+.wpml-ls-flag { display: none; }
+
+/* ── RTL OVERRIDES (Arabic) ─────────────────────── */
+html[lang="ar"] .woocommerce-loop-product__title,
+html[lang="ar"] .product_title { font-family: var(--font-arabic); }
+html[lang="ar"] .woocommerce ul.products li.product .price { text-align: right; }
+html[lang="ar"] .woocommerce form .form-row { text-align: right; }
+
+/* ── WIDGETS ─────────────────────────────────────── */
+.widget_shopping_cart .cart_list li a { color: var(--ck-plum-dark); }
+.widget_product_categories ul li a { color: var(--ck-text-muted); }
+.widget_product_categories ul li a:hover { color: var(--ck-plum); }
+
+/* ── SCROLL BAR ─────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--ck-cream); }
+::-webkit-scrollbar-thumb { background: var(--ck-plum-light); border-radius: 3px; }
