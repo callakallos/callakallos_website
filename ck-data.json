@@ -82,6 +82,22 @@
       "emoji": "🌸",
       "stock": "in",
       "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_5.jpg"
+    },
+    {
+      "id": 6,
+      "name": "lavender lush",
+      "nameAr": "",
+      "desc": "lavender lush",
+      "descAr": "",
+      "price": 150,
+      "oldPrice": 150,
+      "cat": "Premium Luxury",
+      "occ": "Corporate",
+      "badges": [
+        "popular"
+      ],
+      "emoji": "🌸",
+      "stock": "in"
     }
   ],
   "orders": [
@@ -233,5 +249,5 @@
     "--ck-plum-tint": "#D6E8C4",
     "--ck-plum-light": "#5A7040"
   },
-  "nextId": 6
+  "nextId": 7
 }
