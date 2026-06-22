@@ -3306,10 +3306,10 @@ function loadFromStorage() {
     const raw = localStorage.getItem(LS_KEY);
     if (raw) applyData(JSON.parse(raw));
 
-    // Restore hero slideshow images from localStorage
+    // Restore hero slideshow images — only use if it's a real URL, never base64
     [0,1,2,3,4].forEach(i => {
       const src = localStorage.getItem(LS_HERO_KEY + i);
-      if (src) {
+      if (src && src.startsWith('http')) {
         const el = document.querySelectorAll('.ck-cust-img')[i];
         if (el) el.src = src;
       }
