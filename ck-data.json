@@ -246,7 +246,9 @@
       "orderCount": 7
     }
   ],
-  "regularOffers": {},
+  "regularOffers": {
+    "tijoeie@gmail.com": "LOYAL 10"
+  },
   "storeSettings": {
     "storeName": "Calla Kallos",
     "whatsapp": "+971 564417419",
