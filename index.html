@@ -2921,20 +2921,29 @@ function loadFromStorage() {
   } catch(e) { console.warn('Load failed:', e); }
 }
 
+async function fetchGitHubFile(path) {
+  // Use API endpoint (not raw CDN) — updates in seconds, not minutes
+  const tok = ghToken();
+  const headers = { 'Accept': 'application/vnd.github+json' };
+  if (tok) headers['Authorization'] = 'token ' + tok;
+  const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, { headers });
+  if (!res.ok) return null;
+  const meta = await res.json();
+  const text = decodeURIComponent(escape(atob(meta.content.replace(/\n/g, ''))));
+  return JSON.parse(text);
+}
+
 async function loadRemoteData() {
   try {
-    const res = await fetch(`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${DATA_PATH}?t=${Date.now()}`);
-    if (!res.ok) return;
-    const d = await res.json();
+    const d = await fetchGitHubFile(DATA_PATH);
+    if (!d) return;
     const remoteHasProducts = Array.isArray(d.products) && d.products.length > 0;
     if (remoteHasProducts) {
-      // Remote has data — apply it (overrides localStorage)
       applyData(d);
       try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
       renderProducts();
       applyStoreSettings();
     } else if (products.length > 0 && ghToken()) {
-      // Remote is empty but we have local data — push it up so other devices get it
       persistMeta();
     }
   } catch(e) { /* offline — localStorage already loaded */ }
@@ -3153,10 +3162,8 @@ const CONFIG_PATH = 'ck-config.json';
 
 async function loadRemoteConfig() {
   try {
-    const res = await fetch(`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${CONFIG_PATH}?t=${Date.now()}`);
-    if (!res.ok) return;
-    const cfg = await res.json();
-    // Token stored as two halves to satisfy GitHub secret scanning rules
+    const cfg = await fetchGitHubFile(CONFIG_PATH);
+    if (!cfg) return;
     const tok = cfg.ghToken || (cfg.ta && cfg.tb ? cfg.ta + cfg.tb : '');
     if (tok) {
       storeSettings.ghToken = tok;
