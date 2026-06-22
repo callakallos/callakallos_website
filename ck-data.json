@@ -114,6 +114,22 @@
       "emoji": "🌸",
       "stock": "in",
       "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_7.jpg"
+    },
+    {
+      "id": 8,
+      "name": "Pachila chedi",
+      "nameAr": "",
+      "desc": "pacha chedi beta version",
+      "descAr": "",
+      "price": 150,
+      "oldPrice": null,
+      "cat": "Flower Vase",
+      "occ": "Baby Shower",
+      "badges": [
+        "new"
+      ],
+      "emoji": "🌸",
+      "stock": "in"
     }
   ],
   "orders": [
@@ -315,5 +331,5 @@
     "--ck-plum-tint": "#D6E8C4",
     "--ck-plum-light": "#5A7040"
   },
-  "nextId": 8
+  "nextId": 9
 }
