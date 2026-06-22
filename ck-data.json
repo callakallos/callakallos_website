@@ -1,6 +1,174 @@
 {
-  "products": [],
-  "orders": [],
+  "products": [
+    {
+      "id": 1,
+      "name": "Rose Velvet Luxe",
+      "nameAr": "باقة الورود المخملية",
+      "cat": "Hand Bouquet",
+      "occ": "Anniversary",
+      "price": 350,
+      "oldPrice": 420,
+      "badges": [
+        "popular"
+      ],
+      "emoji": "🌹",
+      "stock": "in",
+      "desc": "A sumptuous hand-tied bouquet of deep burgundy roses, wrapped in signature plum packaging with a champagne satin ribbon.",
+      "descAr": "باقة ورد بورجندي فاخرة مربوطة يدوياً"
+    },
+    {
+      "id": 2,
+      "name": "Calla Blanc Elegance",
+      "nameAr": "أناقة كالا البيضاء",
+      "cat": "Exotic Flowers",
+      "occ": "Wedding",
+      "price": 420,
+      "oldPrice": null,
+      "badges": [],
+      "emoji": "🤍",
+      "stock": "in",
+      "desc": "Pristine white calla lilies arranged with sculptural elegance. Perfect for weddings and luxury gifting.",
+      "descAr": "زنبق كالا أبيض نقي"
+    },
+    {
+      "id": 3,
+      "name": "Peony Blush Gift Box",
+      "nameAr": "صندوق الفاوانيا الوردي",
+      "cat": "Box of Flowers",
+      "occ": "Birthday",
+      "price": 380,
+      "oldPrice": null,
+      "badges": [
+        "new"
+      ],
+      "emoji": "💝",
+      "stock": "in",
+      "desc": "Soft pink peonies nestled in our signature deep plum gift box, tied with a champagne bow.",
+      "descAr": "فاوانيا وردية ناعمة في صندوق هدايا"
+    },
+    {
+      "id": 4,
+      "name": "Midnight Garden Bouquet",
+      "nameAr": "باقة حديقة الليل",
+      "cat": "Premium Luxury",
+      "occ": "Anniversary",
+      "price": 495,
+      "oldPrice": null,
+      "badges": [
+        "limited"
+      ],
+      "emoji": "💜",
+      "stock": "low",
+      "desc": "An opulent arrangement of dark roses and seasonal blooms in dramatic deep tones. A statement piece.",
+      "descAr": "تنسيق فاخر من الورود الداكنة"
+    }
+  ],
+  "orders": [
+    {
+      "id": 1042,
+      "date": "2026-06-18",
+      "time": "14:30",
+      "customer": "Ahmed Khalid",
+      "email": "ahmed.k@gmail.com",
+      "phone": "+971 50 123 4567",
+      "product": "Rose Velvet Luxe",
+      "amount": 350,
+      "location": "Dubai Marina, Marina Walk, Villa 12",
+      "status": "Delivered",
+      "orderCount": 5
+    },
+    {
+      "id": 1041,
+      "date": "2026-06-18",
+      "time": "11:15",
+      "customer": "Sara Mohammed",
+      "email": "sara.m@hotmail.com",
+      "phone": "+971 50 987 6543",
+      "product": "Peony Blush Gift Box",
+      "amount": 380,
+      "location": "Jumeirah 2, Beach Road, Apt 4B",
+      "status": "In Transit",
+      "orderCount": 7
+    },
+    {
+      "id": 1040,
+      "date": "2026-06-17",
+      "time": "16:45",
+      "customer": "Priya Raj",
+      "email": "priya.r@gmail.com",
+      "phone": "+971 50 112 2334",
+      "product": "Midnight Garden Bouquet",
+      "amount": 495,
+      "location": "Downtown Dubai, Burj Khalifa Area, Tower 2",
+      "status": "Preparing",
+      "orderCount": 1
+    },
+    {
+      "id": 1039,
+      "date": "2026-06-17",
+      "time": "09:20",
+      "customer": "Maria Lopez",
+      "email": "maria.l@gmail.com",
+      "phone": "+971 50 765 4321",
+      "product": "Calla Blanc Elegance",
+      "amount": 420,
+      "location": "Business Bay, Executive Towers, Block C",
+      "status": "Delivered",
+      "orderCount": 3
+    },
+    {
+      "id": 1038,
+      "date": "2026-06-16",
+      "time": "13:00",
+      "customer": "Fatima Al Zaabi",
+      "email": "fatima.z@icloud.com",
+      "phone": "+971 55 234 5678",
+      "product": "Rose Velvet Luxe",
+      "amount": 350,
+      "location": "Al Barsha, Mall of Emirates area, Villa 7",
+      "status": "Delivered",
+      "orderCount": 4
+    },
+    {
+      "id": 1037,
+      "date": "2026-06-16",
+      "time": "10:30",
+      "customer": "Ahmed Khalid",
+      "email": "ahmed.k@gmail.com",
+      "phone": "+971 50 123 4567",
+      "product": "Peony Blush Gift Box",
+      "amount": 380,
+      "location": "Dubai Marina, Marina Walk, Villa 12",
+      "status": "Delivered",
+      "orderCount": 5
+    },
+    {
+      "id": 1036,
+      "date": "2026-06-15",
+      "time": "09:00",
+      "customer": "Lina Nasser",
+      "email": "lina.n@gmail.com",
+      "phone": "+971 52 345 6789",
+      "product": "Midnight Garden Bouquet",
+      "amount": 495,
+      "location": "Mirdif, Uptown Mirdif, Apt 301",
+      "status": "Delivered",
+      "orderCount": 2
+    },
+    {
+      "id": 1035,
+      "date": "2026-06-14",
+      "time": "15:20",
+      "customer": "Sara Mohammed",
+      "email": "sara.m@hotmail.com",
+      "phone": "+971 50 987 6543",
+      "product": "Rose Velvet Luxe",
+      "amount": 350,
+      "location": "Jumeirah 2, Beach Road, Apt 4B",
+      "status": "Delivered",
+      "orderCount": 7
+    }
+  ],
   "regularOffers": {},
   "storeSettings": {
     "storeName": "Calla Kallos",
@@ -8,9 +176,15 @@
     "email": "hello@callakallos.com",
     "phone": "+971 XX XXX XXXX",
     "announce": "Free delivery within Dubai on orders over AED 300 | Same-day delivery available until 4pm",
-    "announceAr": "توصيل مجاني في دبي على الطلبات فوق 300 درهم",
-    "ghToken": ""
+    "announceAr": "توصيل مجاني في دبي على الطلبات فوق 300 درهم"
   },
-  "theme": {},
-  "nextId": 1
+  "theme": {
+    "--ck-plum": "#2E3B1F",
+    "--ck-plum-dark": "#1C2512",
+    "--ck-champagne": "#C8B88A",
+    "--ck-cream": "#F5F0E8",
+    "--ck-plum-tint": "#D6E8C4",
+    "--ck-plum-light": "#5A7040"
+  },
+  "nextId": 5
 }
