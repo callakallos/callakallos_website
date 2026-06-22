@@ -65,6 +65,22 @@
       "emoji": "🌸",
       "stock": "in",
       "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_4.jpg"
+    },
+    {
+      "id": 5,
+      "name": "yellow rose",
+      "nameAr": "",
+      "desc": "yellow rose",
+      "descAr": "",
+      "price": 150,
+      "oldPrice": 200,
+      "cat": "Box of Flowers",
+      "occ": "Graduation",
+      "badges": [
+        "new"
+      ],
+      "emoji": "🌸",
+      "stock": "in"
     }
   ],
   "orders": [
@@ -203,5 +219,5 @@
     "--ck-plum-tint": "#D6E8C4",
     "--ck-plum-light": "#5A7040"
   },
-  "nextId": 5
+  "nextId": 6
 }
