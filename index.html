@@ -2367,8 +2367,9 @@ async function doLogin() {
     adminTab(role === 'florist' ? 'products' : 'dashboard');
     updateEnquiriesBadge();
     _fbStartRtListener();
-    // Explicitly refresh data after login so admin tab always shows current products
-    _fbDb.ref('ck-data').once('value').then(snap => { if (snap.val()) applyData(snap.val()); });
+    _fbDb.ref('ck-data').once('value').then(snap => {
+      if (snap.val()) { applyData(snap.val()); backfillProductCodes(); }
+    });
   } catch(e) {
     errEl.textContent = 'Incorrect password';
     errEl.classList.add('show');
@@ -3209,6 +3210,17 @@ function applyData(d) {
   }
 }
 
+function backfillProductCodes() {
+  let changed = false;
+  products.forEach(p => {
+    if (!p.code) {
+      p.code = 'CK-' + String(p.id).padStart(4, '0');
+      changed = true;
+    }
+  });
+  if (changed) persistMeta();
+}
+
 function persistMeta() {
   // Products stored WITH imgData (GitHub URLs are fine; skip heavy base64)
   const productsToSave = products.map(p => ({
@@ -3643,8 +3655,9 @@ _fbAuth.onAuthStateChanged(user => {
       adminTab(currentRole === 'florist' ? 'products' : 'dashboard');
       updateEnquiriesBadge();
     }
-    // Always fetch fresh data so admin tab shows current products
-    _fbDb.ref('ck-data').once('value').then(snap => { if (snap.val()) applyData(snap.val()); });
+    _fbDb.ref('ck-data').once('value').then(snap => {
+      if (snap.val()) { applyData(snap.val()); backfillProductCodes(); }
+    });
   }
 });
 
