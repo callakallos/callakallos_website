@@ -70,6 +70,13 @@
         try { localStorage.setItem(window._LS_KEY, JSON.stringify(d)); } catch(e) {}
         renderProducts();
         applyStoreSettings();
+        // Re-render current active admin tab so it picks up fresh data
+        const activeItem = document.querySelector('.ck-sidebar-item.active');
+        if (activeItem && typeof adminTab === 'function') {
+          const tabMap = ['dashboard','products','offers','orders','enquiries','files','settings'];
+          const items  = document.querySelectorAll('.ck-sidebar-item');
+          items.forEach((el, i) => { if (el === activeItem) adminTab(tabMap[i]); });
+        }
       }
     });
   };
