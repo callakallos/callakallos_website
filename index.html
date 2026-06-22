@@ -2355,6 +2355,8 @@ async function doLogin() {
     adminTab(role === 'florist' ? 'products' : 'dashboard');
     updateEnquiriesBadge();
     _fbStartRtListener();
+    // Explicitly refresh data after login so admin tab always shows current products
+    _fbDb.ref('ck-data').once('value').then(snap => { if (snap.val()) applyData(snap.val()); });
   } catch(e) {
     errEl.textContent = 'Incorrect password';
     errEl.classList.add('show');
@@ -3617,6 +3619,8 @@ _fbAuth.onAuthStateChanged(user => {
       adminTab(currentRole === 'florist' ? 'products' : 'dashboard');
       updateEnquiriesBadge();
     }
+    // Always fetch fresh data so admin tab shows current products
+    _fbDb.ref('ck-data').once('value').then(snap => { if (snap.val()) applyData(snap.val()); });
   }
 });
 
