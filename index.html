@@ -6,6 +6,86 @@
 <title>Calla Kallos — فلوريست دبي الفاخر</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Scheherazade+New:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getDatabase, ref, set, get, onValue, child }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+  // ── FIREBASE CONFIG ── Replace with your project values ──────────────────
+  const firebaseConfig = {
+    apiKey:            "REPLACE_API_KEY",
+    authDomain:        "REPLACE_PROJECT_ID.firebaseapp.com",
+    databaseURL:       "https://REPLACE_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId:         "REPLACE_PROJECT_ID",
+    storageBucket:     "REPLACE_PROJECT_ID.appspot.com",
+    messagingSenderId: "REPLACE_SENDER_ID",
+    appId:             "REPLACE_APP_ID"
+  };
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // User-to-role mapping: Firebase email → role
+  const USER_ROLE_MAP = {
+    'admin@callakallos.com':   'admin',
+    'florist@callakallos.com': 'florist'
+  };
+  const USER_DISPLAY_MAP = {
+    'admin@callakallos.com':   'Rinu Kurian',
+    'florist@callakallos.com': 'Florist'
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getDatabase(app);
+
+  // Expose to global scope for use by non-module scripts
+  window._fbAuth = auth;
+  window._fbDb   = db;
+  window._fbRef  = ref;
+  window._fbSet  = set;
+  window._fbGet  = get;
+  window._fbOnValue = onValue;
+  window._fbSignIn  = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
+  window._fbSignOut = () => signOut(auth);
+  window._fbUserRoleMap    = USER_ROLE_MAP;
+  window._fbUserDisplayMap = USER_DISPLAY_MAP;
+
+  // Card-to-email mapping (matches the login card UX)
+  window._fbCardEmail = {
+    admin:   'admin@callakallos.com',
+    florist: 'florist@callakallos.com'
+  };
+
+  // Real-time listener — sync data across all open tabs / devices
+  let _rtListenerActive = false;
+  window._fbStartRtListener = function() {
+    if (_rtListenerActive) return;
+    _rtListenerActive = true;
+    onValue(ref(db, 'ck-data'), snapshot => {
+      const d = snapshot.val();
+      if (d) {
+        applyData(d);
+        try { localStorage.setItem(window._LS_KEY, JSON.stringify(d)); } catch(e) {}
+        renderProducts();
+        applyStoreSettings();
+      }
+    });
+  };
+
+  // Auth state change — restore session on page reload
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      const role = window._fbUserRoleMap[user.email] || 'florist';
+      window.currentRole = role;
+      document.getElementById('adminUserName').textContent =
+        window._fbUserDisplayMap[user.email] || user.email;
+      if (typeof applyRoleUI === 'function') applyRoleUI();
+      if (typeof window._fbStartRtListener === 'function') window._fbStartRtListener();
+    }
+  });
+</script>
 <style>
 /* =============================================
    CALLA KALLOS — CUSTOM THEME CSS
@@ -2306,6 +2386,7 @@ function showStore() {
   document.getElementById('storeSection').style.display = 'block';
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.remove('active');
+  if (window._fbSignOut) window._fbSignOut().catch(() => {});
 }
 function selectLoginUser(role) {
   document.getElementById('loginUser').value = role;
@@ -2331,20 +2412,33 @@ function selectLoginUser(role) {
   document.getElementById('loginPass').focus();
 }
 
-function doLogin() {
-  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+async function doLogin() {
+  const cardRole = document.getElementById('loginUser').value || 'admin';
   const p = document.getElementById('loginPass').value;
-  const validAdmin   = (u === 'admin'   && p === 'admin');
-  const validFlorist = (u === 'florist' && p === 'florist');
-  if (validAdmin || validFlorist) {
-    currentRole = validFlorist ? 'florist' : 'admin';
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.remove('show');
+
+  if (!window._fbSignIn || !window._fbCardEmail) {
+    errEl.textContent = 'Firebase not configured — fill in firebaseConfig first';
+    errEl.classList.add('show'); return;
+  }
+  const email = window._fbCardEmail[cardRole];
+  try {
+    const cred = await window._fbSignIn(email, p);
+    const user  = cred.user;
+    const role  = (window._fbUserRoleMap || {})[user.email] || 'florist';
+    currentRole = role;
+    document.getElementById('adminUserName').textContent =
+      (window._fbUserDisplayMap || {})[user.email] || user.email;
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('adminSection').classList.add('active');
     applyRoleUI();
-    adminTab(validFlorist ? 'products' : 'dashboard');
+    adminTab(role === 'florist' ? 'products' : 'dashboard');
     updateEnquiriesBadge();
-  } else {
-    document.getElementById('loginErr').classList.add('show');
+    if (window._fbStartRtListener) window._fbStartRtListener();
+  } catch(e) {
+    errEl.textContent = 'Incorrect password';
+    errEl.classList.add('show');
   }
 }
 
@@ -3066,12 +3160,12 @@ function saveSettings() {
   applyStoreSettings();
   persistMeta();
   toast('Settings saved ✓');
-  // Persist token + whatsapp to repo so they survive across devices
+  // Persist config to Firebase so it survives across devices
   saveRemoteConfig({
-    ghToken:   storeSettings.ghToken,
     whatsapp:  storeSettings.whatsapp,
-    storeName: storeSettings.storeName
-  }).then(() => toast('Settings synced to GitHub ✓'));
+    storeName: storeSettings.storeName,
+    ghToken:   storeSettings.ghToken
+  }).then(() => toast('Settings synced ✓'));
 }
 
 function populateSettingsInputs() {
@@ -3114,10 +3208,9 @@ function applyStoreSettings() {
 // ============================================================
 //  PERSISTENCE — localStorage (fast) + GitHub (cross-device)
 // ============================================================
-const LS_KEY      = 'ck_data_v3';
+const LS_KEY = window._LS_KEY = 'ck_data_v3';
 const LS_IMG_KEY  = 'ck_img_v2_';
 const LS_HERO_KEY = 'ck_hero_v2_';
-const DATA_PATH   = 'ck-data.json';
 
 function currentTheme() {
   return Object.fromEntries(
@@ -3192,21 +3285,11 @@ function loadFromStorage() {
   } catch(e) { console.warn('Load failed:', e); }
 }
 
-async function fetchGitHubFile(path) {
-  // Use API endpoint (not raw CDN) — updates in seconds, not minutes
-  const tok = ghToken();
-  const headers = { 'Accept': 'application/vnd.github+json' };
-  if (tok) headers['Authorization'] = 'token ' + tok;
-  const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, { headers });
-  if (!res.ok) return null;
-  const meta = await res.json();
-  const text = decodeURIComponent(escape(atob(meta.content.replace(/\n/g, ''))));
-  return JSON.parse(text);
-}
-
 async function loadRemoteData() {
+  if (!window._fbDb) return;
   try {
-    const d = await fetchGitHubFile(DATA_PATH);
+    const snap = await window._fbGet(window._fbRef(window._fbDb, 'ck-data'));
+    const d = snap.val();
     if (!d) return;
     const remoteHasProducts = Array.isArray(d.products) && d.products.length > 0;
     if (remoteHasProducts) {
@@ -3214,40 +3297,18 @@ async function loadRemoteData() {
       try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
       renderProducts();
       applyStoreSettings();
-    } else if (products.length > 0 && ghToken()) {
+    } else if (products.length > 0) {
       persistMeta();
     }
   } catch(e) { /* offline — localStorage already loaded */ }
 }
 
-// Serialise all ck-data.json writes — prevents concurrent SHA conflicts
-let _saveDataQueue = Promise.resolve();
 function saveRemoteData(snapshot) {
-  _saveDataQueue = _saveDataQueue.then(() => _doSaveRemoteData(snapshot));
-  return _saveDataQueue;
-}
-
-async function _doSaveRemoteData(snapshot) {
-  const tok = ghToken();
-  if (!tok) return;
+  if (!window._fbDb) return Promise.resolve();
   const { ghToken: _drop, ...safeSettings } = snapshot.storeSettings || {};
   const safeSnapshot = { ...snapshot, storeSettings: safeSettings };
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(safeSnapshot, null, 2))));
-  // Retry once on SHA conflict (happens when two saves race)
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const meta = await ghRequest(DATA_PATH);
-      const body = { message: 'Sync admin data', content: encoded, branch: GH_BRANCH };
-      if (meta && meta.sha) body.sha = meta.sha;
-      const result = await ghRequest(DATA_PATH, 'PUT', body);
-      if (!result || result.message) {
-        if (attempt === 0 && result && result.message && result.message.includes('expected')) continue; // SHA conflict — retry
-        if (attempt === 1) toast('Sync failed: ' + (result ? result.message : 'no response'), 'error');
-      } else {
-        return; // success
-      }
-    } catch(e) { toast('Sync error: ' + e.message, 'error'); return; }
-  }
+  return window._fbSet(window._fbRef(window._fbDb, 'ck-data'), safeSnapshot)
+    .catch(e => toast('Sync error: ' + e.message, 'error'));
 }
 
 // ============================================================
@@ -3437,47 +3498,26 @@ function fileToBase64(file) {
 // ============================================================
 //  REMOTE CONFIG — load token & settings from ck-config.json
 // ============================================================
-const CONFIG_PATH = 'ck-config.json';
-
 async function loadRemoteConfig() {
+  if (!window._fbDb) return;
   try {
-    const cfg = await fetchGitHubFile(CONFIG_PATH);
+    const snap = await window._fbGet(window._fbRef(window._fbDb, 'ck-config'));
+    const cfg = snap.val();
     if (!cfg) return;
-    const tok = cfg.ghToken || (cfg.ta && cfg.tb ? cfg.ta + cfg.tb : '');
-    if (tok) {
-      storeSettings.ghToken = tok;
-      localStorage.setItem('ck_gh_token', tok);
-    }
     if (cfg.whatsapp)  { storeSettings.whatsapp  = cfg.whatsapp;  applyStoreSettings(); }
     if (cfg.storeName) { storeSettings.storeName = cfg.storeName; }
-  } catch(e) { /* offline or first load — use localStorage fallback */ }
+    if (cfg.ghToken)   { storeSettings.ghToken = cfg.ghToken; localStorage.setItem('ck_gh_token', cfg.ghToken); }
+  } catch(e) { /* offline — use localStorage fallback */ }
 }
 
 async function saveRemoteConfig(updates) {
-  const tok = ghToken();
-  if (!tok) return;
-  let currentCfg = {}, sha;
-  try {
-    const meta = await ghRequest(CONFIG_PATH);
-    if (meta && meta.sha) {
-      sha = meta.sha;
-      const content = atob(meta.content.replace(/\n/g,''));
-      currentCfg = JSON.parse(content);
-    }
-  } catch(e) {}
-  // Strip raw token from updates — ta/tb split form stays in currentCfg
+  if (!window._fbDb) return;
   const { ghToken: _drop, ...safeUpdates } = updates;
-  const merged = { ...currentCfg, ...safeUpdates };
-  const body = {
-    message: 'Update site config',
-    content: btoa(unescape(encodeURIComponent(JSON.stringify(merged, null, 2)))),
-    branch: GH_BRANCH
-  };
-  if (sha) body.sha = sha;
-  const result = await ghRequest(CONFIG_PATH, 'PUT', body);
-  if (!result || result.message) {
-    toast('Sync failed: ' + (result && result.message ? result.message : 'no response'), 'error');
-  }
+  try {
+    const snap = await window._fbGet(window._fbRef(window._fbDb, 'ck-config'));
+    const current = snap.val() || {};
+    await window._fbSet(window._fbRef(window._fbDb, 'ck-config'), { ...current, ...safeUpdates });
+  } catch(e) { toast('Config sync error: ' + e.message, 'error'); }
 }
 
 // ============================================================
@@ -3569,12 +3609,14 @@ function enquiriesHTML() {
     </div>`;
 }
 
-// init — load config first (token), then sync remote data
+// init — load from localStorage immediately, then sync from Firebase once auth is ready
 loadFromStorage();
 renderProducts();
+// Firebase data loads after login via onAuthStateChanged + _fbStartRtListener
+// For the public store view, do a one-time read (no auth needed if DB rules allow public read)
 (async () => {
-  await loadRemoteConfig();  // get token first
-  await loadRemoteData();    // then sync — auto-pushes local data if remote is empty
+  await loadRemoteConfig();
+  await loadRemoteData();
 })();
 
 // Customer image slideshow
