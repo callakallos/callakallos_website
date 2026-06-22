@@ -20,15 +20,15 @@
       "id": 2,
       "name": "Calla Blanc Elegance",
       "nameAr": "أناقة كالا البيضاء",
-      "cat": "Exotic Flowers",
-      "occ": "Wedding",
+      "desc": "Pristine white calla lilies arranged with sculptural elegance. Perfect for weddings and luxury gifting.",
+      "descAr": "زنبق كالا أبيض نقي",
       "price": 420,
       "oldPrice": null,
+      "cat": "Exotic Flowers",
+      "occ": "Wedding",
       "badges": [],
-      "emoji": "🤍",
-      "stock": "in",
-      "desc": "Pristine white calla lilies arranged with sculptural elegance. Perfect for weddings and luxury gifting.",
-      "descAr": "زنبق كالا أبيض نقي"
+      "emoji": "🌸",
+      "stock": "in"
     },
     {
       "id": 3,
