@@ -2757,12 +2757,16 @@ async function saveProduct() {
   persistImage(product.id, imgData);  // Always save base64 for instant display
   persistMeta();
 
-  // Upload to GitHub in background (file manager backup — does not affect display)
+  // Upload to GitHub in background; once done, replace imgData with GitHub URL so all devices can display it
   if (pendingB64 && ghToken()) {
     const ext = pendingFile.split('.').pop().toLowerCase() || 'jpg';
     const ghPath = `images/products/product_${product.id}.${ext}`;
     uploadToGitHub(ghPath, pendingB64, pendingFile).then(url => {
-      if (url) toast('Image backed up to GitHub ✓');
+      if (url) {
+        product.imgData = url;  // GitHub URL — accessible from any device
+        persistMeta();          // re-sync with GitHub URL stored in ck-data.json
+        toast('Image synced across devices ✓');
+      }
       imgPreview.dataset.pendingB64 = '';
     });
   }
@@ -2841,55 +2845,70 @@ function applyStoreSettings() {
 }
 
 // ============================================================
-//  LOCALSTORAGE PERSISTENCE
-//  Images stored in separate keys to avoid quota issues.
+//  PERSISTENCE — localStorage (fast) + GitHub (cross-device)
 // ============================================================
-const LS_KEY      = 'ck_data_v2';
-const LS_IMG_KEY  = 'ck_img_v2_';    // + productId
-const LS_HERO_KEY = 'ck_hero_v2_';   // + slot index
+const LS_KEY      = 'ck_data_v3';
+const LS_IMG_KEY  = 'ck_img_v2_';
+const LS_HERO_KEY = 'ck_hero_v2_';
+const DATA_PATH   = 'ck-data.json';
 
-function persistMeta() {
-  // Save everything except imgData (stored separately)
-  const theme = Object.fromEntries(
+function currentTheme() {
+  return Object.fromEntries(
     Object.keys(defaultTheme).map(v => [v, getComputedStyle(document.documentElement).getPropertyValue(v).trim()])
   );
-  const productsStripped = products.map(p => ({ ...p, imgData: undefined }));
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify({
-      products: productsStripped, orders, regularOffers, storeSettings, theme
-    }));
-  } catch(e) { console.warn('Meta save failed:', e); }
+}
+
+function applyData(d) {
+  // Products: prefer GitHub image URLs; fall back to localStorage base64
+  if (Array.isArray(d.products) && d.products.length) {
+    products = d.products;
+    products.forEach(p => {
+      if (!p.imgData) {
+        const local = localStorage.getItem(LS_IMG_KEY + p.id);
+        if (local) p.imgData = local;
+      }
+    });
+  }
+  if (Array.isArray(d.orders)  && d.orders.length)  orders        = d.orders;
+  if (d.regularOffers) regularOffers = d.regularOffers;
+  if (d.nextId && d.nextId > nextId)  nextId = d.nextId;
+  if (d.storeSettings) Object.assign(storeSettings, d.storeSettings);
+  if (d.theme) Object.entries(d.theme).forEach(([v,c]) => document.documentElement.style.setProperty(v, c));
+  applyStoreSettings();
+}
+
+function persistMeta() {
+  // Products stored WITH imgData (GitHub URLs are fine; skip heavy base64)
+  const productsToSave = products.map(p => ({
+    ...p,
+    imgData: p.imgData && p.imgData.startsWith('http') ? p.imgData : undefined
+  }));
+  const snapshot = { products: productsToSave, orders, regularOffers, storeSettings, theme: currentTheme(), nextId };
+  // localStorage — fast, same device
+  try { localStorage.setItem(LS_KEY, JSON.stringify(snapshot)); } catch(e) {}
+  // localStorage base64 images stay in LS_IMG_KEY keys
+  // GitHub — cross-device (async, non-blocking)
+  saveRemoteData(snapshot);
 }
 
 function persistImage(productId, imgData) {
   if (!imgData) { localStorage.removeItem(LS_IMG_KEY + productId); return; }
-  try { localStorage.setItem(LS_IMG_KEY + productId, imgData); }
-  catch(e) { toast('⚠ Image too large for storage', 'error'); }
+  // Only save base64 to localStorage; GitHub URL stored in product object itself
+  if (!imgData.startsWith('http')) {
+    try { localStorage.setItem(LS_IMG_KEY + productId, imgData); } catch(e) {}
+  }
 }
 
 function persistHeroImage(slot, src) {
-  try { localStorage.setItem(LS_HERO_KEY + slot, src); }
-  catch(e) { console.warn('Hero image save failed:', e); }
+  try { localStorage.setItem(LS_HERO_KEY + slot, src); } catch(e) {}
 }
 
 function loadFromStorage() {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return;
-    const d = JSON.parse(raw);
-    if (Array.isArray(d.products) && d.products.length)  products      = d.products;
-    if (Array.isArray(d.orders)   && d.orders.length)    orders        = d.orders;
-    if (d.regularOffers) regularOffers = d.regularOffers;
-    if (d.storeSettings) Object.assign(storeSettings, d.storeSettings);
-    if (d.theme) Object.entries(d.theme).forEach(([v,c]) => document.documentElement.style.setProperty(v, c));
+    if (raw) applyData(JSON.parse(raw));
 
-    // Restore product images
-    products.forEach(p => {
-      const img = localStorage.getItem(LS_IMG_KEY + p.id);
-      if (img) p.imgData = img;
-    });
-
-    // Restore hero slideshow images
+    // Restore hero slideshow images from localStorage
     [0,1,2,3,4].forEach(i => {
       const src = localStorage.getItem(LS_HERO_KEY + i);
       if (src) {
@@ -2897,9 +2916,36 @@ function loadFromStorage() {
         if (el) el.src = src;
       }
     });
-
-    applyStoreSettings();
   } catch(e) { console.warn('Load failed:', e); }
+}
+
+async function loadRemoteData() {
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${DATA_PATH}?t=${Date.now()}`);
+    if (!res.ok) return;
+    const d = await res.json();
+    applyData(d);
+    // Cache locally
+    try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
+    renderProducts();
+    applyStoreSettings();
+  } catch(e) { /* offline — localStorage already loaded */ }
+}
+
+async function saveRemoteData(snapshot) {
+  const tok = ghToken();
+  if (!tok) return;
+  try {
+    const meta = await ghRequest(DATA_PATH);
+    const sha  = meta && meta.sha ? meta.sha : undefined;
+    const body = {
+      message: 'Sync admin data',
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(snapshot, null, 2)))),
+      branch: GH_BRANCH
+    };
+    if (sha) body.sha = sha;
+    await ghRequest(DATA_PATH, 'PUT', body);
+  } catch(e) { console.warn('Remote data save failed:', e); }
 }
 
 // ============================================================
@@ -3131,7 +3177,8 @@ async function saveRemoteConfig(updates) {
 // init
 loadFromStorage();
 renderProducts();
-loadRemoteConfig();  // async — applies token/settings when ready
+loadRemoteConfig();   // async — token/settings
+loadRemoteData();     // async — cross-device product/order sync
 
 // Customer image slideshow
 (function() {
