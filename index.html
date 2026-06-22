@@ -2923,14 +2923,18 @@ async function saveProduct() {
   persistImage(product.id, imgData);  // Always save base64 for instant display
   persistMeta();
 
-  // Upload to GitHub in background; once done, replace imgData with GitHub URL so all devices can display it
+  // Upload to GitHub in background; once done, store GitHub URL in the products array by ID
   if (pendingB64 && ghToken()) {
+    const uploadId  = product.id;
     const ext = pendingFile.split('.').pop().toLowerCase() || 'jpg';
-    const ghPath = `images/products/product_${product.id}.${ext}`;
+    const ghPath = `images/products/product_${uploadId}.${ext}`;
     uploadToGitHub(ghPath, pendingB64, pendingFile).then(url => {
       if (url) {
-        product.imgData = url;  // GitHub URL — accessible from any device
-        persistMeta();          // re-sync with GitHub URL stored in ck-data.json
+        // Look up by ID in case the array was replaced by a remote sync since save
+        const live = products.find(p => p.id === uploadId);
+        if (live) live.imgData = url;
+        persistMeta();
+        renderProducts();
         toast('Image synced across devices ✓');
       }
       imgPreview.dataset.pendingB64 = '';
