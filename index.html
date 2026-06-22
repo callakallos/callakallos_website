@@ -3027,8 +3027,13 @@ function applyData(d) {
       }
     });
   }
-  if (Array.isArray(d.orders)     && d.orders.length)     orders     = d.orders;
-  if (Array.isArray(d.enquiries))                         enquiries  = d.enquiries;
+  if (Array.isArray(d.orders) && d.orders.length) orders = d.orders;
+  // Merge enquiries: union of local + remote by ID so async load never erases a just-submitted message
+  if (Array.isArray(d.enquiries) && d.enquiries.length) {
+    const localIds = new Set(enquiries.map(e => e.id));
+    const merged = [...enquiries, ...d.enquiries.filter(e => !localIds.has(e.id))];
+    enquiries = merged.sort((a,b) => b.id - a.id);
+  }
   if (d.regularOffers) regularOffers = d.regularOffers;
   if (d.nextId && d.nextId > nextId)  nextId = d.nextId;
   if (d.storeSettings) Object.assign(storeSettings, d.storeSettings);
