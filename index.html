@@ -2949,26 +2949,34 @@ async function loadRemoteData() {
   } catch(e) { /* offline — localStorage already loaded */ }
 }
 
-async function saveRemoteData(snapshot) {
+// Serialise all ck-data.json writes — prevents concurrent SHA conflicts
+let _saveDataQueue = Promise.resolve();
+function saveRemoteData(snapshot) {
+  _saveDataQueue = _saveDataQueue.then(() => _doSaveRemoteData(snapshot));
+  return _saveDataQueue;
+}
+
+async function _doSaveRemoteData(snapshot) {
   const tok = ghToken();
   if (!tok) return;
-  // Strip raw token from storeSettings before committing — prevents secret scanning rejection
   const { ghToken: _drop, ...safeSettings } = snapshot.storeSettings || {};
   const safeSnapshot = { ...snapshot, storeSettings: safeSettings };
-  try {
-    const meta = await ghRequest(DATA_PATH);
-    const sha  = meta && meta.sha ? meta.sha : undefined;
-    const body = {
-      message: 'Sync admin data',
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(safeSnapshot, null, 2)))),
-      branch: GH_BRANCH
-    };
-    if (sha) body.sha = sha;
-    const result = await ghRequest(DATA_PATH, 'PUT', body);
-    if (!result || result.message) {
-      toast('Data sync failed: ' + (result && result.message ? result.message : 'no response'), 'error');
-    }
-  } catch(e) { toast('Data sync error: ' + e.message, 'error'); }
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(safeSnapshot, null, 2))));
+  // Retry once on SHA conflict (happens when two saves race)
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const meta = await ghRequest(DATA_PATH);
+      const body = { message: 'Sync admin data', content: encoded, branch: GH_BRANCH };
+      if (meta && meta.sha) body.sha = meta.sha;
+      const result = await ghRequest(DATA_PATH, 'PUT', body);
+      if (!result || result.message) {
+        if (attempt === 0 && result && result.message && result.message.includes('expected')) continue; // SHA conflict — retry
+        if (attempt === 1) toast('Sync failed: ' + (result ? result.message : 'no response'), 'error');
+      } else {
+        return; // success
+      }
+    } catch(e) { toast('Sync error: ' + e.message, 'error'); return; }
+  }
 }
 
 // ============================================================
