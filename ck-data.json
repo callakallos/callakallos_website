@@ -103,6 +103,19 @@
   ],
   "orders": [
     {
+      "id": 1045,
+      "date": "2026-06-22",
+      "time": "18:41",
+      "customer": "Tijo Thomas",
+      "email": "tijoeie@gmail.com",
+      "phone": "0545372017",
+      "product": "lavender lush",
+      "amount": 150,
+      "location": "villa 20",
+      "status": "Pending",
+      "orderCount": 3
+    },
+    {
       "id": 1044,
       "date": "2026-06-22",
       "time": "18:33",
