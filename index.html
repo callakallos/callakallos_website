@@ -997,6 +997,23 @@ body {
 .ck-login-err { color: #F5A0A0; font-size: 12px; margin-top: 8px; text-align: center; display: none; }
 .ck-login-err.show { display: block; }
 
+/* Checkout payment options */
+.co-pay-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid rgba(46,59,31,0.2);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ck-text-muted);
+  transition: var(--transition);
+  user-select: none;
+}
+.co-pay-opt:hover { border-color: var(--ck-plum); color: var(--ck-plum); }
+.co-pay-opt.selected { background: var(--ck-plum); color: var(--ck-cream); border-color: var(--ck-plum); }
+
 /* Toast */
 .ck-toast {
   position: fixed;
@@ -1443,7 +1460,100 @@ body {
       <span id="cartTotalLabel">Total</span>
       <span id="cartTotalVal">AED 0</span>
     </div>
-    <button class="ck-checkout-btn" id="checkoutBtn">Proceed to Checkout →</button>
+    <button class="ck-checkout-btn" id="checkoutBtn" onclick="openCheckout()">Proceed to Checkout →</button>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="ck-modal-overlay" id="checkoutModal">
+  <div class="ck-modal" style="max-width:560px;">
+    <div class="ck-modal-head">
+      <span class="ck-modal-title">Complete Your Order</span>
+      <button class="ck-modal-close" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="ck-modal-body">
+
+      <!-- Order summary -->
+      <div id="coSummary" style="background:rgba(46,59,31,0.08);border:1px solid rgba(46,59,31,0.12);border-radius:4px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--ck-text-muted);line-height:1.8;"></div>
+
+      <!-- Personal details -->
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ck-champagne);margin-bottom:10px;">Your Details</div>
+      <div class="ck-form-row">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Full Name <span>*</span></label>
+          <input class="ck-input" id="coName" placeholder="e.g. Sara Al Mansoori" style="background:white;border-color:rgba(46,59,31,0.2);color:var(--ck-text);">
+        </div>
+        <div class="ck-form-group">
+          <label class="ck-form-label">Phone Number <span>*</span></label>
+          <input class="ck-input" id="coPhone" placeholder="+971 50 000 0000" style="background:white;border-color:rgba(46,59,31,0.2);color:var(--ck-text);">
+        </div>
+      </div>
+      <div class="ck-form-row full">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Email Address <span>*</span></label>
+          <input class="ck-input" id="coEmail" type="email" placeholder="you@example.com" style="background:white;border-color:rgba(46,59,31,0.2);color:var(--ck-text);">
+        </div>
+      </div>
+      <div class="ck-form-row full">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Delivery Address <span>*</span></label>
+          <textarea class="ck-textarea" id="coAddress" placeholder="Building, street, area, Dubai" style="background:white;border-color:rgba(46,59,31,0.2);color:var(--ck-text);min-height:70px;"></textarea>
+        </div>
+      </div>
+
+      <!-- Delivery type -->
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ck-champagne);margin:16px 0 10px;">Delivery Type</div>
+      <div class="ck-form-row full">
+        <div class="ck-form-group">
+          <select class="ck-select" id="coDelivery" style="background:white;border-color:rgba(46,59,31,0.2);color:var(--ck-text);">
+            <option value="">Select delivery option</option>
+            <option value="same-day">Same-Day Delivery (order before 4pm) — Free over AED 300</option>
+            <option value="scheduled">Scheduled Delivery — Choose a date & time</option>
+            <option value="pickup">Self Pick-Up — Dubai location</option>
+          </select>
+        </div>
+      </div>
+      <div class="ck-form-row full" id="coDateRow" style="display:none;">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Preferred Delivery Date & Time</label>
+          <input class="ck-input" id="coDate" type="datetime-local" style="background:white;border-color:rgba(46,59,31,0.2);color:var(--ck-text);">
+        </div>
+      </div>
+
+      <!-- Special note -->
+      <div class="ck-form-row full" style="margin-top:4px;">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Special Instructions / Card Message</label>
+          <textarea class="ck-textarea" id="coNote" placeholder="e.g. Leave at reception, add a card saying Happy Birthday…" style="background:white;border-color:rgba(46,59,31,0.2);color:var(--ck-text);min-height:64px;"></textarea>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ck-champagne);margin:16px 0 10px;">Payment Method</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="coPayOptions">
+        <label class="co-pay-opt" data-val="cod">
+          <input type="radio" name="coPayment" value="cod" style="display:none;">
+          <span>💵 Cash on Delivery</span>
+        </label>
+        <label class="co-pay-opt" data-val="card">
+          <input type="radio" name="coPayment" value="card" style="display:none;">
+          <span>💳 Card on Delivery</span>
+        </label>
+        <label class="co-pay-opt" data-val="bank">
+          <input type="radio" name="coPayment" value="bank" style="display:none;">
+          <span>🏦 Bank Transfer</span>
+        </label>
+        <label class="co-pay-opt" data-val="whatsapp">
+          <input type="radio" name="coPayment" value="whatsapp" style="display:none;">
+          <span>📲 Pay via WhatsApp</span>
+        </label>
+      </div>
+      <div id="coPayErr" style="color:#A03030;font-size:12px;margin-top:6px;display:none;">Please select a payment method.</div>
+    </div>
+    <div class="ck-modal-footer">
+      <button class="ck-admin-btn-ghost" onclick="closeCheckout()">Cancel</button>
+      <button class="ck-admin-btn" onclick="submitCheckout()">Place Order →</button>
+    </div>
   </div>
 </div>
 
@@ -1675,6 +1785,85 @@ function updateCartUI() {
       </div>
     </div>
   `).join('') : `<div style="padding:40px;text-align:center;color:var(--ck-text-hint);font-size:14px;">${lang==='ar'?'السلة فارغة':'Your cart is empty'}</div>`;
+}
+
+// ============================================================
+//  CHECKOUT MODAL
+// ============================================================
+function openCheckout() {
+  if (!cart.length) { toast('Your cart is empty', 'error'); return; }
+  // Populate order summary
+  const summary = cart.map(c => `${c.name} × ${c.qty} — AED ${c.price * c.qty}`).join('\n');
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  document.getElementById('coSummary').innerHTML =
+    cart.map(c => `<div>🌸 ${c.name} × ${c.qty} <span style="float:right;color:var(--ck-plum);font-weight:500;">AED ${c.price * c.qty}</span></div>`).join('') +
+    `<div style="border-top:1px solid rgba(46,59,31,0.12);margin-top:8px;padding-top:8px;font-weight:500;color:var(--ck-plum-dark);">Total <span style="float:right;">AED ${total.toLocaleString()}</span></div>`;
+  document.getElementById('checkoutModal').classList.add('open');
+  // Close cart drawer
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('open');
+}
+
+function closeCheckout() {
+  document.getElementById('checkoutModal').classList.remove('open');
+}
+
+// Show/hide date field based on delivery type
+document.getElementById('coDelivery').addEventListener('change', function() {
+  document.getElementById('coDateRow').style.display = this.value === 'scheduled' ? '' : 'none';
+});
+
+// Payment option pill toggle
+document.querySelectorAll('.co-pay-opt').forEach(opt => {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('.co-pay-opt').forEach(o => o.classList.remove('selected'));
+    this.classList.add('selected');
+    this.querySelector('input').checked = true;
+    document.getElementById('coPayErr').style.display = 'none';
+  });
+});
+
+function submitCheckout() {
+  const name     = document.getElementById('coName').value.trim();
+  const phone    = document.getElementById('coPhone').value.trim();
+  const email    = document.getElementById('coEmail').value.trim();
+  const address  = document.getElementById('coAddress').value.trim();
+  const delivery = document.getElementById('coDelivery').value;
+  const payment  = document.querySelector('input[name="coPayment"]:checked');
+  const note     = document.getElementById('coNote').value.trim();
+
+  // Basic validation
+  if (!name || !phone || !email || !address || !delivery) {
+    toast('Please fill in all required fields', 'error'); return;
+  }
+  if (!payment) {
+    document.getElementById('coPayErr').style.display = 'block'; return;
+  }
+
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const items = cart.map(c => `${c.name} x${c.qty} (AED ${c.price * c.qty})`).join(', ');
+  const deliveryDate = document.getElementById('coDate').value;
+
+  // Build WhatsApp message
+  let msg = `🌸 *New Order — Calla Kallos*\n\n`;
+  msg += `*Name:* ${name}\n`;
+  msg += `*Phone:* ${phone}\n`;
+  msg += `*Email:* ${email}\n`;
+  msg += `*Address:* ${address}\n`;
+  msg += `*Delivery:* ${delivery}${deliveryDate ? ' — ' + deliveryDate : ''}\n`;
+  msg += `*Payment:* ${payment.value}\n`;
+  if (note) msg += `*Note:* ${note}\n`;
+  msg += `\n*Items:* ${items}\n`;
+  msg += `*Total:* AED ${total.toLocaleString()}`;
+
+  // Send via WhatsApp (replace number with real one)
+  const waNumber = '971500000000'; // ← replace with your WhatsApp number
+  window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+
+  closeCheckout();
+  cart = [];
+  updateCartUI();
+  toast('Order sent! We\'ll confirm via WhatsApp shortly ✓');
 }
 
 function toggleCart() {
