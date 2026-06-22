@@ -2941,12 +2941,15 @@ async function loadRemoteData() {
 async function saveRemoteData(snapshot) {
   const tok = ghToken();
   if (!tok) return;
+  // Strip raw token from storeSettings before committing — prevents secret scanning rejection
+  const { ghToken: _drop, ...safeSettings } = snapshot.storeSettings || {};
+  const safeSnapshot = { ...snapshot, storeSettings: safeSettings };
   try {
     const meta = await ghRequest(DATA_PATH);
     const sha  = meta && meta.sha ? meta.sha : undefined;
     const body = {
       message: 'Sync admin data',
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(snapshot, null, 2)))),
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(safeSnapshot, null, 2)))),
       branch: GH_BRANCH
     };
     if (sha) body.sha = sha;
@@ -3162,7 +3165,6 @@ async function loadRemoteConfig() {
 async function saveRemoteConfig(updates) {
   const tok = ghToken();
   if (!tok) return;
-  // Fetch current config to get SHA
   let currentCfg = {}, sha;
   try {
     const meta = await ghRequest(CONFIG_PATH);
@@ -3172,10 +3174,12 @@ async function saveRemoteConfig(updates) {
       currentCfg = JSON.parse(content);
     }
   } catch(e) {}
-  const merged = { ...currentCfg, ...updates };
+  // Strip raw token from updates — ta/tb split form stays in currentCfg
+  const { ghToken: _drop, ...safeUpdates } = updates;
+  const merged = { ...currentCfg, ...safeUpdates };
   const body = {
     message: 'Update site config',
-    content: btoa(JSON.stringify(merged, null, 2)),
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(merged, null, 2)))),
     branch: GH_BRANCH
   };
   if (sha) body.sha = sha;
