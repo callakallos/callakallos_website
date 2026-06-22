@@ -3597,19 +3597,9 @@ function _fbStartRtListener() {
   _fbDb.ref('ck-data').on('value', snapshot => {
     const d = snapshot.val();
     if (!d) return;
-    applyData(d);
+    applyData(d); // applyData now handles admin tab refresh + applyStoreSettings
     try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
     renderProducts();
-    applyStoreSettings();
-    if (document.getElementById('adminSection').classList.contains('active')) {
-      const activeItem = document.querySelector('.ck-sidebar-item.active');
-      if (activeItem) {
-        const tabMap = ['dashboard','products','offers','orders','enquiries','files','settings'];
-        document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
-          if (el === activeItem) adminTab(tabMap[i]);
-        });
-      }
-    }
   });
 }
 
