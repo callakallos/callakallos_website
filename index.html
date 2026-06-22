@@ -881,26 +881,29 @@ body {
 }
 .ck-modal-overlay.open { display: flex; }
 .ck-modal {
-  background: #1F0E18;
-  border: 1px solid rgba(212,184,150,0.15);
+  background: var(--ck-ivory);
+  border: 1px solid var(--ck-champagne-lt);
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 640px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(28,37,18,0.25);
 }
 .ck-modal-head {
   padding: var(--space-lg);
-  border-bottom: 1px solid rgba(212,184,150,0.1);
+  border-bottom: 1px solid var(--ck-champagne-lt);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--ck-plum);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
-.ck-modal-title { font-size: 16px; color: var(--ck-champagne); font-family: var(--font-display); font-weight: 400; }
-.ck-modal-close { background: none; border: none; color: rgba(212,184,150,0.4); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
-.ck-modal-close:hover { color: var(--ck-champagne); }
-.ck-modal-body { padding: var(--space-lg); }
-.ck-modal-footer { padding: var(--space-md) var(--space-lg); border-top: 1px solid rgba(212,184,150,0.1); display: flex; justify-content: flex-end; gap: 8px; }
+.ck-modal-title { font-size: 16px; color: var(--ck-cream); font-family: var(--font-display); font-weight: 400; letter-spacing: 0.04em; }
+.ck-modal-close { background: none; border: none; color: rgba(247,237,216,0.5); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
+.ck-modal-close:hover { color: var(--ck-cream); }
+.ck-modal-body { padding: var(--space-lg); background: var(--ck-ivory); }
+.ck-modal-footer { padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--ck-champagne-lt); display: flex; justify-content: flex-end; gap: 8px; background: var(--ck-cream-dark); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
 
 /* Form fields */
 .ck-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-md); }
@@ -910,14 +913,14 @@ body {
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(212,184,150,0.5);
+  color: var(--ck-text-muted);
 }
-.ck-form-label span { color: rgba(160,48,48,0.8); margin-left: 2px; }
+.ck-form-label span { color: var(--ck-danger); margin-left: 2px; }
 .ck-input, .ck-select, .ck-textarea {
-  background: rgba(46,59,31,0.2);
-  border: 1px solid rgba(212,184,150,0.15);
+  background: white;
+  border: 1px solid rgba(46,59,31,0.2);
   border-radius: var(--radius-sm);
-  color: var(--ck-cream);
+  color: var(--ck-text);
   font-family: var(--font-body);
   font-size: 13px;
   padding: 9px 12px;
@@ -926,11 +929,11 @@ body {
   width: 100%;
 }
 .ck-input:focus, .ck-select:focus, .ck-textarea:focus {
-  border-color: var(--ck-champagne);
-  background: rgba(46,59,31,0.3);
+  border-color: var(--ck-plum);
+  box-shadow: 0 0 0 2px rgba(46,59,31,0.08);
 }
 .ck-select { cursor: pointer; }
-.ck-select option { background: #1F0E18; }
+.ck-select option { background: white; color: var(--ck-text); }
 .ck-textarea { min-height: 80px; resize: vertical; }
 
 /* Badge selector */
@@ -975,16 +978,20 @@ body {
   justify-content: center;
 }
 .ck-login-card {
-  background: #1F0E18;
-  border: 1px solid rgba(212,184,150,0.12);
+  background: var(--ck-ivory);
+  border: 1px solid var(--ck-champagne-lt);
   border-radius: var(--radius-lg);
-  padding: var(--space-xl) var(--space-xl);
+  padding: 0;
   width: 100%;
   max-width: 380px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(28,37,18,0.3);
 }
 .ck-login-logo {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  padding: var(--space-xl);
+  background: var(--ck-plum);
+  margin-bottom: 0;
 }
 .ck-login-logo-text {
   font-family: var(--font-display);
@@ -993,8 +1000,8 @@ body {
   font-weight: 300;
   letter-spacing: 0.08em;
 }
-.ck-login-sub { font-size: 12px; color: rgba(212,184,150,0.4); letter-spacing: 0.08em; margin-top: 4px; }
-.ck-login-err { color: #F5A0A0; font-size: 12px; margin-top: 8px; text-align: center; display: none; }
+.ck-login-sub { font-size: 12px; color: rgba(247,237,216,0.5); letter-spacing: 0.08em; margin-top: 4px; }
+.ck-login-err { color: var(--ck-danger); font-size: 12px; margin-top: 8px; text-align: center; display: none; }
 .ck-login-err.show { display: block; }
 
 /* Checkout payment options */
@@ -1389,18 +1396,20 @@ body {
         <div class="ck-login-logo-text">Calla Kallos</div>
         <div class="ck-login-sub">ADMIN PORTAL</div>
       </div>
-      <div class="ck-form-group" style="margin-bottom:14px;">
-        <label class="ck-form-label">Username</label>
-        <input class="ck-input" id="loginUser" type="text" placeholder="admin">
-      </div>
-      <div class="ck-form-group" style="margin-bottom:20px;">
-        <label class="ck-form-label">Password</label>
-        <input class="ck-input" id="loginPass" type="password" placeholder="••••••••">
-      </div>
-      <button class="ck-admin-btn" onclick="doLogin()" style="width:100%;justify-content:center;padding:12px;">Sign In</button>
-      <div class="ck-login-err" id="loginErr">Incorrect username or password</div>
-      <div style="margin-top:16px;text-align:center;">
-        <button onclick="showStore()" style="background:none;border:none;color:rgba(212,184,150,0.35);font-size:12px;cursor:pointer;">← Back to store</button>
+      <div style="padding:var(--space-xl);">
+        <div class="ck-form-group" style="margin-bottom:14px;">
+          <label class="ck-form-label">Username</label>
+          <input class="ck-input" id="loginUser" type="text" placeholder="admin">
+        </div>
+        <div class="ck-form-group" style="margin-bottom:20px;">
+          <label class="ck-form-label">Password</label>
+          <input class="ck-input" id="loginPass" type="password" placeholder="••••••••">
+        </div>
+        <button class="ck-btn ck-btn-primary" onclick="doLogin()" style="width:100%;justify-content:center;">Sign In →</button>
+        <div class="ck-login-err" id="loginErr">Incorrect username or password</div>
+        <div style="margin-top:16px;text-align:center;">
+          <button onclick="showStore()" style="background:none;border:none;color:var(--ck-text-hint);font-size:12px;cursor:pointer;letter-spacing:0.04em;">← Back to store</button>
+        </div>
       </div>
     </div>
   </div>
