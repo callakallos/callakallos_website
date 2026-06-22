@@ -117,19 +117,6 @@
   ],
   "orders": [
     {
-      "id": 1047,
-      "date": "2026-06-22",
-      "time": "21:00",
-      "customer": "Tijo Thomas",
-      "email": "tijoeie@gmail.com",
-      "phone": "0545372017",
-      "product": "Luxury Graduation Floral Arrangement 🎓🌸S",
-      "amount": 1100,
-      "location": "abudhabi",
-      "status": "Pending",
-      "orderCount": 4
-    },
-    {
       "id": 1046,
       "date": "2026-06-22",
       "time": "18:48",
