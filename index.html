@@ -3653,6 +3653,8 @@ function _onFbReady(fn) {
 _onFbReady(async () => {
   await loadRemoteConfig();
   await loadRemoteData();
+  // Start real-time listener for all visitors — keeps store in sync when admin adds/edits products
+  if (window._fbStartRtListener) window._fbStartRtListener();
 });
 
 // Customer image slideshow
