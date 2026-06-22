@@ -487,7 +487,14 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.4s ease;
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+.ck-product-thumb {
+  position: relative;
 }
 .ck-product-card:hover .ck-product-thumb img { transform: scale(1.05); }
 .ck-product-thumb-placeholder {
@@ -2061,14 +2068,35 @@ function submitCheckout() {
   msg += `\n*Items:* ${items}\n`;
   msg += `*Total:* AED ${total.toLocaleString()}`;
 
-  // Send via WhatsApp (replace number with real one)
-  const waNumber = '971500000000'; // ← replace with your WhatsApp number
-  window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+  // Use configured WhatsApp number from settings
+  const rawWa = (storeSettings.whatsapp || '').replace(/[^0-9]/g, '');
+  if (!rawWa) {
+    toast('No WhatsApp number configured — go to Admin → Settings', 'error');
+    return;
+  }
+  window.open(`https://wa.me/${rawWa}?text=${encodeURIComponent(msg)}`, '_blank');
+
+  // Save order to orders list
+  const newOrder = {
+    id: orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1001,
+    date: new Date().toISOString().slice(0, 10),
+    time: new Date().toTimeString().slice(0, 5),
+    customer: name,
+    email,
+    phone,
+    product: cart.map(c => c.name).join(', '),
+    amount: total,
+    location: address,
+    status: 'Pending',
+    orderCount: orders.filter(o => o.email === email).length + 1
+  };
+  orders.unshift(newOrder);
+  persistMeta();
 
   closeCheckout();
   cart = [];
   updateCartUI();
-  toast('Order sent! We\'ll confirm via WhatsApp shortly ✓');
+  toast('Order placed! We\'ll confirm via WhatsApp shortly ✓');
 }
 
 function toggleCart() {
