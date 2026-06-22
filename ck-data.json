@@ -4,17 +4,17 @@
       "id": 1,
       "name": "Rose Velvet Luxe",
       "nameAr": "باقة الورود المخملية",
-      "cat": "Hand Bouquet",
-      "occ": "Anniversary",
+      "desc": "A sumptuous hand-tied bouquet of deep burgundy roses, wrapped in signature plum packaging with a champagne satin ribbon.",
+      "descAr": "باقة ورد بورجندي فاخرة مربوطة يدوياً",
       "price": 350,
       "oldPrice": 420,
+      "cat": "Hand Bouquet",
+      "occ": "Anniversary",
       "badges": [
         "popular"
       ],
-      "emoji": "🌹",
-      "stock": "in",
-      "desc": "A sumptuous hand-tied bouquet of deep burgundy roses, wrapped in signature plum packaging with a champagne satin ribbon.",
-      "descAr": "باقة ورد بورجندي فاخرة مربوطة يدوياً"
+      "emoji": "🌸",
+      "stock": "in"
     },
     {
       "id": 2,
