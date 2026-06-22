@@ -871,8 +871,16 @@ body {
 }
 
 /* Product table */
+.ck-table-scroll { max-height: 420px; overflow-y: auto; }
+.ck-table-scroll::-webkit-scrollbar { width: 4px; }
+.ck-table-scroll::-webkit-scrollbar-track { background: transparent; }
+.ck-table-scroll::-webkit-scrollbar-thumb { background: rgba(212,184,150,0.2); border-radius: 2px; }
 .ck-product-table { width: 100%; border-collapse: collapse; }
-.ck-product-table th {
+.ck-product-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #1e2712;
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -2482,10 +2490,12 @@ function productsHTML() {
         <span class="ck-panel-title">All Products (${products.length})</span>
         <input class="ck-input" style="width:200px;padding:6px 10px;" placeholder="Search products…" oninput="filterTable(this.value)">
       </div>
-      <table class="ck-product-table" id="productTable">
-        <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Badges</th><th>Stock</th><th>Actions</th></tr></thead>
-        <tbody>${productRows()}</tbody>
-      </table>
+      <div class="ck-table-scroll">
+        <table class="ck-product-table" id="productTable">
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Badges</th><th>Stock</th><th>Actions</th></tr></thead>
+          <tbody>${productRows()}</tbody>
+        </table>
+      </div>
     </div>
   `;
 }
@@ -2549,9 +2559,10 @@ function offersHTML() {
     </div>
     <div class="ck-admin-panel-block">
       <div class="ck-panel-header"><span class="ck-panel-title">Products with Active Badges (${offerProducts.length})</span></div>
-      <table class="ck-product-table">
-        <thead><tr><th>Product</th><th>Price</th><th>Active Badges</th><th>Actions</th></tr></thead>
-        <tbody>
+      <div class="ck-table-scroll">
+        <table class="ck-product-table">
+          <thead><tr><th>Product</th><th>Price</th><th>Active Badges</th><th>Actions</th></tr></thead>
+          <tbody>
           ${products.map((p,i) => `
             <tr>
               <td>
@@ -2565,8 +2576,9 @@ function offersHTML() {
               <td><button class="ck-admin-btn-ghost" onclick="openEditModal(${i})" style="padding:5px 10px;font-size:11px;">Edit Badges</button></td>
             </tr>
           `).join('')}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 }
