@@ -2056,8 +2056,12 @@ function submitCheckout() {
   const items = cart.map(c => `${c.name} x${c.qty} (AED ${c.price * c.qty})`).join(', ');
   const deliveryDate = document.getElementById('coDate').value;
 
+  // Generate order ID first so it can go into the WhatsApp message
+  const orderId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1001;
+
   // Build WhatsApp message
-  let msg = `🌸 *New Order — Calla Kallos*\n\n`;
+  let msg = `🌸 *New Order — Calla Kallos*\n`;
+  msg += `*Order #:* ${orderId}\n\n`;
   msg += `*Name:* ${name}\n`;
   msg += `*Phone:* ${phone}\n`;
   msg += `*Email:* ${email}\n`;
@@ -2078,7 +2082,7 @@ function submitCheckout() {
 
   // Save order to orders list
   const newOrder = {
-    id: orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1001,
+    id: orderId,
     date: new Date().toISOString().slice(0, 10),
     time: new Date().toTimeString().slice(0, 5),
     customer: name,
