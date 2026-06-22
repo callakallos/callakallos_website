@@ -68,6 +68,19 @@
   ],
   "orders": [
     {
+      "id": 1043,
+      "date": "2026-06-22",
+      "time": "18:12",
+      "customer": "tijo",
+      "email": "tijoeie@gmail.com",
+      "phone": "+971 545372017",
+      "product": "Calla Blanc Elegance",
+      "amount": 420,
+      "location": "we",
+      "status": "Pending",
+      "orderCount": 1
+    },
+    {
       "id": 1042,
       "date": "2026-06-18",
       "time": "14:30",
