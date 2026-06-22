@@ -1703,7 +1703,7 @@ body {
     <div class="ck-admin-nav">
       <div class="ck-admin-brand">Calla Kallos <span>Admin</span></div>
       <div class="ck-admin-user">
-        Rinu Kurian &nbsp;|&nbsp;
+        <span id="adminUserName">Rinu Kurian</span> &nbsp;|&nbsp;
         <button onclick="showStore()" style="background:none;border:1px solid rgba(212,184,150,0.2);color:rgba(212,184,150,0.5);font-size:11px;padding:4px 10px;border-radius:2px;cursor:pointer;">View Store</button>
         <button onclick="showStore()" style="background:none;border:none;color:rgba(212,184,150,0.35);font-size:11px;cursor:pointer;margin-left:4px;">Logout</button>
       </div>
@@ -2264,26 +2264,52 @@ function toast(msg, type='success') {
 // ============================================================
 //  ADMIN AUTH
 // ============================================================
+let currentRole = 'admin'; // 'admin' or 'florist'
+
+function applyRoleUI() {
+  const isFlorist = currentRole === 'florist';
+  // Update displayed name
+  document.getElementById('adminUserName').textContent = isFlorist ? 'Florist' : 'Rinu Kurian';
+  // Hide dashboard + settings sidebar items for florist
+  const sidebarItems = document.querySelectorAll('.ck-sidebar-item');
+  const tabs = ['dashboard','products','offers','orders','enquiries','files','settings'];
+  sidebarItems.forEach((el, i) => {
+    if (isFlorist && (tabs[i] === 'dashboard' || tabs[i] === 'settings')) {
+      el.style.display = 'none';
+    } else {
+      el.style.display = '';
+    }
+  });
+}
+
 function showAdminLogin() {
   // BYPASS: skip login screen during testing
+  currentRole = 'admin';
   document.getElementById('storeSection').style.display = 'none';
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.add('active');
+  applyRoleUI();
   adminTab('dashboard');
   updateEnquiriesBadge();
 }
 function showStore() {
+  currentRole = 'admin';
   document.getElementById('storeSection').style.display = 'block';
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.remove('active');
 }
 function doLogin() {
-  const u = document.getElementById('loginUser').value;
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
   const p = document.getElementById('loginPass').value;
-  if (u === 'admin' && p === 'admin') {
+  const validAdmin   = (u === 'admin'   && p === 'admin');
+  const validFlorist = (u === 'florist' && p === 'florist');
+  if (validAdmin || validFlorist) {
+    currentRole = validFlorist ? 'florist' : 'admin';
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('adminSection').classList.add('active');
-    adminTab('dashboard');
+    applyRoleUI();
+    adminTab(validFlorist ? 'products' : 'dashboard');
+    updateEnquiriesBadge();
   } else {
     document.getElementById('loginErr').classList.add('show');
   }
@@ -2293,6 +2319,8 @@ function doLogin() {
 //  ADMIN TABS
 // ============================================================
 function adminTab(tab) {
+  // Florist cannot access dashboard or settings
+  if (currentRole === 'florist' && (tab === 'dashboard' || tab === 'settings')) return;
   document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
     const tabs = ['dashboard','products','offers','orders','enquiries','files','settings'];
     el.classList.toggle('active', tabs[i]===tab);
@@ -2355,14 +2383,18 @@ function dashboardHTML() {
         </tr>`).join('')
     : `<tr><td colspan="5" style="text-align:center;color:rgba(212,184,150,0.3);padding:24px;">No orders today or yesterday</td></tr>`;
 
+  const isFlorist = currentRole === 'florist';
+  const userName  = isFlorist ? 'Florist' : 'Rinu';
+
   return `
-    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">${greeting}, Rinu 🌸</h2>
+    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">${greeting}, ${userName} 🌸</h2>
+    ${isFlorist ? '' : `
     <div class="ck-admin-stats">
       <div class="ck-stat-card"><div class="ck-stat-label">Total Revenue</div><div class="ck-stat-val">AED ${totalRev.toLocaleString()}</div><div class="ck-stat-sub">All time · ${orders.length} orders</div></div>
       <div class="ck-stat-card"><div class="ck-stat-label">Today's Revenue</div><div class="ck-stat-val">AED ${todayRev.toLocaleString()}</div><div class="ck-stat-sub">${todayDiffStr}</div></div>
       <div class="ck-stat-card"><div class="ck-stat-label">This Week</div><div class="ck-stat-val">AED ${weeklyRev.toLocaleString()}</div><div class="ck-stat-sub">Last 7 days</div></div>
       <div class="ck-stat-card"><div class="ck-stat-label">This Month</div><div class="ck-stat-val">AED ${monthlyRev.toLocaleString()}</div><div class="ck-stat-sub">${new Date().toLocaleString('en',{month:'long'})}</div></div>
-    </div>
+    </div>`}
     <div class="ck-admin-stats" style="margin-top:12px;">
       <div class="ck-stat-card"><div class="ck-stat-label">Products</div><div class="ck-stat-val">${products.length}</div><div class="ck-stat-sub">Active listings</div></div>
       <div class="ck-stat-card"><div class="ck-stat-label">Pending / Preparing</div><div class="ck-stat-val" style="color:#C8B88A;">${pendingCount}</div><div class="ck-stat-sub">Needs action</div></div>
@@ -2375,7 +2407,7 @@ function dashboardHTML() {
         <button class="ck-admin-btn" onclick="adminTab('products');setTimeout(openAddModal,50)">+ Add New Product</button>
         <button class="ck-admin-btn" onclick="adminTab('offers')">🏷 Manage Offers</button>
         <button class="ck-admin-btn-ghost" onclick="adminTab('orders')">📦 View All Orders</button>
-        <button class="ck-admin-btn-ghost" onclick="adminTab('settings')">⚙ Store Settings</button>
+        ${isFlorist ? '' : `<button class="ck-admin-btn-ghost" onclick="adminTab('settings')">⚙ Store Settings</button>`}
       </div>
     </div>
     <div class="ck-admin-panel-block" style="margin-top:20px;">
