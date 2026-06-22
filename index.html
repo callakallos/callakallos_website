@@ -2539,13 +2539,20 @@ function renderOrdersTable() {
   const tbody = document.getElementById('ordersTableBody');
   if (!tbody) return;
 
-  const statusColors = { Delivered:'#4A7C59', 'In Transit':'#C08030', Preparing:'#C08030', Pending:'#888', Cancelled:'#C04040' };
+  const statusMeta = {
+    Delivered:    { color:'#4A7C59', bg:'rgba(74,124,89,0.12)',  border:'rgba(74,124,89,0.25)',  icon:'✓' },
+    'In Transit': { color:'#C08030', bg:'rgba(192,128,48,0.12)', border:'rgba(192,128,48,0.25)', icon:'🚚' },
+    Preparing:    { color:'#B8860B', bg:'rgba(184,134,11,0.1)',  border:'rgba(184,134,11,0.22)', icon:'⏳' },
+    Pending:      { color:'#8899AA', bg:'rgba(136,153,170,0.08)',border:'rgba(136,153,170,0.18)',icon:'🕐' },
+    Cancelled:    { color:'#C04040', bg:'rgba(192,64,64,0.1)',   border:'rgba(192,64,64,0.22)',  icon:'✕' },
+  };
   const statusOpts = ['Pending','Preparing','In Transit','Delivered','Cancelled'];
 
   tbody.innerHTML = list.map(o => {
     const isRegular = o.orderCount >= 3;
+    const sm = statusMeta[o.status] || statusMeta.Pending;
     const selOpts = statusOpts.map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
-    return `<tr>
+    return `<tr style="background:${sm.bg};border-left:3px solid ${sm.border};">
       <td>#${o.id}</td>
       <td style="white-space:nowrap;">${o.date}<br><span style="font-size:11px;color:rgba(212,184,150,0.4);">${o.time}</span></td>
       <td>
@@ -2558,6 +2565,9 @@ function renderOrdersTable() {
       <td style="white-space:nowrap;">AED ${o.amount}</td>
       <td style="font-size:12px;max-width:160px;">${o.location}</td>
       <td>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:${sm.bg};border:1px solid ${sm.border};border-radius:4px;padding:3px 8px;margin-bottom:6px;white-space:nowrap;">
+          <span style="color:${sm.color};font-size:12px;">${sm.icon} ${o.status}</span>
+        </div><br>
         <select class="ck-select" id="status_${o.id}" style="padding:4px 8px;font-size:12px;width:130px;">
           ${selOpts}
         </select>
