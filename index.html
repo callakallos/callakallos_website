@@ -2525,26 +2525,23 @@ async function saveProduct() {
     imgData,
   };
 
-  // Upload to GitHub if token available and we have a new image
-  if (pendingB64 && ghToken()) {
-    const ext = pendingFile.split('.').pop().toLowerCase() || 'jpg';
-    const ghPath = `images/products/product_${productId}.${ext}`;
-    toast('Uploading image…');
-    const url = await uploadToGitHub(ghPath, pendingB64, pendingFile);
-    if (url) {
-      product.imgData = url;
-      imgData = url;
-      imgPreview.dataset.pendingB64 = '';
-    }
-  }
-
   if (idx >= 0) { product.id = products[idx].id; products[idx] = product; toast('Product updated ✓'); }
   else { products.push(product); toast('Product added ✓'); }
   closeModal();
   adminTab('products');
   renderProducts();
-  persistImage(product.id, imgData);
+  persistImage(product.id, imgData);  // Always save base64 for instant display
   persistMeta();
+
+  // Upload to GitHub in background (file manager backup — does not affect display)
+  if (pendingB64 && ghToken()) {
+    const ext = pendingFile.split('.').pop().toLowerCase() || 'jpg';
+    const ghPath = `images/products/product_${product.id}.${ext}`;
+    uploadToGitHub(ghPath, pendingB64, pendingFile).then(url => {
+      if (url) toast('Image backed up to GitHub ✓');
+      imgPreview.dataset.pendingB64 = '';
+    });
+  }
 }
 
 // Store settings state (persists while page is open)
