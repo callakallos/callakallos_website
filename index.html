@@ -3170,6 +3170,17 @@ function applyData(d) {
   if (d.storeSettings) Object.assign(storeSettings, d.storeSettings);
   if (d.theme) Object.entries(d.theme).forEach(([v,c]) => document.documentElement.style.setProperty(v, c));
   applyStoreSettings();
+  // If admin panel is open, refresh whichever tab is active
+  const adminEl = document.getElementById('adminSection');
+  if (adminEl && adminEl.classList.contains('active')) {
+    const activeItem = document.querySelector('.ck-sidebar-item.active');
+    if (activeItem) {
+      const tabMap = ['dashboard','products','offers','orders','enquiries','files','settings'];
+      document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
+        if (el === activeItem) adminTab(tabMap[i]);
+      });
+    }
+  }
 }
 
 function persistMeta() {
