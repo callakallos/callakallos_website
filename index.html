@@ -1901,6 +1901,10 @@ body {
           <img id="imgPreview" class="ck-img-preview" alt="Preview">
         </div>
       </div>
+      <div class="ck-form-group" style="margin-bottom:14px;">
+        <label class="ck-form-label">Product Code</label>
+        <input class="ck-input" id="fldCode" readonly style="opacity:0.6;cursor:default;letter-spacing:0.1em;font-weight:500;">
+      </div>
       <div class="ck-form-row">
         <div class="ck-form-group">
           <label class="ck-form-label">Product Name (English) <span>*</span></label>
@@ -2951,6 +2955,7 @@ function openAddModal() {
   ['fldName','fldNameAr','fldDesc','fldDescAr','fldPrice','fldOldPrice'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fldCat').value = '';
   document.getElementById('fldOcc').value = '';
+  document.getElementById('fldCode').value = 'CK-' + String(nextId).padStart(4, '0');
   document.getElementById('imgPreview').style.display = 'none';
   document.querySelectorAll('.ck-badge-opt').forEach(b => b.classList.remove('selected'));
   document.getElementById('productModal').classList.add('open');
@@ -2969,6 +2974,7 @@ function openEditModal(i) {
   document.getElementById('fldOldPrice').value = p.oldPrice || '';
   document.getElementById('fldCat').value = p.cat;
   document.getElementById('fldOcc').value = p.occ || '';
+  document.getElementById('fldCode').value = p.code || ('CK-' + String(p.id).padStart(4, '0'));
   if (p.imgData) { const img = document.getElementById('imgPreview'); img.src = p.imgData; img.style.display='block'; }
   else document.getElementById('imgPreview').style.display = 'none';
   document.querySelectorAll('.ck-badge-opt').forEach(b => b.classList.toggle('selected', selectedBadges.includes(b.dataset.val)));
@@ -3027,6 +3033,7 @@ async function saveProduct() {
 
   const product = {
     id: productId,
+    code: document.getElementById('fldCode').value || ('CK-' + String(productId).padStart(4, '0')),
     name,
     nameAr: document.getElementById('fldNameAr').value.trim(),
     desc: document.getElementById('fldDesc').value.trim(),
