@@ -2854,6 +2854,56 @@ function settingsHTML() {
       </div>
     </div>
 
+    <!-- Change Passwords -->
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">Change Passwords</span></div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Admin password -->
+        <div>
+          <div style="font-size:12px;letter-spacing:0.08em;color:rgba(212,184,150,0.5);text-transform:uppercase;margin-bottom:12px;">👑 Admin Password</div>
+          <div class="ck-form-row">
+            <div class="ck-form-group">
+              <label class="ck-form-label">Current Password</label>
+              <input class="ck-input" id="pwAdminCurrent" type="password" placeholder="Your current password">
+            </div>
+            <div class="ck-form-group">
+              <label class="ck-form-label">New Password</label>
+              <input class="ck-input" id="pwAdminNew" type="password" placeholder="New password (min 6 chars)">
+            </div>
+          </div>
+          <button class="ck-admin-btn" onclick="changeAdminPassword()" style="margin-top:4px;">Update Admin Password</button>
+          <div id="pwAdminMsg" style="margin-top:8px;font-size:13px;display:none;"></div>
+        </div>
+
+        <div style="border-top:1px solid rgba(212,184,150,0.08);"></div>
+
+        <!-- Florist password -->
+        <div>
+          <div style="font-size:12px;letter-spacing:0.08em;color:rgba(212,184,150,0.5);text-transform:uppercase;margin-bottom:12px;">🌸 Florist Password</div>
+          <div class="ck-form-row">
+            <div class="ck-form-group">
+              <label class="ck-form-label">Current Florist Password</label>
+              <input class="ck-input" id="pwFloristCurrent" type="password" placeholder="Current florist password">
+            </div>
+            <div class="ck-form-group">
+              <label class="ck-form-label">New Florist Password</label>
+              <input class="ck-input" id="pwFloristNew" type="password" placeholder="New password (min 6 chars)">
+            </div>
+          </div>
+          <div class="ck-form-row" style="margin-top:8px;">
+            <div class="ck-form-group">
+              <label class="ck-form-label">Your Admin Password <span style="font-size:10px;color:var(--ck-text-hint);text-transform:none;">(to re-login after)</span></label>
+              <input class="ck-input" id="pwAdminConfirm" type="password" placeholder="Your admin password">
+            </div>
+          </div>
+          <button class="ck-admin-btn" onclick="changeFloristPassword()" style="margin-top:4px;">Update Florist Password</button>
+          <div id="pwFloristMsg" style="margin-top:8px;font-size:13px;display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Payment -->
     <div class="ck-admin-panel-block">
       <div class="ck-panel-header"><span class="ck-panel-title">Payment Gateways</span></div>
@@ -2871,6 +2921,61 @@ function settingsHTML() {
       </div>
     </div>
   `;
+}
+
+async function changeAdminPassword() {
+  const curPw = document.getElementById('pwAdminCurrent').value.trim();
+  const newPw = document.getElementById('pwAdminNew').value.trim();
+  const msgEl = document.getElementById('pwAdminMsg');
+  msgEl.style.display = 'none';
+  if (!curPw || !newPw) { _pwMsg(msgEl, 'Please fill in both fields.', false); return; }
+  if (newPw.length < 6) { _pwMsg(msgEl, 'New password must be at least 6 characters.', false); return; }
+  try {
+    const email = FB_CARD_EMAIL['admin'];
+    const credential = firebase.auth.EmailAuthProvider.credential(email, curPw);
+    await _fbAuth.currentUser.reauthenticateWithCredential(credential);
+    await _fbAuth.currentUser.updatePassword(newPw);
+    document.getElementById('pwAdminCurrent').value = '';
+    document.getElementById('pwAdminNew').value = '';
+    _pwMsg(msgEl, '✓ Admin password updated successfully.', true);
+  } catch(e) {
+    const msg = e.code === 'auth/wrong-password' ? 'Current password is incorrect.' : e.message;
+    _pwMsg(msgEl, msg, false);
+  }
+}
+
+async function changeFloristPassword() {
+  const curPw   = document.getElementById('pwFloristCurrent').value.trim();
+  const newPw   = document.getElementById('pwFloristNew').value.trim();
+  const adminPw = document.getElementById('pwAdminConfirm').value.trim();
+  const msgEl   = document.getElementById('pwFloristMsg');
+  msgEl.style.display = 'none';
+  if (!curPw || !newPw || !adminPw) { _pwMsg(msgEl, 'Please fill in all three fields.', false); return; }
+  if (newPw.length < 6) { _pwMsg(msgEl, 'New password must be at least 6 characters.', false); return; }
+  try {
+    // Sign in as florist to update their password
+    const floristCred = await _fbAuth.signInWithEmailAndPassword(FB_CARD_EMAIL['florist'], curPw);
+    await floristCred.user.updatePassword(newPw);
+    // Sign back in as admin
+    await _fbAuth.signInWithEmailAndPassword(FB_CARD_EMAIL['admin'], adminPw);
+    document.getElementById('pwFloristCurrent').value = '';
+    document.getElementById('pwFloristNew').value = '';
+    document.getElementById('pwAdminConfirm').value = '';
+    _pwMsg(msgEl, '✓ Florist password updated successfully.', true);
+  } catch(e) {
+    const msg = e.code === 'auth/wrong-password' ? 'One of the passwords is incorrect.' : e.message;
+    _pwMsg(msgEl, msg, false);
+    // If florist sign-in succeeded but admin re-login failed, try to restore admin session
+    if (_fbAuth.currentUser && _fbAuth.currentUser.email === FB_CARD_EMAIL['florist']) {
+      _pwMsg(msgEl, msg + ' Re-enter your admin password to restore your session.', false);
+    }
+  }
+}
+
+function _pwMsg(el, text, success) {
+  el.style.color = success ? '#7bc47f' : '#ff8a8a';
+  el.textContent = text;
+  el.style.display = 'block';
 }
 
 function cssToHex(v) {
