@@ -2931,30 +2931,31 @@ async function saveProduct() {
     imgData,
   };
 
-  if (idx >= 0) { product.id = products[idx].id; products[idx] = product; toast('Product updated ✓'); }
-  else { products.push(product); toast('Product added ✓'); }
+  if (idx >= 0) { product.id = products[idx].id; products[idx] = product; }
+  else { products.push(product); }
   closeModal();
   adminTab('products');
   renderProducts();
-  persistImage(product.id, imgData);  // Always save base64 for instant display
-  persistMeta();
+  persistImage(product.id, imgData); // save base64 locally for instant display on this device
 
-  // Upload to GitHub in background; once done, store GitHub URL in the products array by ID
   if (pendingB64 && ghToken()) {
-    const uploadId  = product.id;
+    // Has a new image — upload first, then sync everything to GitHub in one shot
+    const uploadId = product.id;
     const ext = pendingFile.split('.').pop().toLowerCase() || 'jpg';
     const ghPath = `images/products/product_${uploadId}.${ext}`;
+    toast('Uploading image…');
     uploadToGitHub(ghPath, pendingB64, pendingFile).then(url => {
-      if (url) {
-        // Look up by ID in case the array was replaced by a remote sync since save
-        const live = products.find(p => p.id === uploadId);
-        if (live) live.imgData = url;
-        persistMeta();
-        renderProducts();
-        toast('Image synced across devices ✓');
-      }
       imgPreview.dataset.pendingB64 = '';
+      const live = products.find(p => p.id === uploadId);
+      if (live) live.imgData = url || live.imgData;
+      persistMeta(); // single GitHub write — image URL already in product
+      renderProducts();
+      toast(url ? 'Product saved — image synced to all devices ✓' : 'Product saved ✓');
     });
+  } else {
+    // No new image — sync immediately
+    persistMeta();
+    toast('Product saved ✓');
   }
 }
 
