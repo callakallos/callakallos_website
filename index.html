@@ -1679,16 +1679,28 @@ body {
         <div class="ck-login-sub">ADMIN PORTAL</div>
       </div>
       <div style="padding:var(--space-xl);">
-        <div class="ck-form-group" style="margin-bottom:14px;">
-          <label class="ck-form-label">Username</label>
-          <input class="ck-input" id="loginUser" type="text" placeholder="admin">
+        <div style="margin-bottom:20px;">
+          <label class="ck-form-label" style="color:rgba(212,184,150,0.6);margin-bottom:10px;display:block;">Select User</label>
+          <div style="display:flex;gap:10px;">
+            <div id="userCardAdmin" onclick="selectLoginUser('admin')" style="flex:1;border:1px solid var(--ck-champagne);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;background:rgba(200,184,138,0.12);transition:all 0.2s;">
+              <div style="font-size:22px;margin-bottom:6px;">👑</div>
+              <div style="font-size:12px;color:var(--ck-champagne);font-weight:600;letter-spacing:0.06em;">ADMIN</div>
+              <div style="font-size:10px;color:rgba(212,184,150,0.45);margin-top:3px;">Full access</div>
+            </div>
+            <div id="userCardFlorist" onclick="selectLoginUser('florist')" style="flex:1;border:1px solid rgba(200,184,138,0.25);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;background:transparent;transition:all 0.2s;">
+              <div style="font-size:22px;margin-bottom:6px;">🌸</div>
+              <div style="font-size:12px;color:rgba(212,184,150,0.6);font-weight:600;letter-spacing:0.06em;">FLORIST</div>
+              <div style="font-size:10px;color:rgba(212,184,150,0.35);margin-top:3px;">Limited access</div>
+            </div>
+          </div>
         </div>
+        <input type="hidden" id="loginUser" value="admin">
         <div class="ck-form-group" style="margin-bottom:20px;">
-          <label class="ck-form-label">Password</label>
-          <input class="ck-input" id="loginPass" type="password" placeholder="••••••••">
+          <label class="ck-form-label" style="color:rgba(212,184,150,0.6);">Password</label>
+          <input class="ck-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <button class="ck-btn ck-btn-primary" onclick="doLogin()" style="width:100%;justify-content:center;">Sign In →</button>
-        <div class="ck-login-err" id="loginErr">Incorrect username or password</div>
+        <div class="ck-login-err" id="loginErr">Incorrect password</div>
         <div style="margin-top:16px;text-align:center;">
           <button onclick="showStore()" style="background:none;border:none;color:var(--ck-text-hint);font-size:12px;cursor:pointer;letter-spacing:0.04em;">← Back to store</button>
         </div>
@@ -2298,6 +2310,30 @@ function showStore() {
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.remove('active');
 }
+function selectLoginUser(role) {
+  document.getElementById('loginUser').value = role;
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').classList.remove('show');
+  const adminCard   = document.getElementById('userCardAdmin');
+  const floristCard = document.getElementById('userCardFlorist');
+  if (role === 'admin') {
+    adminCard.style.border   = '1px solid var(--ck-champagne)';
+    adminCard.style.background = 'rgba(200,184,138,0.12)';
+    adminCard.querySelector('div:nth-child(2)').style.color = 'var(--ck-champagne)';
+    floristCard.style.border   = '1px solid rgba(200,184,138,0.25)';
+    floristCard.style.background = 'transparent';
+    floristCard.querySelector('div:nth-child(2)').style.color = 'rgba(212,184,150,0.6)';
+  } else {
+    floristCard.style.border   = '1px solid var(--ck-champagne)';
+    floristCard.style.background = 'rgba(200,184,138,0.12)';
+    floristCard.querySelector('div:nth-child(2)').style.color = 'var(--ck-champagne)';
+    adminCard.style.border   = '1px solid rgba(200,184,138,0.25)';
+    adminCard.style.background = 'transparent';
+    adminCard.querySelector('div:nth-child(2)').style.color = 'rgba(212,184,150,0.6)';
+  }
+  document.getElementById('loginPass').focus();
+}
+
 function doLogin() {
   const u = document.getElementById('loginUser').value.trim().toLowerCase();
   const p = document.getElementById('loginPass').value;
