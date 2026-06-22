@@ -1444,6 +1444,10 @@ body {
           <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
           Orders
         </div>
+        <div class="ck-sidebar-item" onclick="adminTab('files')">
+          <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          File Manager
+        </div>
         <div class="ck-sidebar-item" onclick="adminTab('settings')">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           Settings
@@ -1942,7 +1946,7 @@ function doLogin() {
 // ============================================================
 function adminTab(tab) {
   document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
-    const tabs = ['dashboard','products','offers','orders','settings'];
+    const tabs = ['dashboard','products','offers','orders','files','settings'];
     el.classList.toggle('active', tabs[i]===tab);
   });
   const main = document.getElementById('adminMain');
@@ -1950,6 +1954,7 @@ function adminTab(tab) {
   else if (tab==='products') main.innerHTML = productsHTML();
   else if (tab==='offers') main.innerHTML = offersHTML();
   else if (tab==='orders') { main.innerHTML = ordersHTML(); renderOrdersTable(); }
+  else if (tab==='files') { main.innerHTML = fileManagerHTML(); loadFileManager(); }
   else if (tab==='settings') { main.innerHTML = settingsHTML(); populateSettingsInputs(); }
 }
 
@@ -2263,6 +2268,13 @@ function settingsHTML() {
         </div>
         <div class="ck-form-row full"><div class="ck-form-group"><label class="ck-form-label">Announcement Bar Text (EN)</label><input class="ck-input" id="settingAnnounce" value="Free delivery within Dubai on orders over AED 300 | Same-day delivery available until 4pm"></div></div>
         <div class="ck-form-row full"><div class="ck-form-group"><label class="ck-form-label">إعلان الشريط العلوي (عربي)</label><input class="ck-input" id="settingAnnounceAr" style="direction:rtl;" value="توصيل مجاني في دبي على الطلبات فوق 300 درهم"></div></div>
+        <div class="ck-form-row full" style="margin-top:8px;">
+          <div class="ck-form-group">
+            <label class="ck-form-label">GitHub Access Token <span style="font-size:10px;color:var(--ck-text-hint);text-transform:none;letter-spacing:0;">(needed to upload & delete images)</span></label>
+            <input class="ck-input" id="settingGhToken" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+            <span style="font-size:11px;color:var(--ck-text-hint);margin-top:3px;">Generate at github.com/settings/tokens → classic → repo scope</span>
+          </div>
+        </div>
         <div style="margin-top:12px;"><button class="ck-admin-btn" onclick="saveSettings()">Save Settings</button></div>
       </div>
     </div>
@@ -2307,7 +2319,7 @@ function settingsHTML() {
             <div style="text-align:center;">
               <div onclick="document.getElementById('heroUpload${n}').click()"
                 style="width:100%;aspect-ratio:9/16;background:rgba(255,255,255,0.05);border:1px dashed rgba(212,184,150,0.25);border-radius:4px;overflow:hidden;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;">
-                <img id="heroThumb${n}" src="Images/C${n}.jpg" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+                <img id="heroThumb${n}" src="images/hero/C${n}.jpg" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
                 <div id="heroPlaceholder${n}" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
                   <div style="font-size:20px;">📷</div>
                   <div style="font-size:10px;color:rgba(212,184,150,0.3);margin-top:4px;">C${n}</div>
@@ -2379,17 +2391,36 @@ function resetTheme() {
 
 function replaceHeroImage(n, input) {
   if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
   const reader = new FileReader();
-  reader.onload = e => {
-    const src = e.target.result;
+  reader.onload = async e => {
+    const dataUrl = e.target.result;
+    // Show preview immediately
     const thumb = document.getElementById('heroThumb'+n);
-    if (thumb) { thumb.src = src; thumb.style.display='block'; }
+    if (thumb) { thumb.src = dataUrl; thumb.style.display='block'; }
     const imgs = document.querySelectorAll('.ck-cust-img');
-    if (imgs[n-1]) imgs[n-1].src = src;
-    persistHeroImage(n-1, src);
-    toast('Slot '+n+' image updated ✓');
+    if (imgs[n-1]) imgs[n-1].src = dataUrl;
+    persistHeroImage(n-1, dataUrl);
+
+    // Try to save to GitHub
+    const tok = ghToken();
+    if (tok) {
+      const ghPath = `images/hero/C${n}.jpg`;
+      const base64 = dataUrl.split(',')[1];
+      toast('Uploading image to GitHub…');
+      const url = await uploadToGitHub(ghPath, base64, file.name);
+      if (url) {
+        persistHeroImage(n-1, url);
+        if (imgs[n-1]) imgs[n-1].src = url + '?t=' + Date.now();
+        toast('Slot '+n+' saved to GitHub ✓');
+      } else {
+        toast('Slot '+n+' saved locally (set GitHub token in Settings to persist)');
+      }
+    } else {
+      toast('Slot '+n+' updated (set GitHub token in Settings to save permanently)');
+    }
   };
-  reader.readAsDataURL(input.files[0]);
+  reader.readAsDataURL(file);
 }
 
 // ============================================================
@@ -2440,36 +2471,46 @@ function toggleBadge(el) {
 
 function previewImg(input) {
   if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
   const reader = new FileReader();
   reader.onload = e => {
-    // Compress to max 600px and JPEG 70% before storing
     const tempImg = new Image();
     tempImg.onload = () => {
-      const MAX = 600;
+      const MAX = 800;
       const scale = Math.min(1, MAX / Math.max(tempImg.width, tempImg.height));
       const canvas = document.createElement('canvas');
       canvas.width  = Math.round(tempImg.width  * scale);
       canvas.height = Math.round(tempImg.height * scale);
       canvas.getContext('2d').drawImage(tempImg, 0, 0, canvas.width, canvas.height);
-      const compressed = canvas.toDataURL('image/jpeg', 0.72);
+      const compressed = canvas.toDataURL('image/jpeg', 0.82);
       const preview = document.getElementById('imgPreview');
       preview.src = compressed;
       preview.style.display = 'block';
+      // Store pending upload info for saveProduct to use
+      preview.dataset.pendingFile = file.name;
+      preview.dataset.pendingB64  = compressed.split(',')[1];
     };
     tempImg.src = e.target.result;
   };
-  reader.readAsDataURL(input.files[0]);
+  reader.readAsDataURL(file);
 }
 
-function saveProduct() {
+async function saveProduct() {
   const name = document.getElementById('fldName').value.trim();
   const price = parseFloat(document.getElementById('fldPrice').value);
   const cat = document.getElementById('fldCat').value;
   if (!name || !price || !cat) { toast('Please fill required fields', 'error'); return; }
+
   const imgPreview = document.getElementById('imgPreview');
-  const imgData = imgPreview.style.display !== 'none' ? imgPreview.src : null;
+  let imgData = imgPreview.style.display !== 'none' ? imgPreview.src : null;
+  const pendingB64  = imgPreview.dataset.pendingB64;
+  const pendingFile = imgPreview.dataset.pendingFile || 'product.jpg';
+
+  const idx = parseInt(document.getElementById('editIdx').value);
+  const productId = idx >= 0 ? products[idx].id : nextId++;
+
   const product = {
-    id: nextId++,
+    id: productId,
     name,
     nameAr: document.getElementById('fldNameAr').value.trim(),
     desc: document.getElementById('fldDesc').value.trim(),
@@ -2483,7 +2524,20 @@ function saveProduct() {
     stock: 'in',
     imgData,
   };
-  const idx = parseInt(document.getElementById('editIdx').value);
+
+  // Upload to GitHub if token available and we have a new image
+  if (pendingB64 && ghToken()) {
+    const ext = pendingFile.split('.').pop().toLowerCase() || 'jpg';
+    const ghPath = `images/products/product_${productId}.${ext}`;
+    toast('Uploading image…');
+    const url = await uploadToGitHub(ghPath, pendingB64, pendingFile);
+    if (url) {
+      product.imgData = url;
+      imgData = url;
+      imgPreview.dataset.pendingB64 = '';
+    }
+  }
+
   if (idx >= 0) { product.id = products[idx].id; products[idx] = product; toast('Product updated ✓'); }
   else { products.push(product); toast('Product added ✓'); }
   closeModal();
@@ -2500,8 +2554,12 @@ let storeSettings = {
   email: 'hello@callakallos.com',
   phone: '+971 XX XXX XXXX',
   announce: 'Free delivery within Dubai on orders over AED 300 | Same-day delivery available until 4pm',
-  announceAr: 'توصيل مجاني في دبي على الطلبات فوق 300 درهم'
+  announceAr: 'توصيل مجاني في دبي على الطلبات فوق 300 درهم',
+  ghToken: ''
 };
+const GH_REPO = 'callakallos/callakallos_website';
+const GH_BRANCH = 'main';
+function ghToken() { return storeSettings.ghToken || localStorage.getItem('ck_gh_token') || ''; }
 
 function saveSettings() {
   const get = id => (document.getElementById(id)||{value:''}).value.trim();
@@ -2511,6 +2569,8 @@ function saveSettings() {
   storeSettings.phone      = get('settingPhone')     || storeSettings.phone;
   storeSettings.announce   = get('settingAnnounce')  || storeSettings.announce;
   storeSettings.announceAr = get('settingAnnounceAr')|| storeSettings.announceAr;
+  const tok = get('settingGhToken');
+  if (tok) { storeSettings.ghToken = tok; localStorage.setItem('ck_gh_token', tok); }
   applyStoreSettings();
   persistMeta();
   toast('Settings saved ✓');
@@ -2525,6 +2585,7 @@ function populateSettingsInputs() {
   set('settingPhone',      s.phone);
   set('settingAnnounce',   s.announce);
   set('settingAnnounceAr', s.announceAr);
+  set('settingGhToken',    s.ghToken || localStorage.getItem('ck_gh_token') || '');
 }
 
 function applyStoreSettings() {
@@ -2612,6 +2673,190 @@ function loadFromStorage() {
 
     applyStoreSettings();
   } catch(e) { console.warn('Load failed:', e); }
+}
+
+// ============================================================
+//  GITHUB API — IMAGE STORAGE
+// ============================================================
+async function ghRequest(path, method='GET', body=null) {
+  const tok = ghToken();
+  if (!tok) return null;
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
+      method,
+      headers: {
+        'Authorization': 'token ' + tok,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github+json'
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+    return await res.json();
+  } catch(e) { console.error('GitHub API error:', e); return null; }
+}
+
+async function uploadToGitHub(path, base64, origName) {
+  // Check if file exists first (need SHA to overwrite)
+  const existing = await ghRequest(path);
+  const sha = existing && existing.sha ? existing.sha : undefined;
+  const body = {
+    message: `Upload image: ${origName}`,
+    content: base64,
+    branch: GH_BRANCH
+  };
+  if (sha) body.sha = sha;
+  const result = await ghRequest(path, 'PUT', body);
+  if (result && result.content && result.content.download_url) {
+    return result.content.download_url;
+  }
+  if (result && result.content) {
+    return `https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${path}`;
+  }
+  return null;
+}
+
+async function deleteFromGitHub(path, sha) {
+  const result = await ghRequest(path, 'DELETE', {
+    message: `Delete image: ${path}`,
+    sha,
+    branch: GH_BRANCH
+  });
+  return result && !result.message;
+}
+
+async function listGitHubFolder(folder) {
+  const result = await ghRequest(folder);
+  if (!Array.isArray(result)) return [];
+  return result.filter(f => f.type === 'file' && /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name));
+}
+
+// ============================================================
+//  FILE MANAGER
+// ============================================================
+function fileManagerHTML() {
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">File Manager</h2>
+      <label class="ck-admin-btn" style="cursor:pointer;">
+        ⬆ Upload Images
+        <input type="file" id="fmUploadInput" accept="image/*" multiple style="display:none" onchange="fmUploadFiles(this)">
+      </label>
+    </div>
+    ${!ghToken() ? `
+      <div style="background:rgba(200,184,138,0.1);border:1px solid rgba(200,184,138,0.25);border-radius:6px;padding:16px 20px;margin-bottom:20px;color:rgba(212,184,150,0.7);font-size:13px;">
+        ⚠ No GitHub token set. Go to <strong>Settings</strong> and enter your GitHub Access Token to enable image upload and delete. Images uploaded without a token will only be available until the page is refreshed.
+      </div>` : ''}
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header">
+        <span class="ck-panel-title">📁 images/hero &nbsp;<span style="font-size:11px;opacity:.5;">— Hero slideshow images</span></span>
+      </div>
+      <div id="fmHero" style="padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;">
+        <div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">Loading…</div>
+      </div>
+    </div>
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header">
+        <span class="ck-panel-title">📁 images/products &nbsp;<span style="font-size:11px;opacity:.5;">— Product images</span></span>
+      </div>
+      <div id="fmProducts" style="padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;">
+        <div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">Loading…</div>
+      </div>
+    </div>
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header">
+        <span class="ck-panel-title">📁 images/logo &nbsp;<span style="font-size:11px;opacity:.5;">— Logo files</span></span>
+      </div>
+      <div id="fmLogo" style="padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;">
+        <div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">Loading…</div>
+      </div>
+    </div>
+  `;
+}
+
+async function loadFileManager() {
+  const folders = ['images/hero','images/products','images/logo'];
+  const ids     = ['fmHero','fmProducts','fmLogo'];
+  for (let i = 0; i < folders.length; i++) {
+    const container = document.getElementById(ids[i]);
+    if (!container) continue;
+    if (!ghToken()) {
+      container.innerHTML = renderLocalImages(folders[i]);
+      continue;
+    }
+    const files = await listGitHubFolder(folders[i]);
+    if (!files.length) {
+      container.innerHTML = '<div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">No images yet.</div>';
+    } else {
+      container.innerHTML = files.map(f => fmFileCard(f, folders[i])).join('');
+    }
+  }
+}
+
+function renderLocalImages(folder) {
+  // When no token, just show the known static images
+  const staticMap = {
+    'images/hero':     ['C1.jpg','C2.jpg','C3.jpg','C4.jpg','C5.jpg','C6.jpg','C7.jpg'],
+    'images/products': [],
+    'images/logo':     ['LOGO2.jpg','logo-1.JPG','logo-1-transparent.png','logo-2-transparent.png']
+  };
+  const files = staticMap[folder] || [];
+  if (!files.length) return '<div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">No images. Set GitHub token to manage.</div>';
+  return files.map(name => {
+    const src = `https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${folder}/${name}`;
+    return `
+      <div style="background:rgba(46,59,31,0.15);border:1px solid rgba(212,184,150,0.1);border-radius:6px;overflow:hidden;text-align:center;">
+        <div style="height:100px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;">
+          <img src="${src}" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='📷'">
+        </div>
+        <div style="padding:6px 8px;font-size:10px;color:rgba(212,184,150,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+        <div style="padding:0 8px 8px;color:rgba(212,184,150,0.2);font-size:10px;">Set token to delete</div>
+      </div>`;
+  }).join('');
+}
+
+function fmFileCard(file, folder) {
+  const src = `https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${folder}/${file.name}?t=${Date.now()}`;
+  return `
+    <div style="background:rgba(46,59,31,0.15);border:1px solid rgba(212,184,150,0.1);border-radius:6px;overflow:hidden;text-align:center;">
+      <div style="height:100px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;">
+        <img src="${src}" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='📷'">
+      </div>
+      <div style="padding:6px 8px;font-size:10px;color:rgba(212,184,150,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${file.name}">${file.name}</div>
+      <div style="padding:0 8px 8px;">
+        <button class="ck-admin-btn-danger" style="width:100%;font-size:11px;padding:4px;" onclick="fmDeleteFile('${folder}/${file.name}','${file.sha}')">🗑 Delete</button>
+      </div>
+    </div>`;
+}
+
+async function fmDeleteFile(path, sha) {
+  if (!confirm(`Delete ${path}?`)) return;
+  toast('Deleting…');
+  const ok = await deleteFromGitHub(path, sha);
+  if (ok) { toast('Deleted ✓'); loadFileManager(); }
+  else toast('Delete failed — check token permissions', 'error');
+}
+
+// Upload from File Manager upload button
+async function fmUploadFiles(input) {
+  if (!input.files || !input.files.length) return;
+  if (!ghToken()) { toast('Set GitHub token in Settings first', 'error'); return; }
+  const files = Array.from(input.files);
+  toast(`Uploading ${files.length} file(s)…`);
+  for (const file of files) {
+    const b64 = await fileToBase64(file);
+    const path = `images/${file.name}`;
+    await uploadToGitHub(path, b64, file.name);
+  }
+  toast(`${files.length} image(s) uploaded ✓`);
+  loadFileManager();
+}
+
+function fileToBase64(file) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result.split(',')[1]);
+    r.readAsDataURL(file);
+  });
 }
 
 // init
