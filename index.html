@@ -2468,8 +2468,9 @@ function renderOrdersTable() {
           ${selOpts}
         </select>
       </td>
-      <td>
+      <td style="white-space:nowrap;">
         <button class="ck-admin-btn" onclick="saveOrderStatus(${o.id})" style="padding:5px 12px;font-size:11px;">Save</button>
+        <button class="ck-admin-btn-danger" onclick="deleteOrder(${o.id})" style="padding:5px 10px;font-size:11px;margin-left:4px;">Delete</button>
       </td>
     </tr>`;
   }).join('');
@@ -2482,6 +2483,14 @@ function saveOrderStatus(id) {
   if (!sel) return;
   const o = orders.find(x => x.id===id);
   if (o) { o.status = sel.value; persistMeta(); toast('Order #'+id+' status updated ✓'); }
+}
+
+function deleteOrder(id) {
+  if (!confirm(`Delete order #${id}? This cannot be undone.`)) return;
+  orders = orders.filter(o => o.id !== id);
+  persistMeta();
+  renderOrdersTable();
+  toast('Order #'+id+' deleted ✓');
 }
 
 function exportOrdersCSV() {
