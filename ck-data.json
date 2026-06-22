@@ -276,6 +276,16 @@
   ],
   "enquiries": [
     {
+      "id": 1782148504616,
+      "date": "2026-06-22",
+      "time": "21:15",
+      "name": "Ashly joseph",
+      "contact": "tijoeie@gmail.com",
+      "topic": "Delivery Query",
+      "message": "Abudhabi il delivery ondo chechi?",
+      "read": false
+    },
+    {
       "id": 1782140580541,
       "date": "2026-06-22",
       "time": "19:03",
