@@ -2183,33 +2183,84 @@ function adminTab(tab) {
 }
 
 function dashboardHTML() {
-  const totalRev = products.reduce((s,p)=>s+p.price,0)*8;
+  const now   = new Date();
+  const todayStr     = now.toISOString().slice(0,10);
+  const yesterdayStr = new Date(now - 864e5).toISOString().slice(0,10);
+  const weekAgo      = new Date(now - 6*864e5).toISOString().slice(0,10);
+  const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
+
+  const totalRev   = orders.reduce((s,o)=>s+(o.amount||0), 0);
+  const todayRev   = orders.filter(o=>o.date===todayStr).reduce((s,o)=>s+(o.amount||0),0);
+  const weeklyRev  = orders.filter(o=>o.date>=weekAgo).reduce((s,o)=>s+(o.amount||0),0);
+  const monthlyRev = orders.filter(o=>o.date>=monthStart).reduce((s,o)=>s+(o.amount||0),0);
+
+  const todayOrders     = orders.filter(o=>o.date===todayStr).length;
+  const yesterdayOrders = orders.filter(o=>o.date===yesterdayStr).length;
+  const todayDiff       = todayOrders - yesterdayOrders;
+  const todayDiffStr    = todayDiff > 0 ? `↑ ${todayDiff} from yesterday` : todayDiff < 0 ? `↓ ${Math.abs(todayDiff)} from yesterday` : 'Same as yesterday';
+
+  const pendingCount   = orders.filter(o=>o.status==='Pending'||o.status==='Preparing').length;
+  const deliveredCount = orders.filter(o=>o.status==='Delivered').length;
+  const transitCount   = orders.filter(o=>o.status==='In Transit').length;
+
+  const hr = now.getHours();
+  const greeting = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+
+  // Recent orders = today + yesterday, sorted newest first
+  const recentOrders = orders
+    .filter(o => o.date === todayStr || o.date === yesterdayStr)
+    .sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time));
+
+  const statusStyle = s => {
+    if (s==='Delivered')  return 'color:#4A7C59;';
+    if (s==='In Transit') return 'color:#C08030;';
+    if (s==='Pending'||s==='Preparing') return 'color:rgba(212,184,150,0.7);';
+    return 'color:rgba(212,184,150,0.5);';
+  };
+  const statusIcon = s => s==='Delivered' ? '✓' : s==='In Transit' ? '🚚' : '⏳';
+
+  const recentRows = recentOrders.length
+    ? recentOrders.map(o=>`
+        <tr>
+          <td>#${o.id}<br><span style="font-size:10px;color:rgba(212,184,150,0.4);">${o.date===todayStr?'Today':o.time?o.time:''}</span></td>
+          <td>${o.customer}</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.product}</td>
+          <td>AED ${(o.amount||0).toLocaleString()}</td>
+          <td><span style="${statusStyle(o.status)}">${statusIcon(o.status)} ${o.status}</span></td>
+        </tr>`).join('')
+    : `<tr><td colspan="5" style="text-align:center;color:rgba(212,184,150,0.3);padding:24px;">No orders today or yesterday</td></tr>`;
+
   return `
-    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">Good morning, Rinu 🌸</h2>
+    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">${greeting}, Rinu 🌸</h2>
     <div class="ck-admin-stats">
-      <div class="ck-stat-card"><div class="ck-stat-label">Products</div><div class="ck-stat-val">${products.length}</div><div class="ck-stat-sub">Active listings</div></div>
-      <div class="ck-stat-card"><div class="ck-stat-label">Orders Today</div><div class="ck-stat-val">8</div><div class="ck-stat-sub">↑ 2 from yesterday</div></div>
-      <div class="ck-stat-card"><div class="ck-stat-label">Revenue (MTD)</div><div class="ck-stat-val">AED ${(totalRev).toLocaleString()}</div><div class="ck-stat-sub">↑ 18% this month</div></div>
-      <div class="ck-stat-card"><div class="ck-stat-label">Pending Delivery</div><div class="ck-stat-val">3</div><div class="ck-stat-sub">Within today's slots</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Total Revenue</div><div class="ck-stat-val">AED ${totalRev.toLocaleString()}</div><div class="ck-stat-sub">All time · ${orders.length} orders</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Today's Revenue</div><div class="ck-stat-val">AED ${todayRev.toLocaleString()}</div><div class="ck-stat-sub">${todayDiffStr}</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">This Week</div><div class="ck-stat-val">AED ${weeklyRev.toLocaleString()}</div><div class="ck-stat-sub">Last 7 days</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">This Month</div><div class="ck-stat-val">AED ${monthlyRev.toLocaleString()}</div><div class="ck-stat-sub">${new Date().toLocaleString('en',{month:'long'})}</div></div>
     </div>
-    <div class="ck-admin-panel-block">
+    <div class="ck-admin-stats" style="margin-top:12px;">
+      <div class="ck-stat-card"><div class="ck-stat-label">Products</div><div class="ck-stat-val">${products.length}</div><div class="ck-stat-sub">Active listings</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Pending / Preparing</div><div class="ck-stat-val" style="color:#C8B88A;">${pendingCount}</div><div class="ck-stat-sub">Needs action</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">In Transit</div><div class="ck-stat-val" style="color:#C08030;">${transitCount}</div><div class="ck-stat-sub">On the way</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Delivered</div><div class="ck-stat-val" style="color:#4A7C59;">${deliveredCount}</div><div class="ck-stat-sub">Completed</div></div>
+    </div>
+    <div class="ck-admin-panel-block" style="margin-top:20px;">
       <div class="ck-panel-header"><span class="ck-panel-title">Quick Actions</span></div>
       <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap;">
         <button class="ck-admin-btn" onclick="adminTab('products');setTimeout(openAddModal,50)">+ Add New Product</button>
         <button class="ck-admin-btn" onclick="adminTab('offers')">🏷 Manage Offers</button>
-        <button class="ck-admin-btn-ghost" onclick="adminTab('orders')">📦 View Orders</button>
+        <button class="ck-admin-btn-ghost" onclick="adminTab('orders')">📦 View All Orders</button>
         <button class="ck-admin-btn-ghost" onclick="adminTab('settings')">⚙ Store Settings</button>
       </div>
     </div>
-    <div class="ck-admin-panel-block">
-      <div class="ck-panel-header"><span class="ck-panel-title">Recent Orders</span></div>
+    <div class="ck-admin-panel-block" style="margin-top:20px;">
+      <div class="ck-panel-header">
+        <span class="ck-panel-title">Recent Orders — Today &amp; Yesterday</span>
+        <span style="font-size:11px;color:rgba(212,184,150,0.4);">${recentOrders.length} order${recentOrders.length!==1?'s':''}</span>
+      </div>
       <table class="ck-product-table">
         <thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td>#1042</td><td>Ahmed K.</td><td>Rose Velvet Luxe</td><td>AED 350</td><td><span style="color:#4A7C59;">✓ Delivered</span></td></tr>
-          <tr><td>#1041</td><td>Sara M.</td><td>Peony Blush Gift Box</td><td>AED 380</td><td><span style="color:#C08030;">⏳ In Transit</span></td></tr>
-          <tr><td>#1040</td><td>Priya R.</td><td>Midnight Garden</td><td>AED 495</td><td><span style="color:#C08030;">⏳ Preparing</span></td></tr>
-        </tbody>
+        <tbody>${recentRows}</tbody>
       </table>
     </div>
   `;
