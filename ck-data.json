@@ -131,6 +131,23 @@
       "emoji": "🌸",
       "stock": "in",
       "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_8.jpg"
+    },
+    {
+      "id": 9,
+      "name": "baby pink rose",
+      "nameAr": "",
+      "desc": "baby pink rose",
+      "descAr": "",
+      "price": 100,
+      "oldPrice": null,
+      "cat": "Gift Hamper",
+      "occ": "Wedding",
+      "badges": [
+        "sale"
+      ],
+      "emoji": "🌸",
+      "stock": "in",
+      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_9.jpg"
     }
   ],
   "orders": [
@@ -332,5 +349,5 @@
     "--ck-plum-tint": "#D6E8C4",
     "--ck-plum-light": "#5A7040"
   },
-  "nextId": 9
+  "nextId": 10
 }
