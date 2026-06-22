@@ -89,24 +89,21 @@
   onAuthStateChanged(auth, user => {
     if (user) {
       const role = window._fbUserRoleMap[user.email] || 'florist';
-      currentRole = role;
+      window.currentRole = role; // must use window. — modules are strict mode
       document.getElementById('adminUserName').textContent =
         window._fbUserDisplayMap[user.email] || user.email;
-      if (typeof applyRoleUI === 'function') applyRoleUI();
-      if (typeof window._fbStartRtListener === 'function') window._fbStartRtListener();
-      // Restore admin panel if session was active
-      if (document.getElementById('adminSection').classList.contains('active')) {
-        applyRoleUI();
-      } else if (document.getElementById('loginSection').style.display !== 'none') {
-        // Already on login screen — do nothing
-      } else {
-        // Was on store — restore admin
+      window._fbStartRtListener();
+      // Restore admin panel on page reload (session persisted)
+      const adminEl = document.getElementById('adminSection');
+      const loginEl = document.getElementById('loginSection');
+      if (!adminEl.classList.contains('active') && loginEl.style.display === 'none') {
         document.getElementById('storeSection').style.display = 'none';
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminSection').classList.add('active');
-        applyRoleUI();
-        adminTab(role === 'florist' ? 'products' : 'dashboard');
-        updateEnquiriesBadge();
+        adminEl.classList.add('active');
+        if (typeof applyRoleUI === 'function') applyRoleUI();
+        if (typeof adminTab === 'function') adminTab(role === 'florist' ? 'products' : 'dashboard');
+        if (typeof updateEnquiriesBadge === 'function') updateEnquiriesBadge();
+      } else if (adminEl.classList.contains('active')) {
+        if (typeof applyRoleUI === 'function') applyRoleUI();
       }
     }
   });
@@ -2381,7 +2378,7 @@ function toast(msg, type='success') {
 // ============================================================
 //  ADMIN AUTH
 // ============================================================
-let currentRole = 'admin'; // 'admin' or 'florist'
+window.currentRole = 'admin'; // 'admin' or 'florist' — on window so Firebase module can access it
 
 function applyRoleUI() {
   const isFlorist = currentRole === 'florist';
