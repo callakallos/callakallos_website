@@ -1120,16 +1120,196 @@ body {
 }
 .ck-checkout-btn:hover { background: var(--ck-plum-mid); }
 
-/* Responsive */
+/* =============================================
+   MOBILE MENU TOGGLE
+   ============================================= */
+.ck-mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--ck-cream);
+  cursor: pointer;
+  padding: 4px;
+  flex-direction: column;
+  gap: 5px;
+}
+.ck-mobile-menu-btn span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: var(--transition);
+}
+.ck-mobile-nav {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--ck-plum-dark);
+  z-index: 200;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+.ck-mobile-nav.open { display: flex; }
+.ck-mobile-nav a {
+  color: var(--ck-cream);
+  text-decoration: none;
+  font-size: 28px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: 0.06em;
+}
+.ck-mobile-nav-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: rgba(247,237,216,0.6);
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* =============================================
+   TABLET — max 1024px
+   ============================================= */
+@media (max-width: 1024px) {
+  .ck-container { padding: 0 var(--space-lg); }
+  .ck-hero { grid-template-columns: 60% 40%; min-height: 480px; }
+  .ck-hero-title { font-size: 42px; }
+  .ck-hero-logo-deco { width: 200px; }
+  .ck-footer-grid { grid-template-columns: 1.5fr 1fr 1fr; gap: var(--space-lg); }
+  .ck-footer-grid > div:last-child { grid-column: 1 / -1; }
+  #section-about > div { gap: 36px; }
+  #section-contact > div > div { gap: 28px; }
+}
+
+/* =============================================
+   MOBILE — max 768px
+   ============================================= */
 @media (max-width: 768px) {
-  .ck-hero { grid-template-columns: 1fr; }
-  .ck-hero::after { display: none; }
-  .ck-hero-title { font-size: 36px; }
+
+  /* --- Nav --- */
+  .ck-nav { height: 64px; padding: 0 var(--space-md); }
   .ck-nav-menu { display: none; }
-  .ck-footer-grid { grid-template-columns: 1fr 1fr; }
+  .ck-mobile-menu-btn { display: flex; }
+  .ck-nav-actions { gap: 8px; }
+  .ck-logo-text { font-size: 22px; }
+  .ck-logo-img { height: 52px; }
+
+  /* --- Announce bar --- */
+  .ck-announce { padding: 8px var(--space-md); flex-wrap: wrap; gap: 6px; }
+  .ck-announce-text { font-size: 11px; order: 2; width: 100%; text-align: center; }
+  .ck-announce-lang { order: 1; }
+
+  /* --- Hero --- */
+  .ck-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .ck-hero::after { display: none; }
+  .ck-customers-bg {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    clip-path: none;
+    order: -1;
+  }
+  .ck-hero-content {
+    padding: var(--space-xl) var(--space-md);
+    flex-direction: column;
+    gap: 20px;
+    order: 0;
+  }
+  .ck-hero-logo-deco { display: none; }
+  .ck-hero-title { font-size: 32px; }
+  .ck-hero-title-ar { font-size: 26px; }
+  .ck-hero-sub { font-size: 13px; max-width: 100%; }
+  .ck-hero-btns { flex-direction: column; gap: 10px; }
+  .ck-hero-btns .ck-btn { width: 100%; justify-content: center; }
+  .ck-hero-visual { display: none; }
+
+  /* --- Occasions strip --- */
+  .ck-occasions-strip { padding: var(--space-md); }
+
+  /* --- Section headers --- */
+  .ck-section-hd { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .ck-section-h2 { font-size: 26px; }
+
+  /* --- Shop section --- */
+  #section-shop { padding: 32px var(--space-md); }
+  .ck-products-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+  .ck-product-thumb { height: 180px; }
+  .ck-product-name { font-size: 15px; }
+
+  /* --- Features strip --- */
+  .ck-features-strip {
+    padding: var(--space-lg) var(--space-md);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* --- About section --- */
+  #section-about { padding: 48px var(--space-md); }
+  #section-about > div {
+    grid-template-columns: 1fr !important;
+    gap: 32px;
+  }
+  #section-about h2 { font-size: 30px; }
+  #section-about > div > div:last-child {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* --- Contact section --- */
+  #section-contact { padding: 48px var(--space-md); }
+  #section-contact > div > div { grid-template-columns: 1fr !important; gap: 28px; }
+
+  /* --- Footer --- */
+  .ck-footer { padding: var(--space-xl) var(--space-md) var(--space-lg); }
+  .ck-footer-grid { grid-template-columns: 1fr; gap: var(--space-lg); }
+  .ck-footer-bottom { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  /* --- Cart drawer --- */
+  .ck-cart-drawer { width: 100%; }
+
+  /* --- Checkout modal --- */
+  .ck-modal-overlay { padding: 0; align-items: flex-end; }
+  .ck-modal {
+    max-width: 100% !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh;
+  }
+  .ck-modal-head { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .ck-form-row { grid-template-columns: 1fr; }
+
+  /* --- Co-pay options --- */
+  .co-pay-opt { font-size: 12px; padding: 7px 12px; }
+
+  /* --- Admin --- */
   .ck-admin-layout { grid-template-columns: 1fr; }
   .ck-admin-sidebar { display: none; }
-  .ck-form-row { grid-template-columns: 1fr; }
+  .ck-admin-nav { padding: 0 var(--space-md); }
+  .ck-admin-main { padding: var(--space-md); }
+  .ck-admin-stats { grid-template-columns: repeat(2, 1fr); }
+
+  /* --- Login card --- */
+  .ck-login-screen { padding: var(--space-md); }
+  .ck-login-card { max-width: 100%; }
+}
+
+/* =============================================
+   SMALL MOBILE — max 480px
+   ============================================= */
+@media (max-width: 480px) {
+  .ck-products-grid { grid-template-columns: 1fr; }
+  .ck-product-thumb { height: 220px; }
+  .ck-features-strip { grid-template-columns: 1fr; }
+  .ck-hero-title { font-size: 28px; }
+  #section-about > div > div:last-child { grid-template-columns: 1fr !important; }
+  .ck-admin-stats { grid-template-columns: 1fr; }
+  .ck-cart-drawer { width: 100%; }
 }
 </style>
 </head>
@@ -1171,8 +1351,20 @@ body {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         <span class="ck-cart-count" id="cartCount">0</span>
       </button>
+      <button class="ck-mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile nav overlay -->
+  <div class="ck-mobile-nav" id="mobileNav">
+    <button class="ck-mobile-nav-close" onclick="toggleMobileMenu()">✕</button>
+    <a href="#section-shop" onclick="toggleMobileMenu()" data-en="Shop" data-ar="تسوق">Shop</a>
+    <a href="#section-occasions" onclick="toggleMobileMenu()" data-en="Occasions" data-ar="المناسبات">Occasions</a>
+    <a href="#section-about" onclick="toggleMobileMenu()" data-en="About" data-ar="عن المتجر">About</a>
+    <a href="#section-contact" onclick="toggleMobileMenu()" data-en="Contact" data-ar="تواصل">Contact</a>
+  </div>
 
   <section class="ck-hero">
     <div class="ck-customers-bg">
@@ -1883,6 +2075,10 @@ function toggleCart() {
   document.getElementById('cartDrawer').classList.toggle('open');
   document.getElementById('cartOverlay').classList.toggle('open');
   updateCartUI();
+}
+
+function toggleMobileMenu() {
+  document.getElementById('mobileNav').classList.toggle('open');
 }
 
 // ============================================================
