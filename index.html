@@ -6,16 +6,12 @@
 <title>Calla Kallos — فلوريست دبي الفاخر</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Scheherazade+New:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
-    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getDatabase, ref, set, get, onValue, child }
-    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
-
-  // ── FIREBASE CONFIG ── Replace with your project values ──────────────────
-  const firebaseConfig = {
+<!-- Firebase Compat SDK (regular scripts — no module scope issues) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  firebase.initializeApp({
     apiKey:            "AIzaSyCljpIAggL_6a9Z3u1USqoGhqJ39SyOfgo",
     authDomain:        "callakallos.firebaseapp.com",
     databaseURL:       "https://callakallos-default-rtdb.firebaseio.com",
@@ -23,87 +19,64 @@
     storageBucket:     "callakallos.firebasestorage.app",
     messagingSenderId: "153962679668",
     appId:             "1:153962679668:web:2135291884f8b6e9a77021"
-  };
-  // ─────────────────────────────────────────────────────────────────────────
+  });
 
-  // User-to-role mapping: Firebase email → role
-  const USER_ROLE_MAP = {
+  const _fbAuth = firebase.auth();
+  const _fbDb   = firebase.database();
+
+  const FB_USER_ROLE = {
     'admin@callakallos.com':   'admin',
     'florist@callakallos.com': 'florist'
   };
-  const USER_DISPLAY_MAP = {
+  const FB_USER_NAME = {
     'admin@callakallos.com':   'Rinu Kurian',
     'florist@callakallos.com': 'Florist'
   };
-
-  const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getDatabase(app);
-
-  // Expose to global scope for use by non-module scripts
-  window._fbAuth = auth;
-  window._fbDb   = db;
-  window._fbRef  = ref;
-  window._fbSet  = set;
-  window._fbGet  = get;
-  window._fbOnValue = onValue;
-  window._fbSignIn  = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
-  window._fbSignOut = () => signOut(auth);
-  window._fbUserRoleMap    = USER_ROLE_MAP;
-  window._fbUserDisplayMap = USER_DISPLAY_MAP;
-
-  // Card-to-email mapping (matches the login card UX)
-  window._fbCardEmail = {
+  const FB_CARD_EMAIL = {
     admin:   'admin@callakallos.com',
     florist: 'florist@callakallos.com'
   };
 
-  // Real-time listener — sync data across all open tabs / devices
+  // Real-time listener — keeps store and admin in sync across all devices
   let _rtListenerActive = false;
-  window._fbStartRtListener = function() {
+  function _fbStartRtListener() {
     if (_rtListenerActive) return;
     _rtListenerActive = true;
-    onValue(ref(db, 'ck-data'), snapshot => {
+    _fbDb.ref('ck-data').on('value', snapshot => {
       const d = snapshot.val();
-      if (d) {
-        applyData(d);
-        try { localStorage.setItem(window._LS_KEY, JSON.stringify(d)); } catch(e) {}
-        renderProducts();
-        applyStoreSettings();
-        // Re-render current active admin tab so it picks up fresh data
+      if (!d) return;
+      applyData(d);
+      try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
+      renderProducts();
+      applyStoreSettings();
+      // Re-render active admin tab if admin panel is open
+      if (document.getElementById('adminSection').classList.contains('active')) {
         const activeItem = document.querySelector('.ck-sidebar-item.active');
-        if (activeItem && typeof adminTab === 'function') {
+        if (activeItem) {
           const tabMap = ['dashboard','products','offers','orders','enquiries','files','settings'];
-          const items  = document.querySelectorAll('.ck-sidebar-item');
-          items.forEach((el, i) => { if (el === activeItem) adminTab(tabMap[i]); });
+          document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
+            if (el === activeItem) adminTab(tabMap[i]);
+          });
         }
       }
     });
-  };
+  }
 
-  // Signal Firebase is ready — triggers deferred loadRemoteData/loadRemoteConfig
-  window._fbReady = true;
-  window.dispatchEvent(new Event('fb-ready'));
-
-  // Auth state change — restore session on page reload
-  onAuthStateChanged(auth, user => {
+  // Restore session on page reload
+  _fbAuth.onAuthStateChanged(user => {
     if (user) {
-      const role = window._fbUserRoleMap[user.email] || 'florist';
-      window.currentRole = role; // must use window. — modules are strict mode
-      document.getElementById('adminUserName').textContent =
-        window._fbUserDisplayMap[user.email] || user.email;
-      window._fbStartRtListener();
-      // Restore admin panel on page reload (session persisted)
+      const role = FB_USER_ROLE[user.email] || 'florist';
+      currentRole = role;
+      document.getElementById('adminUserName').textContent = FB_USER_NAME[user.email] || user.email;
+      _fbStartRtListener();
       const adminEl = document.getElementById('adminSection');
-      const loginEl = document.getElementById('loginSection');
-      if (!adminEl.classList.contains('active') && loginEl.style.display === 'none') {
+      if (!adminEl.classList.contains('active')) {
         document.getElementById('storeSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'none';
         adminEl.classList.add('active');
-        if (typeof applyRoleUI === 'function') applyRoleUI();
-        if (typeof adminTab === 'function') adminTab(role === 'florist' ? 'products' : 'dashboard');
-        if (typeof updateEnquiriesBadge === 'function') updateEnquiriesBadge();
-      } else if (adminEl.classList.contains('active')) {
-        if (typeof applyRoleUI === 'function') applyRoleUI();
+        applyRoleUI();
+        adminTab(role === 'florist' ? 'products' : 'dashboard');
+        updateEnquiriesBadge();
       }
     }
   });
@@ -2408,7 +2381,7 @@ function showStore() {
   document.getElementById('storeSection').style.display = 'block';
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.remove('active');
-  if (window._fbSignOut) window._fbSignOut().catch(() => {});
+  _fbAuth.signOut().catch(() => {});
 }
 function selectLoginUser(role) {
   document.getElementById('loginUser').value = role;
@@ -2440,24 +2413,19 @@ async function doLogin() {
   const errEl = document.getElementById('loginErr');
   errEl.classList.remove('show');
 
-  if (!window._fbSignIn || !window._fbCardEmail) {
-    errEl.textContent = 'Firebase not configured — fill in firebaseConfig first';
-    errEl.classList.add('show'); return;
-  }
-  const email = window._fbCardEmail[cardRole];
+  const email = FB_CARD_EMAIL[cardRole];
   try {
-    const cred = await window._fbSignIn(email, p);
+    const cred = await _fbAuth.signInWithEmailAndPassword(email, p);
     const user  = cred.user;
-    const role  = (window._fbUserRoleMap || {})[user.email] || 'florist';
+    const role  = FB_USER_ROLE[user.email] || 'florist';
     currentRole = role;
-    document.getElementById('adminUserName').textContent =
-      (window._fbUserDisplayMap || {})[user.email] || user.email;
+    document.getElementById('adminUserName').textContent = FB_USER_NAME[user.email] || user.email;
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('adminSection').classList.add('active');
     applyRoleUI();
     adminTab(role === 'florist' ? 'products' : 'dashboard');
     updateEnquiriesBadge();
-    if (window._fbStartRtListener) window._fbStartRtListener();
+    _fbStartRtListener();
   } catch(e) {
     errEl.textContent = 'Incorrect password';
     errEl.classList.add('show');
@@ -3230,7 +3198,7 @@ function applyStoreSettings() {
 // ============================================================
 //  PERSISTENCE — localStorage (fast) + GitHub (cross-device)
 // ============================================================
-const LS_KEY = window._LS_KEY = 'ck_data_v3';
+const LS_KEY = 'ck_data_v3';
 const LS_IMG_KEY  = 'ck_img_v2_';
 const LS_HERO_KEY = 'ck_hero_v2_';
 
@@ -3318,13 +3286,12 @@ function loadFromStorage() {
 }
 
 async function loadRemoteData() {
-  if (!window._fbDb) return;
   try {
-    const snap = await window._fbGet(window._fbRef(window._fbDb, 'ck-data'));
+    const snap = await _fbDb.ref('ck-data').once('value');
     const d = snap.val();
     if (!d) return;
-    const remoteHasProducts = Array.isArray(d.products) && d.products.length > 0;
-    if (remoteHasProducts) {
+    const prods = toArray(d.products);
+    if (prods.length) {
       applyData(d);
       try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
       renderProducts();
@@ -3336,10 +3303,9 @@ async function loadRemoteData() {
 }
 
 function saveRemoteData(snapshot) {
-  if (!window._fbDb) return Promise.resolve();
   const { ghToken: _drop, ...safeSettings } = snapshot.storeSettings || {};
   const safeSnapshot = { ...snapshot, storeSettings: safeSettings };
-  return window._fbSet(window._fbRef(window._fbDb, 'ck-data'), safeSnapshot)
+  return _fbDb.ref('ck-data').set(safeSnapshot)
     .catch(e => toast('Sync error: ' + e.message, 'error'));
 }
 
@@ -3531,9 +3497,8 @@ function fileToBase64(file) {
 //  REMOTE CONFIG — load token & settings from ck-config.json
 // ============================================================
 async function loadRemoteConfig() {
-  if (!window._fbDb) return;
   try {
-    const snap = await window._fbGet(window._fbRef(window._fbDb, 'ck-config'));
+    const snap = await _fbDb.ref('ck-config').once('value');
     const cfg = snap.val();
     if (!cfg) return;
     if (cfg.whatsapp)  { storeSettings.whatsapp  = cfg.whatsapp;  applyStoreSettings(); }
@@ -3543,12 +3508,11 @@ async function loadRemoteConfig() {
 }
 
 async function saveRemoteConfig(updates) {
-  if (!window._fbDb) return;
   const { ghToken: _drop, ...safeUpdates } = updates;
   try {
-    const snap = await window._fbGet(window._fbRef(window._fbDb, 'ck-config'));
+    const snap = await _fbDb.ref('ck-config').once('value');
     const current = snap.val() || {};
-    await window._fbSet(window._fbRef(window._fbDb, 'ck-config'), { ...current, ...safeUpdates });
+    await _fbDb.ref('ck-config').set({ ...current, ...safeUpdates });
   } catch(e) { toast('Config sync error: ' + e.message, 'error'); }
 }
 
@@ -3645,17 +3609,12 @@ function enquiriesHTML() {
 loadFromStorage();
 renderProducts();
 
-// Wait for Firebase module to initialise before syncing remote data
-function _onFbReady(fn) {
-  if (window._fbReady) { fn(); }
-  else { window.addEventListener('fb-ready', fn, { once: true }); }
-}
-_onFbReady(async () => {
+// Firebase compat SDK loads synchronously — safe to call immediately
+(async () => {
   await loadRemoteConfig();
   await loadRemoteData();
-  // Start real-time listener for all visitors — keeps store in sync when admin adds/edits products
-  if (window._fbStartRtListener) window._fbStartRtListener();
-});
+  _fbStartRtListener(); // real-time sync for all visitors
+})();
 
 // Customer image slideshow
 (function() {
