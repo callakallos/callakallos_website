@@ -189,6 +189,42 @@ body {
   color: var(--ck-cream);
   border-bottom-color: var(--ck-champagne);
 }
+/* Nav dropdowns */
+.ck-nav-menu li { position: relative; }
+.ck-nav-menu li > a.has-drop::after { content: ' ▾'; font-size: 9px; opacity: .6; }
+.ck-nav-drop {
+  display: none;
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ck-plum-dark);
+  border: 1px solid rgba(200,184,138,0.15);
+  border-radius: 6px;
+  padding: 8px 0;
+  min-width: 180px;
+  z-index: 9999;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+.ck-nav-menu li:hover .ck-nav-drop { display: block; }
+.ck-nav-drop a {
+  display: block;
+  padding: 9px 18px;
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: rgba(247,237,216,0.75);
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: none;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.ck-nav-drop a:hover { background: rgba(200,184,138,0.1); color: var(--ck-champagne); border-bottom: none; }
+.ck-nav-drop-divider { height: 1px; background: rgba(200,184,138,0.12); margin: 4px 0; }
+/* Mobile nav category sections */
+.ck-mobile-nav-section { font-size: 10px; letter-spacing: .12em; color: rgba(212,184,150,0.4); padding: 14px 0 4px; text-transform: uppercase; }
+.ck-mobile-nav a.sub { font-size: 12px; padding: 8px 0 8px 12px; color: rgba(247,237,216,0.6); }
+.ck-mobile-nav a.sub:hover { color: var(--ck-champagne); }
 .ck-nav-actions { display: flex; align-items: center; gap: var(--space-md); }
 .ck-icon-btn {
   background: none;
@@ -1342,8 +1378,29 @@ body {
       <img src="images/logo/logo-2-transparent.png" alt="Calla Kallos" class="ck-logo-img">
     </a>
     <ul class="ck-nav-menu">
-      <li><a href="#section-shop" data-en="Shop" data-ar="تسوق">Shop</a></li>
-      <li><a href="#section-occasions" data-en="Occasions" data-ar="المناسبات">Occasions</a></li>
+      <li>
+        <a href="#section-shop" class="has-drop" data-en="Shop" data-ar="تسوق">Shop</a>
+        <div class="ck-nav-drop">
+          <a href="#section-shop" onclick="filterAndScroll('All')">All Products</a>
+          <div class="ck-nav-drop-divider"></div>
+          <a href="#section-shop" onclick="filterAndScroll('Hand Bouquet')">Hand Bouquets</a>
+          <a href="#section-shop" onclick="filterAndScroll('Gift Hamper')">Gift Hampers</a>
+          <a href="#section-shop" onclick="filterAndScroll('Box of Flowers')">Box Flowers</a>
+          <a href="#section-shop" onclick="filterAndScroll('Wedding Flowers')">Wedding Flowers</a>
+          <a href="#section-shop" onclick="filterAndScroll('Corporate')">Corporate</a>
+        </div>
+      </li>
+      <li>
+        <a href="#section-occasions" class="has-drop" data-en="Occasions" data-ar="المناسبات">Occasions</a>
+        <div class="ck-nav-drop">
+          <a href="#section-shop" onclick="filterAndScroll('Anniversary')">Anniversary</a>
+          <a href="#section-shop" onclick="filterAndScroll('Birthday')">Birthday</a>
+          <a href="#section-shop" onclick="filterAndScroll('Valentine\'s Day')">Valentine's</a>
+          <a href="#section-shop" onclick="filterAndScroll('Eid Special')">Eid Special</a>
+          <a href="#section-shop" onclick="filterAndScroll('Sympathy')">Sympathy</a>
+          <a href="#section-shop" onclick="filterAndScroll('Wedding')">Wedding</a>
+        </div>
+      </li>
       <li><a href="#section-about" data-en="About" data-ar="عن المتجر">About</a></li>
       <li><a href="#section-contact" data-en="Contact" data-ar="تواصل">Contact</a></li>
     </ul>
@@ -1367,10 +1424,22 @@ body {
   <!-- Mobile nav overlay -->
   <div class="ck-mobile-nav" id="mobileNav">
     <button class="ck-mobile-nav-close" onclick="toggleMobileMenu()">✕</button>
-    <a href="#section-shop" onclick="toggleMobileMenu()" data-en="Shop" data-ar="تسوق">Shop</a>
-    <a href="#section-occasions" onclick="toggleMobileMenu()" data-en="Occasions" data-ar="المناسبات">Occasions</a>
-    <a href="#section-about" onclick="toggleMobileMenu()" data-en="About" data-ar="عن المتجر">About</a>
-    <a href="#section-contact" onclick="toggleMobileMenu()" data-en="Contact" data-ar="تواصل">Contact</a>
+    <a href="#section-shop" onclick="filterAndScroll('All');toggleMobileMenu()">Shop All</a>
+    <div class="ck-mobile-nav-section">Categories</div>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Hand Bouquet');toggleMobileMenu()">Hand Bouquets</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Gift Hamper');toggleMobileMenu()">Gift Hampers</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Box of Flowers');toggleMobileMenu()">Box Flowers</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Wedding Flowers');toggleMobileMenu()">Wedding Flowers</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Corporate');toggleMobileMenu()">Corporate</a>
+    <div class="ck-mobile-nav-section">Occasions</div>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Anniversary');toggleMobileMenu()">Anniversary</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Birthday');toggleMobileMenu()">Birthday</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Valentine\'s Day');toggleMobileMenu()">Valentine's</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Eid Special');toggleMobileMenu()">Eid Special</a>
+    <a class="sub" href="#section-shop" onclick="filterAndScroll('Sympathy');toggleMobileMenu()">Sympathy</a>
+    <div class="ck-mobile-nav-section">More</div>
+    <a href="#section-about" onclick="toggleMobileMenu()">About</a>
+    <a href="#section-contact" onclick="toggleMobileMenu()">Contact</a>
   </div>
 
   <section class="ck-hero">
@@ -1551,19 +1620,19 @@ body {
       </div>
       <div class="ck-footer-col">
         <div class="ck-footer-col-title" data-en="Shop" data-ar="تسوق">Shop</div>
-        <a href="#" data-en="Hand Bouquets" data-ar="باقات يدوية">Hand Bouquets</a>
-        <a href="#" data-en="Gift Hampers" data-ar="سلات هدايا">Gift Hampers</a>
-        <a href="#" data-en="Box Flowers" data-ar="زهور في صناديق">Box Flowers</a>
-        <a href="#" data-en="Wedding Flowers" data-ar="زهور الأفراح">Wedding Flowers</a>
-        <a href="#" data-en="Corporate" data-ar="شركات">Corporate</a>
+        <a href="#section-shop" onclick="filterAndScroll('Hand Bouquet')" data-en="Hand Bouquets" data-ar="باقات يدوية">Hand Bouquets</a>
+        <a href="#section-shop" onclick="filterAndScroll('Gift Hamper')" data-en="Gift Hampers" data-ar="سلات هدايا">Gift Hampers</a>
+        <a href="#section-shop" onclick="filterAndScroll('Box of Flowers')" data-en="Box Flowers" data-ar="زهور في صناديق">Box Flowers</a>
+        <a href="#section-shop" onclick="filterAndScroll('Wedding Flowers')" data-en="Wedding Flowers" data-ar="زهور الأفراح">Wedding Flowers</a>
+        <a href="#section-shop" onclick="filterAndScroll('Corporate')" data-en="Corporate" data-ar="شركات">Corporate</a>
       </div>
       <div class="ck-footer-col">
         <div class="ck-footer-col-title" data-en="Occasions" data-ar="المناسبات">Occasions</div>
-        <a href="#" data-en="Anniversary" data-ar="ذكرى سنوية">Anniversary</a>
-        <a href="#" data-en="Birthday" data-ar="عيد ميلاد">Birthday</a>
-        <a href="#" data-en="Valentine's" data-ar="عيد الحب">Valentine's</a>
-        <a href="#" data-en="Eid Special" data-ar="عيد خاص">Eid Special</a>
-        <a href="#" data-en="Sympathy" data-ar="تعازي">Sympathy</a>
+        <a href="#section-shop" onclick="filterAndScroll('Anniversary')" data-en="Anniversary" data-ar="ذكرى سنوية">Anniversary</a>
+        <a href="#section-shop" onclick="filterAndScroll('Birthday')" data-en="Birthday" data-ar="عيد ميلاد">Birthday</a>
+        <a href="#section-shop" onclick="filterAndScroll('Valentine\'s Day')" data-en="Valentine's" data-ar="عيد الحب">Valentine's</a>
+        <a href="#section-shop" onclick="filterAndScroll('Eid Special')" data-en="Eid Special" data-ar="عيد خاص">Eid Special</a>
+        <a href="#section-shop" onclick="filterAndScroll('Sympathy')" data-en="Sympathy" data-ar="تعازي">Sympathy</a>
       </div>
       <div class="ck-footer-col">
         <div class="ck-footer-col-title" data-en="Contact" data-ar="تواصل معنا">Contact</div>
@@ -2116,19 +2185,32 @@ function toggleMobileMenu() {
 // ============================================================
 //  OCCASION FILTER
 // ============================================================
+function filterAndScroll(term) {
+  // Update active occ tag if one matches
+  document.querySelectorAll('.ck-occ-tag').forEach(t => {
+    const tagVal = t.dataset.en || t.textContent.trim();
+    t.classList.toggle('active', term === 'All' ? tagVal === 'All' : tagVal === term);
+  });
+  // Filter products
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+  const filtered = term === 'All' ? products : products.filter(p =>
+    p.cat === term || p.occ === term ||
+    (term === 'Valentine\'s Day' && (p.occ === "Valentine's Day" || p.occ === "Valentine's"))
+  );
+  const saved = products;
+  products = filtered.length ? filtered : products;
+  renderProducts();
+  products = saved;
+  // Scroll to shop section
+  const shop = document.getElementById('section-shop');
+  if (shop) shop.scrollIntoView({ behavior: 'smooth' });
+}
+
 document.querySelectorAll('.ck-occ-tag').forEach(tag => {
   tag.addEventListener('click', function() {
-    document.querySelectorAll('.ck-occ-tag').forEach(t => t.classList.remove('active'));
-    this.classList.add('active');
-    const occ = this.dataset.en || this.textContent;
-    const filtered = occ === 'All' ? products : products.filter(p => p.occ === occ || p.cat === occ);
-    const grid = document.getElementById('productsGrid');
-    if (grid) {
-      const temp = products;
-      products = filtered;
-      renderProducts();
-      products = temp;
-    }
+    const term = this.dataset.en || this.textContent.trim();
+    filterAndScroll(term);
   });
 });
 
