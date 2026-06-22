@@ -4,67 +4,63 @@
       "id": 1,
       "name": "Rose Velvet Luxe",
       "nameAr": "باقة الورود المخملية",
-      "desc": "A sumptuous hand-tied bouquet of deep burgundy roses, wrapped in signature plum packaging with a champagne satin ribbon.",
-      "descAr": "باقة ورد بورجندي فاخرة مربوطة يدوياً",
-      "price": 350,
-      "oldPrice": 420,
       "cat": "Hand Bouquet",
       "occ": "Anniversary",
+      "price": 350,
+      "oldPrice": 420,
       "badges": [
         "popular"
       ],
-      "emoji": "🌸",
+      "emoji": "🌹",
       "stock": "in",
-      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_1.jpg"
+      "desc": "A sumptuous hand-tied bouquet of deep burgundy roses, wrapped in signature plum packaging with a champagne satin ribbon.",
+      "descAr": "باقة ورد بورجندي فاخرة مربوطة يدوياً"
     },
     {
       "id": 2,
       "name": "Calla Blanc Elegance",
       "nameAr": "أناقة كالا البيضاء",
-      "desc": "Pristine white calla lilies arranged with sculptural elegance. Perfect for weddings and luxury gifting.",
-      "descAr": "زنبق كالا أبيض نقي",
-      "price": 420,
-      "oldPrice": null,
       "cat": "Exotic Flowers",
       "occ": "Wedding",
+      "price": 420,
+      "oldPrice": null,
       "badges": [],
-      "emoji": "🌸",
+      "emoji": "🤍",
       "stock": "in",
-      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_2.jpg"
+      "desc": "Pristine white calla lilies arranged with sculptural elegance. Perfect for weddings and luxury gifting.",
+      "descAr": "زنبق كالا أبيض نقي"
     },
     {
       "id": 3,
       "name": "Peony Blush Gift Box",
       "nameAr": "صندوق الفاوانيا الوردي",
-      "desc": "Soft pink peonies nestled in our signature deep plum gift box, tied with a champagne bow.",
-      "descAr": "فاوانيا وردية ناعمة في صندوق هدايا",
-      "price": 380,
-      "oldPrice": null,
       "cat": "Box of Flowers",
       "occ": "Birthday",
+      "price": 380,
+      "oldPrice": null,
       "badges": [
         "new"
       ],
-      "emoji": "🌸",
+      "emoji": "💝",
       "stock": "in",
-      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_3.jpg"
+      "desc": "Soft pink peonies nestled in our signature deep plum gift box, tied with a champagne bow.",
+      "descAr": "فاوانيا وردية ناعمة في صندوق هدايا"
     },
     {
       "id": 4,
       "name": "Midnight Garden Bouquet",
       "nameAr": "باقة حديقة الليل",
-      "desc": "An opulent arrangement of dark roses and seasonal blooms in dramatic deep tones. A statement piece.",
-      "descAr": "تنسيق فاخر من الورود الداكنة",
-      "price": 495,
-      "oldPrice": null,
       "cat": "Premium Luxury",
       "occ": "Anniversary",
+      "price": 495,
+      "oldPrice": null,
       "badges": [
         "limited"
       ],
-      "emoji": "🌸",
-      "stock": "in",
-      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_4.jpg"
+      "emoji": "💜",
+      "stock": "low",
+      "desc": "An opulent arrangement of dark roses and seasonal blooms in dramatic deep tones. A statement piece.",
+      "descAr": "تنسيق فاخر من الورود الداكنة"
     }
   ],
   "orders": [
@@ -176,9 +172,9 @@
   "regularOffers": {},
   "storeSettings": {
     "storeName": "Calla Kallos",
-    "whatsapp": "+971 545372017",
+    "whatsapp": "",
     "email": "hello@callakallos.com",
-    "phone": "+971 545372017",
+    "phone": "+971 XX XXX XXXX",
     "announce": "Free delivery within Dubai on orders over AED 300 | Same-day delivery available until 4pm",
     "announceAr": "توصيل مجاني في دبي على الطلبات فوق 300 درهم"
   },
