@@ -2955,8 +2955,11 @@ async function saveRemoteData(snapshot) {
       branch: GH_BRANCH
     };
     if (sha) body.sha = sha;
-    await ghRequest(DATA_PATH, 'PUT', body);
-  } catch(e) { console.warn('Remote data save failed:', e); }
+    const result = await ghRequest(DATA_PATH, 'PUT', body);
+    if (!result || result.message) {
+      toast('Data sync failed: ' + (result && result.message ? result.message : 'no response'), 'error');
+    }
+  } catch(e) { toast('Data sync error: ' + e.message, 'error'); }
 }
 
 // ============================================================
@@ -3185,7 +3188,10 @@ async function saveRemoteConfig(updates) {
     branch: GH_BRANCH
   };
   if (sha) body.sha = sha;
-  await ghRequest(CONFIG_PATH, 'PUT', body);
+  const result = await ghRequest(CONFIG_PATH, 'PUT', body);
+  if (!result || result.message) {
+    toast('Sync failed: ' + (result && result.message ? result.message : 'no response'), 'error');
+  }
 }
 
 // init — load config first (token), then sync remote data
