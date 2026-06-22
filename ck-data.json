@@ -28,23 +28,24 @@
       "occ": "Wedding",
       "badges": [],
       "emoji": "🌸",
-      "stock": "in"
+      "stock": "in",
+      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_2.jpg"
     },
     {
       "id": 3,
       "name": "Peony Blush Gift Box",
       "nameAr": "صندوق الفاوانيا الوردي",
-      "cat": "Box of Flowers",
-      "occ": "Birthday",
+      "desc": "Soft pink peonies nestled in our signature deep plum gift box, tied with a champagne bow.",
+      "descAr": "فاوانيا وردية ناعمة في صندوق هدايا",
       "price": 380,
       "oldPrice": null,
+      "cat": "Box of Flowers",
+      "occ": "Birthday",
       "badges": [
         "new"
       ],
-      "emoji": "💝",
-      "stock": "in",
-      "desc": "Soft pink peonies nestled in our signature deep plum gift box, tied with a champagne bow.",
-      "descAr": "فاوانيا وردية ناعمة في صندوق هدايا"
+      "emoji": "🌸",
+      "stock": "in"
     },
     {
       "id": 4,
