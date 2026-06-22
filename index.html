@@ -2037,7 +2037,7 @@ function setLang(l) {
 function badgeHTML(badges) {
   const map = { new:'ck-badge-new', sale:'ck-badge-sale', popular:'ck-badge-popular', limited:'ck-badge-limited', custom:'ck-badge-custom' };
   const labels = { en:{ new:'New', sale:'Sale', popular:'Best Seller', limited:'Limited', custom:'Custom'}, ar:{ new:'جديد', sale:'تخفيض', popular:'الأكثر مبيعاً', limited:'محدود', custom:'مخصص'} };
-  return badges.map(b => `<span class="ck-badge ${map[b]||'ck-badge-new'}">${labels[lang][b]||b}</span>`).join('');
+  return (badges||[]).map(b => `<span class="ck-badge ${map[b]||'ck-badge-new'}">${labels[lang][b]||b}</span>`).join('');
 }
 
 function renderProducts() {
@@ -2504,7 +2504,7 @@ function productRows() {
       </td>
       <td>${p.cat}</td>
       <td>AED ${p.price}${p.oldPrice?`<br><span style="font-size:11px;text-decoration:line-through;color:rgba(212,184,150,0.3);">AED ${p.oldPrice}</span>`:''}</td>
-      <td>${p.badges.length ? p.badges.map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '<span style="color:rgba(212,184,150,0.25);font-size:11px;">none</span>'}</td>
+      <td>${(p.badges||[]).length ? (p.badges||[]).map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '<span style="color:rgba(212,184,150,0.25);font-size:11px;">none</span>'}</td>
       <td><span class="ck-stock-dot ck-stock-${p.stock}"></span>${p.stock==='in'?'In Stock':p.stock==='low'?'Low Stock':'Out of Stock'}</td>
       <td>
         <div class="ck-table-actions">
@@ -2534,7 +2534,7 @@ function deleteProduct(i) {
 }
 
 function offersHTML() {
-  const offerProducts = products.filter(p => p.badges.length > 0);
+  const offerProducts = products.filter(p => (p.badges||[]).length > 0);
   return `
     <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">Offers & Badges</h2>
     <div class="ck-admin-panel-block" style="margin-bottom:20px;">
@@ -2556,7 +2556,7 @@ function offersHTML() {
             <tr>
               <td>${p.emoji||'🌸'} ${p.name}</td>
               <td>AED ${p.price}</td>
-              <td>${p.badges.length ? p.badges.map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '—'}</td>
+              <td>${(p.badges||[]).length ? (p.badges||[]).map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '—'}</td>
               <td><button class="ck-admin-btn-ghost" onclick="openEditModal(${i})" style="padding:5px 10px;font-size:11px;">Edit Badges</button></td>
             </tr>
           `).join('')}
@@ -2941,7 +2941,7 @@ function openAddModal() {
 
 function openEditModal(i) {
   const p = products[i];
-  selectedBadges = [...p.badges];
+  selectedBadges = [...(p.badges||[])];
   document.getElementById('editIdx').value = i;
   document.getElementById('modalTitle').textContent = 'Edit Product';
   document.getElementById('fldName').value = p.name;
