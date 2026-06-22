@@ -3234,8 +3234,34 @@ async function loadRemoteData() {
 function saveRemoteData(snapshot) {
   const { ghToken: _drop, ...safeSettings } = snapshot.storeSettings || {};
   const safeSnapshot = { ...snapshot, storeSettings: safeSettings };
-  return _fbDb.ref('ck-data').set(safeSnapshot)
+  _fbDb.ref('ck-data').set(safeSnapshot)
     .catch(e => toast('Sync error: ' + e.message, 'error'));
+  saveDataJson(safeSnapshot);
+}
+
+async function saveDataJson(data) {
+  const tok = ghToken();
+  if (!tok) return;
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const existing = await ghRequest('data.json');
+  const sha = existing && existing.sha ? existing.sha : undefined;
+  const body = { message: 'Update store data', content, branch: GH_BRANCH };
+  if (sha) body.sha = sha;
+  await ghRequest('data.json', 'PUT', body);
+}
+
+async function loadDataJson() {
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/data.json?t=${Date.now()}`);
+    if (!res.ok) return false;
+    const d = await res.json();
+    if (!d || !toArray(d.products).length) return false;
+    applyData(d);
+    try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
+    renderProducts();
+    applyStoreSettings();
+    return true;
+  } catch(e) { return false; }
 }
 
 // ============================================================
@@ -3600,7 +3626,8 @@ loadFromStorage();
 renderProducts();
 (async () => {
   await loadRemoteConfig();
-  await loadRemoteData();
+  const gotGit = await loadDataJson();
+  if (!gotGit) await loadRemoteData();
   _fbStartRtListener();
 })();
 
