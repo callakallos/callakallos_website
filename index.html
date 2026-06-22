@@ -2295,14 +2295,11 @@ function applyRoleUI() {
 }
 
 function showAdminLogin() {
-  // BYPASS: skip login screen during testing
   currentRole = 'admin';
   document.getElementById('storeSection').style.display = 'none';
-  document.getElementById('loginSection').style.display = 'none';
-  document.getElementById('adminSection').classList.add('active');
-  applyRoleUI();
-  adminTab('dashboard');
-  updateEnquiriesBadge();
+  document.getElementById('adminSection').classList.remove('active');
+  document.getElementById('loginSection').style.display = 'block';
+  setTimeout(() => document.getElementById('loginPass').focus(), 100);
 }
 function showStore() {
   currentRole = 'admin';
