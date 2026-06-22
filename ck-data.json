@@ -45,23 +45,24 @@
         "new"
       ],
       "emoji": "🌸",
-      "stock": "in"
+      "stock": "in",
+      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_3.jpg"
     },
     {
       "id": 4,
       "name": "Midnight Garden Bouquet",
       "nameAr": "باقة حديقة الليل",
-      "cat": "Premium Luxury",
-      "occ": "Anniversary",
+      "desc": "An opulent arrangement of dark roses and seasonal blooms in dramatic deep tones. A statement piece.",
+      "descAr": "تنسيق فاخر من الورود الداكنة",
       "price": 495,
       "oldPrice": null,
+      "cat": "Premium Luxury",
+      "occ": "Anniversary",
       "badges": [
         "limited"
       ],
-      "emoji": "💜",
-      "stock": "low",
-      "desc": "An opulent arrangement of dark roses and seasonal blooms in dramatic deep tones. A statement piece.",
-      "descAr": "تنسيق فاخر من الورود الداكنة"
+      "emoji": "🌸",
+      "stock": "in"
     }
   ],
   "orders": [
