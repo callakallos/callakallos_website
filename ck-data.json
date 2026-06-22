@@ -99,6 +99,20 @@
       "emoji": "🌸",
       "stock": "in",
       "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_6.jpg"
+    },
+    {
+      "id": 7,
+      "name": "Luxury Graduation Floral Arrangement 🎓🌸S",
+      "nameAr": "",
+      "desc": "Celebrate a special milestone with our elegant Luxury Graduation Floral Arrangement, thoughtfully designed to honor achievements in style. Featuring a sophisticated blend of premium roses, chrysanthemums, baby’s breath, and lush greenery, this arrangement is beautifully presented in a modern decorative tray with a stylish graduation topper.\n\nPerfect for graduation ceremonies, gift presentations, photo shoots, and congratulatory surprises, this floral masterpiece combines timeless elegance with a luxurious touch.\n\n✨ Features:\n\nPremium fresh flower arrangement\nElegant graduation-themed topper\nLuxury presentation tray\nSoft pastel and rich floral color palette\nPerfect for graduates of all ages\nIdeal for gifting and celebration displays\n\n🎓 A beautiful way to say: \"Congratulations on your achievement—your future shines bright!\"\n\nSize: Customizable upon request\nOccasion: Graduation, Academic Achievement, Convocation, Congratulations Gift\n\n💐 Crafted with love, elegance, and attention to every detail.",
+      "descAr": "### تنسيق زهور التخرج الفاخر 🎓🌸\n\nاحتفل بإنجاز مميز مع **تنسيق زهور التخرج الفاخر** المصمم بعناية ليعكس الفخامة والأناقة في كل تفصيلة. يضم هذا التنسيق مزيجًا راقيًا من الورود الفاخرة، وأزهار الأقحوان، وزهور الجيبسوفيلا (Baby’s Breath)، مع لمسات من الأوراق الخضراء الطبيعية، مقدّمًا في صينية أنيقة مع بطاقة تخرج مميزة.\n\nيُعد هذا التنسيق الخيار المثالي لحفلات التخرج، والهدايا التذكارية، وجلسات التصوير، والمناسبات الاحتفالية الخاصة بالخريجين.\n\n✨ **المميزات:**\n\n* تنسيق من الزهور الطبيعية الفاخرة\n* بطاقة تهنئة بتصميم خاص للتخرج\n* تقديم أنيق وفاخر\n* ألوان متناغمة تجمع بين الرقي والجمال\n* مناسب لجميع المراحل الدراسية\n* هدية مثالية للاحتفال بالنجاح والإنجاز\n\n🎓 **رسالة التهنئة:**\n*\"مبارك التخرج، ومنها إلى أعلى المراتب والنجاحات بإذن الله.\"*\n\n📏 **الحجم:** قابل للتخصيص حسب الطلب\n🎉 **المناسبة:** التخرج، حفل التخرج، التكريم، هدية نجاح وإنجاز\n\n💐 *صُمم بعناية ليجعل لحظات التخرج أكثر تميزًا وفخامة.*",
+      "price": 550,
+      "oldPrice": 800,
+      "cat": "Premium Luxury",
+      "occ": "Graduation",
+      "badges": [],
+      "emoji": "🌸",
+      "stock": "in"
     }
   ],
   "orders": [
@@ -290,5 +304,5 @@
     "--ck-plum-tint": "#D6E8C4",
     "--ck-plum-light": "#5A7040"
   },
-  "nextId": 7
+  "nextId": 8
 }
