@@ -259,6 +259,18 @@
       "orderCount": 7
     }
   ],
+  "enquiries": [
+    {
+      "id": 1782140580541,
+      "date": "2026-06-22",
+      "time": "19:03",
+      "name": "Tijo Thomas",
+      "contact": "tijoeie@gmail.com",
+      "topic": "Wedding / Event",
+      "message": "details pls",
+      "read": false
+    }
+  ],
   "regularOffers": {
     "tijoeie@gmail.com": "LOYAL 10"
   },
