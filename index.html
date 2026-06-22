@@ -3225,10 +3225,18 @@ function currentTheme() {
   );
 }
 
+// Firebase RTDB returns objects with numeric keys instead of arrays — convert back
+function toArray(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  return Object.keys(val).sort((a,b) => Number(a)-Number(b)).map(k => val[k]);
+}
+
 function applyData(d) {
   // Products: prefer GitHub image URLs; fall back to localStorage base64
-  if (Array.isArray(d.products) && d.products.length) {
-    products = d.products;
+  const prods = toArray(d.products);
+  if (prods.length) {
+    products = prods;
     products.forEach(p => {
       if (!p.imgData) {
         const local = localStorage.getItem(LS_IMG_KEY + p.id);
@@ -3236,11 +3244,13 @@ function applyData(d) {
       }
     });
   }
-  if (Array.isArray(d.orders) && d.orders.length) orders = d.orders;
+  const ords = toArray(d.orders);
+  if (ords.length) orders = ords;
   // Merge enquiries: union of local + remote by ID so async load never erases a just-submitted message
-  if (Array.isArray(d.enquiries) && d.enquiries.length) {
+  const enqs = toArray(d.enquiries);
+  if (enqs.length) {
     const localIds = new Set(enquiries.map(e => e.id));
-    const merged = [...enquiries, ...d.enquiries.filter(e => !localIds.has(e.id))];
+    const merged = [...enquiries, ...enqs.filter(e => !localIds.has(e.id))];
     enquiries = merged.sort((a,b) => b.id - a.id);
   }
   if (d.regularOffers) regularOffers = d.regularOffers;
