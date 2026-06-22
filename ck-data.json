@@ -148,6 +148,23 @@
       "emoji": "🌸",
       "stock": "in",
       "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_9.jpg"
+    },
+    {
+      "id": 10,
+      "name": "rose basket",
+      "nameAr": "",
+      "desc": "",
+      "descAr": "",
+      "price": 210,
+      "oldPrice": null,
+      "cat": "Box of Flowers",
+      "occ": "Wedding",
+      "badges": [
+        "custom"
+      ],
+      "emoji": "🌸",
+      "stock": "in",
+      "imgData": "https://raw.githubusercontent.com/callakallos/callakallos_website/main/images/products/product_10.webp"
     }
   ],
   "orders": [
@@ -349,5 +366,5 @@
     "--ck-plum-tint": "#D6E8C4",
     "--ck-plum-light": "#5A7040"
   },
-  "nextId": 10
+  "nextId": 11
 }
