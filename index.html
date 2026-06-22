@@ -6,81 +6,10 @@
 <title>Calla Kallos — فلوريست دبي الفاخر</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Scheherazade+New:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- Firebase Compat SDK (regular scripts — no module scope issues) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script>
-  firebase.initializeApp({
-    apiKey:            "AIzaSyCljpIAggL_6a9Z3u1USqoGhqJ39SyOfgo",
-    authDomain:        "callakallos.firebaseapp.com",
-    databaseURL:       "https://callakallos-default-rtdb.firebaseio.com",
-    projectId:         "callakallos",
-    storageBucket:     "callakallos.firebasestorage.app",
-    messagingSenderId: "153962679668",
-    appId:             "1:153962679668:web:2135291884f8b6e9a77021"
-  });
-
-  const _fbAuth = firebase.auth();
-  const _fbDb   = firebase.database();
-
-  const FB_USER_ROLE = {
-    'admin@callakallos.com':   'admin',
-    'florist@callakallos.com': 'florist'
-  };
-  const FB_USER_NAME = {
-    'admin@callakallos.com':   'Rinu Kurian',
-    'florist@callakallos.com': 'Florist'
-  };
-  const FB_CARD_EMAIL = {
-    admin:   'admin@callakallos.com',
-    florist: 'florist@callakallos.com'
-  };
-
-  // Real-time listener — keeps store and admin in sync across all devices
-  let _rtListenerActive = false;
-  function _fbStartRtListener() {
-    if (_rtListenerActive) return;
-    _rtListenerActive = true;
-    _fbDb.ref('ck-data').on('value', snapshot => {
-      const d = snapshot.val();
-      if (!d) return;
-      applyData(d);
-      try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
-      renderProducts();
-      applyStoreSettings();
-      // Re-render active admin tab if admin panel is open
-      if (document.getElementById('adminSection').classList.contains('active')) {
-        const activeItem = document.querySelector('.ck-sidebar-item.active');
-        if (activeItem) {
-          const tabMap = ['dashboard','products','offers','orders','enquiries','files','settings'];
-          document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
-            if (el === activeItem) adminTab(tabMap[i]);
-          });
-        }
-      }
-    });
-  }
-
-  // Restore session on page reload
-  _fbAuth.onAuthStateChanged(user => {
-    if (user) {
-      const role = FB_USER_ROLE[user.email] || 'florist';
-      currentRole = role;
-      document.getElementById('adminUserName').textContent = FB_USER_NAME[user.email] || user.email;
-      _fbStartRtListener();
-      const adminEl = document.getElementById('adminSection');
-      if (!adminEl.classList.contains('active')) {
-        document.getElementById('storeSection').style.display = 'none';
-        document.getElementById('loginSection').style.display = 'none';
-        adminEl.classList.add('active');
-        applyRoleUI();
-        adminTab(role === 'florist' ? 'products' : 'dashboard');
-        updateEnquiriesBadge();
-      }
-    }
-  });
-</script>
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
 <style>
 /* =============================================
    CALLA KALLOS — CUSTOM THEME CSS
@@ -3605,15 +3534,74 @@ function enquiriesHTML() {
     </div>`;
 }
 
-// init — load localStorage immediately for fast first paint
+// ============================================================
+//  FIREBASE INIT — in main script so all vars share same scope
+// ============================================================
+firebase.initializeApp({
+  apiKey:            "AIzaSyCljpIAggL_6a9Z3u1USqoGhqJ39SyOfgo",
+  authDomain:        "callakallos.firebaseapp.com",
+  databaseURL:       "https://callakallos-default-rtdb.firebaseio.com",
+  projectId:         "callakallos",
+  storageBucket:     "callakallos.firebasestorage.app",
+  messagingSenderId: "153962679668",
+  appId:             "1:153962679668:web:2135291884f8b6e9a77021"
+});
+const _fbAuth = firebase.auth();
+const _fbDb   = firebase.database();
+
+const FB_USER_ROLE  = { 'admin@callakallos.com':'admin', 'florist@callakallos.com':'florist' };
+const FB_USER_NAME  = { 'admin@callakallos.com':'Rinu Kurian', 'florist@callakallos.com':'Florist' };
+const FB_CARD_EMAIL = { admin:'admin@callakallos.com', florist:'florist@callakallos.com' };
+
+let _rtListenerActive = false;
+function _fbStartRtListener() {
+  if (_rtListenerActive) return;
+  _rtListenerActive = true;
+  _fbDb.ref('ck-data').on('value', snapshot => {
+    const d = snapshot.val();
+    if (!d) return;
+    applyData(d);
+    try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
+    renderProducts();
+    applyStoreSettings();
+    if (document.getElementById('adminSection').classList.contains('active')) {
+      const activeItem = document.querySelector('.ck-sidebar-item.active');
+      if (activeItem) {
+        const tabMap = ['dashboard','products','offers','orders','enquiries','files','settings'];
+        document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
+          if (el === activeItem) adminTab(tabMap[i]);
+        });
+      }
+    }
+  });
+}
+
+_fbAuth.onAuthStateChanged(user => {
+  if (user) {
+    currentRole = FB_USER_ROLE[user.email] || 'florist';
+    document.getElementById('adminUserName').textContent = FB_USER_NAME[user.email] || user.email;
+    _fbStartRtListener();
+    const adminEl = document.getElementById('adminSection');
+    if (!adminEl.classList.contains('active')) {
+      document.getElementById('storeSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'none';
+      adminEl.classList.add('active');
+      applyRoleUI();
+      adminTab(currentRole === 'florist' ? 'products' : 'dashboard');
+      updateEnquiriesBadge();
+    }
+  }
+});
+
+// ============================================================
+//  INIT
+// ============================================================
 loadFromStorage();
 renderProducts();
-
-// Firebase compat SDK loads synchronously — safe to call immediately
 (async () => {
   await loadRemoteConfig();
   await loadRemoteData();
-  _fbStartRtListener(); // real-time sync for all visitors
+  _fbStartRtListener();
 })();
 
 // Customer image slideshow
