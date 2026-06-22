@@ -2554,7 +2554,12 @@ function offersHTML() {
         <tbody>
           ${products.map((p,i) => `
             <tr>
-              <td>${p.emoji||'🌸'} ${p.name}</td>
+              <td>
+                <div style="display:inline-flex;align-items:center;gap:10px;">
+                  <span class="ck-table-thumb">${p.imgData?`<img src="${p.imgData}" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">`:p.emoji||'🌸'}</span>
+                  <span>${p.name}</span>
+                </div>
+              </td>
               <td>AED ${p.price}</td>
               <td>${(p.badges||[]).length ? (p.badges||[]).map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '—'}</td>
               <td><button class="ck-admin-btn-ghost" onclick="openEditModal(${i})" style="padding:5px 10px;font-size:11px;">Edit Badges</button></td>
