@@ -1593,9 +1593,9 @@ body {
         <div>
           <h3 style="font-family:var(--font-display);font-size:20px;font-weight:400;color:var(--ck-plum-dark);margin-bottom:20px;">Send a Message</h3>
           <div style="display:flex;flex-direction:column;gap:12px;">
-            <input class="ck-input" placeholder="Your Name" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
-            <input class="ck-input" placeholder="Email or Phone" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
-            <select class="ck-select" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);padding:10px 14px;">
+            <input id="cqName" class="ck-input" placeholder="Your Name" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
+            <input id="cqContact" class="ck-input" placeholder="Email or Phone" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
+            <select id="cqTopic" class="ck-select" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);padding:10px 14px;">
               <option value="">What are you enquiring about?</option>
               <option>Custom Arrangement</option>
               <option>Wedding / Event</option>
@@ -1603,8 +1603,8 @@ body {
               <option>Delivery Query</option>
               <option>Other</option>
             </select>
-            <textarea class="ck-textarea" placeholder="Your message…" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);min-height:100px;"></textarea>
-            <button class="ck-btn ck-btn-primary" onclick="toast('Message sent! We\'ll be in touch shortly ✓')" style="width:100%;justify-content:center;">Send Message →</button>
+            <textarea id="cqMessage" class="ck-textarea" placeholder="Your message…" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);min-height:100px;"></textarea>
+            <button class="ck-btn ck-btn-primary" onclick="sendEnquiry()" style="width:100%;justify-content:center;">Send Message →</button>
           </div>
         </div>
       </div>
@@ -1711,6 +1711,11 @@ body {
         <div class="ck-sidebar-item" onclick="adminTab('orders')">
           <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
           Orders
+        </div>
+        <div class="ck-sidebar-item" onclick="adminTab('enquiries')">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Enquiries
+          <span id="enquiriesBadge" style="display:none;margin-left:auto;background:#C04040;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;"></span>
         </div>
         <div class="ck-sidebar-item" onclick="adminTab('files')">
           <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
@@ -1951,6 +1956,7 @@ let products = [
   { id:4, name:'Midnight Garden Bouquet', nameAr:'باقة حديقة الليل', cat:'Premium Luxury', occ:'Anniversary', price:495, oldPrice:null, badges:['limited'], emoji:'💜', stock:'low', desc:'An opulent arrangement of dark roses and seasonal blooms in dramatic deep tones. A statement piece.', descAr:'تنسيق فاخر من الورود الداكنة' },
 ];
 let nextId = 5;
+let enquiries = [];
 
 let orders = [
   { id:1042, date:'2026-06-18', time:'14:30', customer:'Ahmed Khalid',     email:'ahmed.k@gmail.com',   phone:'+971 50 123 4567', product:'Rose Velvet Luxe',        amount:350, location:'Dubai Marina, Marina Walk, Villa 12',          status:'Delivered',  orderCount:5 },
@@ -2235,6 +2241,7 @@ function showAdminLogin() {
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.add('active');
   adminTab('dashboard');
+  updateEnquiriesBadge();
 }
 function showStore() {
   document.getElementById('storeSection').style.display = 'block';
@@ -2258,7 +2265,7 @@ function doLogin() {
 // ============================================================
 function adminTab(tab) {
   document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
-    const tabs = ['dashboard','products','offers','orders','files','settings'];
+    const tabs = ['dashboard','products','offers','orders','enquiries','files','settings'];
     el.classList.toggle('active', tabs[i]===tab);
   });
   const main = document.getElementById('adminMain');
@@ -2266,6 +2273,7 @@ function adminTab(tab) {
   else if (tab==='products') main.innerHTML = productsHTML();
   else if (tab==='offers') main.innerHTML = offersHTML();
   else if (tab==='orders') { main.innerHTML = ordersHTML(); renderOrdersTable(); }
+  else if (tab==='enquiries') { main.innerHTML = enquiriesHTML(); markEnquiriesRead(); }
   else if (tab==='files') { main.innerHTML = fileManagerHTML(); loadFileManager(); }
   else if (tab==='settings') { main.innerHTML = settingsHTML(); populateSettingsInputs(); }
 }
@@ -3019,7 +3027,8 @@ function applyData(d) {
       }
     });
   }
-  if (Array.isArray(d.orders)  && d.orders.length)  orders        = d.orders;
+  if (Array.isArray(d.orders)     && d.orders.length)     orders     = d.orders;
+  if (Array.isArray(d.enquiries))                         enquiries  = d.enquiries;
   if (d.regularOffers) regularOffers = d.regularOffers;
   if (d.nextId && d.nextId > nextId)  nextId = d.nextId;
   if (d.storeSettings) Object.assign(storeSettings, d.storeSettings);
@@ -3033,7 +3042,7 @@ function persistMeta() {
     ...p,
     imgData: p.imgData && p.imgData.startsWith('http') ? p.imgData : undefined
   }));
-  const snapshot = { products: productsToSave, orders, regularOffers, storeSettings, theme: currentTheme(), nextId };
+  const snapshot = { products: productsToSave, orders, enquiries, regularOffers, storeSettings, theme: currentTheme(), nextId };
   // localStorage — fast, same device
   try { localStorage.setItem(LS_KEY, JSON.stringify(snapshot)); } catch(e) {}
   // localStorage base64 images stay in LS_IMG_KEY keys
@@ -3355,6 +3364,86 @@ async function saveRemoteConfig(updates) {
   if (!result || result.message) {
     toast('Sync failed: ' + (result && result.message ? result.message : 'no response'), 'error');
   }
+}
+
+// ============================================================
+//  ENQUIRIES
+// ============================================================
+function sendEnquiry() {
+  const name    = (document.getElementById('cqName').value    || '').trim();
+  const contact = (document.getElementById('cqContact').value || '').trim();
+  const topic   = (document.getElementById('cqTopic').value   || '').trim();
+  const message = (document.getElementById('cqMessage').value || '').trim();
+  if (!name || !contact || !message) {
+    toast('Please fill in your name, contact, and message', 'error'); return;
+  }
+  const enq = {
+    id: Date.now(),
+    date: new Date().toISOString().slice(0,10),
+    time: new Date().toTimeString().slice(0,5),
+    name, contact, topic: topic || 'General', message,
+    read: false
+  };
+  enquiries.unshift(enq);
+  persistMeta();
+  updateEnquiriesBadge();
+  // Clear form
+  ['cqName','cqContact','cqMessage'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('cqTopic').selectedIndex = 0;
+  toast('Message sent! We\'ll be in touch shortly ✓');
+}
+
+function updateEnquiriesBadge() {
+  const unread = enquiries.filter(e => !e.read).length;
+  const badge = document.getElementById('enquiriesBadge');
+  if (!badge) return;
+  if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline-block'; }
+  else { badge.style.display = 'none'; }
+}
+
+function markEnquiriesRead() {
+  let changed = false;
+  enquiries.forEach(e => { if (!e.read) { e.read = true; changed = true; } });
+  if (changed) { persistMeta(); updateEnquiriesBadge(); }
+}
+
+function deleteEnquiry(id) {
+  enquiries = enquiries.filter(e => e.id !== id);
+  persistMeta();
+  document.getElementById('adminMain').innerHTML = enquiriesHTML();
+  markEnquiriesRead();
+  toast('Enquiry deleted ✓');
+}
+
+function enquiriesHTML() {
+  const topicColor = { 'Custom Arrangement':'#7A5C8A','Wedding / Event':'#C08030','Corporate Order':'#4A7C59','Delivery Query':'#4A6A8A','General':'#888','Other':'#888' };
+  const rows = enquiries.length ? enquiries.map(e => `
+    <div style="background:rgba(46,59,31,${e.read?'0.08':'0.18'});border:1px solid rgba(200,184,138,${e.read?'0.1':'0.25'});border-radius:8px;padding:18px 20px;margin-bottom:12px;position:relative;">
+      ${!e.read ? '<span style="position:absolute;top:16px;right:56px;width:8px;height:8px;background:#C04040;border-radius:50%;"></span>' : ''}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-weight:500;color:var(--ck-cream);font-size:14px;">${e.name}</span>
+          <span style="font-size:12px;color:rgba(212,184,150,0.6);">${e.contact}</span>
+          <span style="font-size:11px;background:rgba(${e.topic==='Wedding / Event'?'192,128,48':'74,124,89'},0.2);color:${topicColor[e.topic]||'#888'};padding:2px 8px;border-radius:3px;letter-spacing:.05em;">${e.topic}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;color:rgba(212,184,150,0.35);">${e.date} ${e.time}</span>
+          <button class="ck-admin-btn-danger" onclick="deleteEnquiry(${e.id})" style="padding:3px 10px;font-size:11px;">Delete</button>
+        </div>
+      </div>
+      <p style="margin:0;font-size:13px;color:rgba(247,237,216,0.75);line-height:1.6;white-space:pre-wrap;">${e.message}</p>
+    </div>`).join('')
+  : '<div style="text-align:center;padding:48px;color:rgba(212,184,150,0.3);font-size:14px;">No enquiries yet</div>';
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">Customer Enquiries</h2>
+      <span style="font-size:12px;color:rgba(212,184,150,0.4);">${enquiries.length} total · ${enquiries.filter(e=>!e.read).length} unread</span>
+    </div>
+    <div class="ck-admin-panel-block">
+      <div class="ck-panel-header"><span class="ck-panel-title">All Messages</span></div>
+      <div style="padding:16px;">${rows}</div>
+    </div>`;
 }
 
 // init — load config first (token), then sync remote data
