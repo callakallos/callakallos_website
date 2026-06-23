@@ -1073,6 +1073,172 @@ body {
 .ck-login-err { color: var(--ck-danger); font-size: 12px; margin-top: 8px; text-align: center; display: none; }
 .ck-login-err.show { display: block; }
 
+/* Gift Box Builder */
+.ck-giftbox {
+  background: var(--ck-plum-dark);
+  padding: 72px 40px;
+}
+.ck-giftbox-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  align-items: flex-start;
+}
+.ck-gb-category {
+  margin-bottom: 28px;
+}
+.ck-gb-cat-title {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ck-champagne);
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+.ck-gb-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.ck-gb-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(212,184,150,0.12);
+  border-radius: 10px;
+  padding: 16px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.ck-gb-item:hover {
+  border-color: rgba(212,184,150,0.3);
+  background: rgba(255,255,255,0.07);
+}
+.ck-gb-item.selected {
+  border-color: var(--ck-champagne);
+  background: rgba(200,184,138,0.1);
+  box-shadow: 0 0 0 1px var(--ck-champagne);
+}
+.ck-gb-item-emoji {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+.ck-gb-item-name {
+  font-size: 13px;
+  color: var(--ck-cream);
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.ck-gb-item-price {
+  font-size: 12px;
+  color: var(--ck-champagne);
+  font-weight: 500;
+}
+.ck-gb-qty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ck-gb-qty button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,184,150,0.25);
+  background: rgba(255,255,255,0.05);
+  color: var(--ck-champagne);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ck-gb-qty button:hover { background: rgba(200,184,138,0.15); }
+.ck-gb-qty span {
+  font-size: 14px;
+  color: var(--ck-cream);
+  min-width: 20px;
+  text-align: center;
+}
+.ck-gb-summary {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(212,184,150,0.15);
+  border-radius: 14px;
+  padding: 28px 24px;
+  position: sticky;
+  top: 100px;
+}
+.ck-gb-summary-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--ck-champagne);
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+.ck-gb-summary-items {
+  min-height: 60px;
+  margin-bottom: 16px;
+}
+.ck-gb-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(212,184,150,0.06);
+  font-size: 13px;
+  color: rgba(247,237,216,0.75);
+}
+.ck-gb-summary-row:last-child { border-bottom: none; }
+.ck-gb-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 0 0;
+  border-top: 1px solid rgba(212,184,150,0.15);
+  margin-top: 8px;
+}
+.ck-gb-total-label {
+  font-size: 14px;
+  color: var(--ck-cream);
+  font-weight: 500;
+}
+.ck-gb-total-price {
+  font-size: 18px;
+  color: var(--ck-champagne);
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+.ck-gb-add-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  background: var(--ck-champagne);
+  color: var(--ck-plum-dark);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ck-gb-add-btn:hover { background: #b8a87a; }
+.ck-gb-empty {
+  text-align: center;
+  padding: 24px 0;
+  color: rgba(212,184,150,0.3);
+  font-size: 13px;
+}
+
+@media(max-width:768px) {
+  .ck-giftbox { padding: 48px var(--space-md); }
+  .ck-giftbox-grid { grid-template-columns: 1fr; }
+  .ck-gb-summary { position: static; }
+  .ck-gb-items { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* Checkout payment options */
 .co-pay-opt {
   display: inline-flex;
@@ -1549,6 +1715,50 @@ body {
       <div class="ck-feature-sub" data-en="Visa, MC, Apple Pay, COD" data-ar="فيزا، ماستر، آبل باي، كاش">Visa, MC, Apple Pay, COD</div>
     </div>
   </div>
+
+  <!-- ========== GIFT BOX BUILDER ========== -->
+  <section class="ck-giftbox" id="section-giftbox">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ck-champagne);margin-bottom:10px;">✨ Customize Your Gift</div>
+      <h2 style="font-family:var(--font-display);font-size:36px;font-weight:300;color:var(--ck-cream);margin:0;">Build Your Own Gift Box</h2>
+      <p style="color:rgba(247,237,216,0.5);font-size:14px;margin-top:10px;">Select your favourite items to create a personalised luxury gift box</p>
+    </div>
+    <div class="ck-giftbox-grid">
+      <div>
+        <div class="ck-gb-category">
+          <div class="ck-gb-cat-title">🌹 Flowers</div>
+          <div class="ck-gb-items" id="gbFlowers"></div>
+        </div>
+        <div class="ck-gb-category">
+          <div class="ck-gb-cat-title">🍫 Chocolates</div>
+          <div class="ck-gb-items" id="gbChocolates"></div>
+        </div>
+        <div class="ck-gb-category">
+          <div class="ck-gb-cat-title">🧸 Teddy Bears</div>
+          <div class="ck-gb-items" id="gbTeddies"></div>
+        </div>
+        <div class="ck-gb-category">
+          <div class="ck-gb-cat-title">🌸 Perfumes</div>
+          <div class="ck-gb-items" id="gbPerfumes"></div>
+        </div>
+        <div class="ck-gb-category">
+          <div class="ck-gb-cat-title">💌 Greeting Cards</div>
+          <div class="ck-gb-items" id="gbCards"></div>
+        </div>
+      </div>
+      <div class="ck-gb-summary">
+        <div class="ck-gb-summary-title">🎁 Your Gift Box</div>
+        <div class="ck-gb-summary-items" id="gbSummaryItems">
+          <div class="ck-gb-empty">Select items to build your gift box</div>
+        </div>
+        <div class="ck-gb-total">
+          <span class="ck-gb-total-label">Total</span>
+          <span class="ck-gb-total-price" id="gbTotal">AED 0</span>
+        </div>
+        <button class="ck-gb-add-btn" onclick="addGiftBoxToCart()">ADD GIFT BOX TO CART →</button>
+      </div>
+    </div>
+  </section>
 
   <!-- ========== ABOUT SECTION ========== -->
   <section id="section-about" style="background:var(--ck-plum-dark);padding:72px 40px;">
@@ -2247,6 +2457,152 @@ function toggleCart() {
 function toggleMobileMenu() {
   document.getElementById('mobileNav').classList.toggle('open');
 }
+
+// ============================================================
+//  GIFT BOX BUILDER
+// ============================================================
+const giftBoxItems = {
+  flowers: [
+    { name: 'Red Roses (6)', emoji: '🌹', price: 120 },
+    { name: 'Pink Roses (6)', emoji: '🌷', price: 120 },
+    { name: 'White Lilies (3)', emoji: '🤍', price: 150 },
+    { name: 'Sunflowers (3)', emoji: '🌻', price: 100 },
+    { name: 'Mixed Bouquet', emoji: '💐', price: 180 },
+    { name: 'Orchid Stem', emoji: '🪻', price: 90 },
+  ],
+  chocolates: [
+    { name: 'Godiva Box (12pc)', emoji: '🍫', price: 95 },
+    { name: 'Patchi Box (24pc)', emoji: '🎀', price: 140 },
+    { name: 'Ferrero Rocher (16pc)', emoji: '✨', price: 65 },
+    { name: 'Belgian Truffles', emoji: '🍬', price: 85 },
+  ],
+  teddies: [
+    { name: 'Small Bear (20cm)', emoji: '🧸', price: 45 },
+    { name: 'Medium Bear (40cm)', emoji: '🧸', price: 85 },
+    { name: 'Large Bear (60cm)', emoji: '🧸', price: 150 },
+    { name: 'Bunny Plush', emoji: '🐰', price: 65 },
+  ],
+  perfumes: [
+    { name: 'Rose Oud (50ml)', emoji: '🌹', price: 180 },
+    { name: 'Jasmine Mist (50ml)', emoji: '🌸', price: 160 },
+    { name: 'Luxury Candle', emoji: '🕯️', price: 120 },
+    { name: 'Diffuser Set', emoji: '🌿', price: 95 },
+  ],
+  cards: [
+    { name: 'Happy Birthday', emoji: '🎂', price: 15 },
+    { name: 'Anniversary', emoji: '💕', price: 15 },
+    { name: 'Congratulations', emoji: '🎉', price: 15 },
+    { name: 'Get Well Soon', emoji: '💝', price: 15 },
+    { name: 'Custom Message', emoji: '✍️', price: 20 },
+  ],
+};
+
+let giftBoxSelection = {};
+
+function renderGiftBoxItems() {
+  const containers = {
+    flowers: 'gbFlowers',
+    chocolates: 'gbChocolates',
+    teddies: 'gbTeddies',
+    perfumes: 'gbPerfumes',
+    cards: 'gbCards',
+  };
+  Object.entries(containers).forEach(([cat, containerId]) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = giftBoxItems[cat].map((item, i) => {
+      const key = cat + '_' + i;
+      const qty = giftBoxSelection[key] || 0;
+      return `
+        <div class="ck-gb-item ${qty > 0 ? 'selected' : ''}" onclick="gbToggle('${key}','${cat}',${i})">
+          <div class="ck-gb-item-emoji">${item.emoji}</div>
+          <div class="ck-gb-item-name">${item.name}</div>
+          <div class="ck-gb-item-price">AED ${item.price}</div>
+          ${qty > 0 ? `
+            <div class="ck-gb-qty" onclick="event.stopPropagation()">
+              <button onclick="gbAdjust('${key}',-1)">−</button>
+              <span>${qty}</span>
+              <button onclick="gbAdjust('${key}',1)">+</button>
+            </div>
+          ` : ''}
+        </div>`;
+    }).join('');
+  });
+}
+
+function gbToggle(key, cat, idx) {
+  if (giftBoxSelection[key]) {
+    delete giftBoxSelection[key];
+  } else {
+    giftBoxSelection[key] = 1;
+  }
+  renderGiftBoxItems();
+  updateGbSummary();
+}
+
+function gbAdjust(key, delta) {
+  const qty = (giftBoxSelection[key] || 0) + delta;
+  if (qty <= 0) delete giftBoxSelection[key];
+  else giftBoxSelection[key] = qty;
+  renderGiftBoxItems();
+  updateGbSummary();
+}
+
+function updateGbSummary() {
+  const summaryEl = document.getElementById('gbSummaryItems');
+  const totalEl = document.getElementById('gbTotal');
+  const entries = Object.entries(giftBoxSelection);
+  if (!entries.length) {
+    summaryEl.innerHTML = '<div class="ck-gb-empty">Select items to build your gift box</div>';
+    totalEl.textContent = 'AED 0';
+    return;
+  }
+  let total = 0;
+  summaryEl.innerHTML = entries.map(([key, qty]) => {
+    const [cat, idx] = key.split('_');
+    const item = giftBoxItems[cat][parseInt(idx)];
+    const subtotal = item.price * qty;
+    total += subtotal;
+    return `<div class="ck-gb-summary-row">
+      <span>${item.emoji} ${item.name} ×${qty}</span>
+      <span style="color:var(--ck-champagne);">AED ${subtotal}</span>
+    </div>`;
+  }).join('');
+  totalEl.textContent = 'AED ' + total.toLocaleString();
+}
+
+function addGiftBoxToCart() {
+  const entries = Object.entries(giftBoxSelection);
+  if (!entries.length) { toast('Please select items for your gift box', 'error'); return; }
+  let total = 0;
+  const names = [];
+  entries.forEach(([key, qty]) => {
+    const [cat, idx] = key.split('_');
+    const item = giftBoxItems[cat][parseInt(idx)];
+    total += item.price * qty;
+    names.push(item.name + (qty > 1 ? ' ×' + qty : ''));
+  });
+  cart.push({
+    id: 'giftbox_' + Date.now(),
+    name: '🎁 Custom Gift Box',
+    desc: names.join(', '),
+    price: total,
+    qty: 1,
+    imgData: null,
+    emoji: '🎁'
+  });
+  updateCartUI();
+  giftBoxSelection = {};
+  renderGiftBoxItems();
+  updateGbSummary();
+  toast('Custom Gift Box added to cart ✓');
+}
+
+// Render gift box items on load
+document.addEventListener('DOMContentLoaded', () => {
+  renderGiftBoxItems();
+  updateGbSummary();
+});
 
 // ============================================================
 //  OCCASION FILTER
