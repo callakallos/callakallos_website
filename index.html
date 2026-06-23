@@ -1749,6 +1749,7 @@ body {
         <div class="ck-sidebar-item" onclick="adminTab('orders')">
           <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
           Orders
+          <span id="ordersBadge" style="display:none;margin-left:auto;background:#C08030;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;"></span>
         </div>
         <div class="ck-sidebar-item" onclick="adminTab('enquiries')">
           <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -2367,7 +2368,7 @@ async function doLogin() {
     document.getElementById('adminSection').classList.add('active');
     applyRoleUI();
     adminTab(role === 'florist' ? 'products' : 'dashboard');
-    updateEnquiriesBadge();
+    updateEnquiriesBadge(); updateOrdersBadge();
     _fbStartRtListener();
     _startOrderQueueListener();
     _fbDb.ref('ck-data').once('value').then(snap => {
@@ -2707,8 +2708,13 @@ function renderOrdersTable() {
         </select>
       </td>
       <td style="white-space:nowrap;">
-        <button class="ck-admin-btn" onclick="saveOrderStatus(${o.id})" style="padding:5px 12px;font-size:11px;">Save</button>
-        <button class="ck-admin-btn-danger" onclick="deleteOrder(${o.id})" style="padding:5px 10px;font-size:11px;margin-left:4px;">Delete</button>
+        ${o.status === 'Pending' ? `
+          <button class="ck-admin-btn" onclick="acceptOrder(${o.id})" style="padding:5px 12px;font-size:11px;">✓ Accept</button>
+          <button class="ck-admin-btn-danger" onclick="declineOrder(${o.id})" style="padding:5px 10px;font-size:11px;margin-left:4px;">✕ Decline</button>
+        ` : `
+          <button class="ck-admin-btn" onclick="saveOrderStatus(${o.id})" style="padding:5px 12px;font-size:11px;">Save</button>
+          <button class="ck-admin-btn-danger" onclick="deleteOrder(${o.id})" style="padding:5px 10px;font-size:11px;margin-left:4px;">Delete</button>
+        `}
       </td>
     </tr>`;
   }).join('');
@@ -2723,11 +2729,43 @@ function saveOrderStatus(id) {
   if (o) { o.status = sel.value; persistMeta(); toast('Order #'+id+' status updated ✓'); }
 }
 
+function acceptOrder(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  o.status = 'Preparing';
+  persistMeta();
+  renderOrdersTable();
+  updateOrdersBadge();
+  toast('Order #' + id + ' accepted ✓');
+}
+
+function declineOrder(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  const reason = prompt('Decline reason / message to customer:', 'Sorry, we are unable to fulfil your order at this time.');
+  if (reason === null) return;
+  o.status = 'Cancelled';
+  persistMeta();
+  renderOrdersTable();
+  updateOrdersBadge();
+  toast('Order #' + id + ' declined');
+  // Open WhatsApp to customer with the decline message
+  const phone = (o.phone || '').replace(/[^0-9]/g, '');
+  if (phone) {
+    let msg = `🌸 *Calla Kallos — Order Update*\n`;
+    msg += `*Order #:* ${o.id}\n`;
+    msg += `*Items:* ${o.product}\n\n`;
+    msg += reason;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+}
+
 function deleteOrder(id) {
   if (!confirm(`Delete order #${id}? This cannot be undone.`)) return;
   orders = orders.filter(o => o.id !== id);
   persistMeta();
   renderOrdersTable();
+  updateOrdersBadge();
   toast('Order #'+id+' deleted ✓');
 }
 
@@ -3649,7 +3687,7 @@ function sendEnquiry() {
   enquiries.unshift(enq);
   if (_fbAuth.currentUser) persistMeta();
   else _fbDb.ref('ck-new-enquiries/' + enq.id).set(enq).catch(() => {});
-  updateEnquiriesBadge();
+  updateEnquiriesBadge(); updateOrdersBadge();
   // Clear form
   ['cqName','cqContact','cqMessage'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   document.getElementById('cqTopic').selectedIndex = 0;
@@ -3664,17 +3702,25 @@ function updateEnquiriesBadge() {
   else { badge.style.display = 'none'; }
 }
 
+function updateOrdersBadge() {
+  const pending = orders.filter(o => o.status === 'Pending').length;
+  const badge = document.getElementById('ordersBadge');
+  if (!badge) return;
+  if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline-block'; }
+  else { badge.style.display = 'none'; }
+}
+
 function markEnquiriesRead() {
   let changed = false;
   enquiries.forEach(e => { if (!e.read) { e.read = true; changed = true; } });
-  if (changed) { persistMeta(); updateEnquiriesBadge(); }
+  if (changed) { persistMeta(); updateEnquiriesBadge(); updateOrdersBadge(); }
 }
 
 function deleteEnquiry(id) {
   enquiries = enquiries.filter(e => e.id !== id);
   persistMeta();
   document.getElementById('adminMain').innerHTML = enquiriesHTML();
-  updateEnquiriesBadge();
+  updateEnquiriesBadge(); updateOrdersBadge();
   toast('Enquiry deleted ✓');
 }
 function toggleEnquiryRead(id) {
@@ -3683,7 +3729,7 @@ function toggleEnquiryRead(id) {
   e.read = !e.read;
   persistMeta();
   document.getElementById('adminMain').innerHTML = enquiriesHTML();
-  updateEnquiriesBadge();
+  updateEnquiriesBadge(); updateOrdersBadge();
 }
 
 function enquiriesHTML() {
@@ -3761,7 +3807,7 @@ function _startOrderQueueListener() {
     if (!orders.some(o => o.id === order.id)) {
       orders.unshift(order);
       persistMeta();
-      updateEnquiriesBadge();
+      updateEnquiriesBadge(); updateOrdersBadge();
       toast('📦 New order #' + order.id + ' from ' + order.customer);
     }
     // Remove from queue
@@ -3773,7 +3819,7 @@ function _startOrderQueueListener() {
     if (!enquiries.some(e => e.id === enq.id)) {
       enquiries.unshift(enq);
       persistMeta();
-      updateEnquiriesBadge();
+      updateEnquiriesBadge(); updateOrdersBadge();
     }
     snapshot.ref.remove().catch(() => {});
   });
@@ -3792,7 +3838,7 @@ _fbAuth.onAuthStateChanged(user => {
       adminEl.classList.add('active');
       applyRoleUI();
       adminTab(currentRole === 'florist' ? 'products' : 'dashboard');
-      updateEnquiriesBadge();
+      updateEnquiriesBadge(); updateOrdersBadge();
     }
     _fbDb.ref('ck-data').once('value').then(snap => {
       if (snap.val()) { applyData(snap.val()); backfillProductCodes(); }
