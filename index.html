@@ -5177,6 +5177,41 @@ function applyAdminTheme(themeKey) {
   document.documentElement.style.setProperty('--admin-sidebar-active-color', t.sidebarActiveColor);
   document.documentElement.style.setProperty('--admin-stat-bg', t.statBg);
 
+  // Inject theme override stylesheet
+  let themeStyle = document.getElementById('adminThemeStyle');
+  if (!themeStyle) { themeStyle = document.createElement('style'); themeStyle.id = 'adminThemeStyle'; document.head.appendChild(themeStyle); }
+  themeStyle.textContent = `
+    #adminSection .ck-admin-wrapper { color: ${t.text} !important; }
+    #adminSection .ck-admin-main * { color: inherit; }
+    #adminSection .ck-admin-main h2 { color: ${t.accent} !important; }
+    #adminSection .ck-stat-card { background: ${t.statBg} !important; border-color: ${t.panelBorder} !important; }
+    #adminSection .ck-stat-label { color: ${t.textMuted} !important; }
+    #adminSection .ck-stat-val { color: ${t.text} !important; }
+    #adminSection .ck-stat-sub { color: ${t.accent} !important; }
+    #adminSection .ck-admin-panel-block { background: ${t.panelBg} !important; border-color: ${t.panelBorder} !important; }
+    #adminSection .ck-panel-header { border-bottom-color: ${t.panelBorder} !important; }
+    #adminSection .ck-panel-title { color: ${t.accent} !important; }
+    #adminSection .ck-product-table th { background: ${t.nav} !important; color: ${t.textMuted} !important; }
+    #adminSection .ck-product-table td { color: ${t.text} !important; border-bottom-color: ${t.panelBorder} !important; }
+    #adminSection .ck-product-table tr:hover td { background: ${t.sidebarActive} !important; }
+    #adminSection .ck-sidebar-item { color: ${t.textMuted} !important; }
+    #adminSection .ck-sidebar-item:hover { color: ${t.sidebarActiveColor} !important; background: ${t.sidebarActive} !important; }
+    #adminSection .ck-sidebar-item.active { color: ${t.sidebarActiveColor} !important; border-left-color: ${t.sidebarActiveColor} !important; background: ${t.sidebarActive} !important; }
+    #adminSection .ck-sidebar-item svg { stroke: currentColor !important; }
+    #adminSection .ck-admin-btn { background: ${t.btnBg} !important; color: ${t.btnText} !important; }
+    #adminSection .ck-admin-btn:hover { opacity: 0.9; }
+    #adminSection .ck-admin-btn-ghost { color: ${t.textMuted} !important; border-color: ${t.panelBorder} !important; }
+    #adminSection .ck-admin-btn-ghost:hover { color: ${t.accent} !important; border-color: ${t.accent} !important; }
+    #adminSection .ck-admin-btn-danger { color: #C04040 !important; border-color: rgba(192,64,64,0.3) !important; }
+    #adminSection .ck-input, #adminSection .ck-select, #adminSection .ck-textarea { background: ${t.main} !important; color: ${t.text} !important; border-color: ${t.panelBorder} !important; }
+    #adminSection .ck-input::placeholder { color: ${t.textMuted} !important; }
+    #adminSection .ck-admin-brand span { color: ${t.textMuted} !important; }
+    #adminSection .ck-admin-user { color: ${t.textMuted} !important; }
+    #adminSection .ck-admin-user button, #adminSection .ck-admin-user a { color: ${t.textMuted} !important; }
+    #adminSection .ck-table-scroll::-webkit-scrollbar-thumb { background: ${t.textMuted} !important; }
+    #adminSection .ck-form-label { color: ${t.textMuted} !important; }
+  `;
+
   // Apply to existing styled elements
   w.querySelectorAll('.ck-sidebar-item').forEach(el => {
     el.style.color = '';
