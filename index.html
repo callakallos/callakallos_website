@@ -3071,6 +3071,8 @@ function adminTab(tab) {
   else if (tab==='admin-themes') main.innerHTML = adminThemesHTML();
   else if (tab==='logs') { main.innerHTML = '<div id="logsContainer"><div style="text-align:center;padding:48px;color:rgba(212,184,150,0.3);">Loading logs…</div></div>'; loadActivityLogs(); }
   else if (tab==='settings') { main.innerHTML = settingsHTML(); populateSettingsInputs(); }
+  // Re-apply admin theme to fix inline-styled colors in freshly rendered content
+  if (currentAdminTheme && currentAdminTheme !== 'default') applyAdminTheme(currentAdminTheme);
 }
 
 function dashboardHTML() {
@@ -5180,9 +5182,26 @@ function applyAdminTheme(themeKey) {
   // Inject theme override stylesheet
   let themeStyle = document.getElementById('adminThemeStyle');
   if (!themeStyle) { themeStyle = document.createElement('style'); themeStyle.id = 'adminThemeStyle'; document.head.appendChild(themeStyle); }
+  // Force-override all inline color styles in admin main content
+  const mainEl = w.querySelector('.ck-admin-main');
+  if (mainEl) {
+    mainEl.querySelectorAll('[style]').forEach(el => {
+      const s = el.getAttribute('style');
+      if (!s) return;
+      let ns = s;
+      // Replace hardcoded light-on-dark colors with theme text
+      ns = ns.replace(/color:\s*var\(--ck-cream\)/gi, `color:${t.text}`);
+      ns = ns.replace(/color:\s*var\(--ck-champagne\)/gi, `color:${t.accent}`);
+      ns = ns.replace(/color:\s*rgba\(247,237,216,[^)]+\)/gi, `color:${t.text}`);
+      ns = ns.replace(/color:\s*rgba\(212,184,150,[^)]+\)/gi, `color:${t.textMuted}`);
+      ns = ns.replace(/color:\s*rgba\(200,184,138,[^)]+\)/gi, `color:${t.textMuted}`);
+      ns = ns.replace(/color:\s*rgba\(245,240,232,[^)]+\)/gi, `color:${t.text}`);
+      if (ns !== s) el.setAttribute('style', ns);
+    });
+  }
+
   themeStyle.textContent = `
     #adminSection .ck-admin-wrapper { color: ${t.text} !important; }
-    #adminSection .ck-admin-main * { color: inherit; }
     #adminSection .ck-admin-main h2 { color: ${t.accent} !important; }
     #adminSection .ck-stat-card { background: ${t.statBg} !important; border-color: ${t.panelBorder} !important; }
     #adminSection .ck-stat-label { color: ${t.textMuted} !important; }
@@ -5210,6 +5229,8 @@ function applyAdminTheme(themeKey) {
     #adminSection .ck-admin-user button, #adminSection .ck-admin-user a { color: ${t.textMuted} !important; }
     #adminSection .ck-table-scroll::-webkit-scrollbar-thumb { background: ${t.textMuted} !important; }
     #adminSection .ck-form-label { color: ${t.textMuted} !important; }
+    #adminSection .ck-badge { color: inherit !important; }
+    #adminSection .ck-stock-dot { border-color: ${t.panelBorder} !important; }
   `;
 
   // Apply to existing styled elements
