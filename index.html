@@ -1966,6 +1966,10 @@ body {
           Enquiries
           <span id="enquiriesBadge" style="display:none;margin-left:auto;background:#C04040;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;"></span>
         </div>
+        <div class="ck-sidebar-item" onclick="adminTab('crm')">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Customers
+        </div>
         <div class="ck-sidebar-item" onclick="adminTab('files')">
           <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
           File Manager
@@ -2659,7 +2663,7 @@ function applyRoleUI() {
   document.getElementById('adminUserName').textContent = isFlorist ? 'Florist' : 'Rinu Kurian';
   // Hide dashboard + settings sidebar items for florist
   const sidebarItems = document.querySelectorAll('.ck-sidebar-item');
-  const tabs = ['dashboard','products','offers','orders','enquiries','files','settings'];
+  const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','settings'];
   sidebarItems.forEach((el, i) => {
     if (isFlorist && (tabs[i] === 'dashboard' || tabs[i] === 'settings')) {
       el.style.display = 'none';
@@ -2743,7 +2747,7 @@ function adminTab(tab) {
   // Florist cannot access dashboard or settings
   if (currentRole === 'florist' && (tab === 'dashboard' || tab === 'settings')) return;
   document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
-    const tabs = ['dashboard','products','offers','orders','enquiries','files','settings'];
+    const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','settings'];
     el.classList.toggle('active', tabs[i]===tab);
   });
   const main = document.getElementById('adminMain');
@@ -2752,6 +2756,7 @@ function adminTab(tab) {
   else if (tab==='offers') main.innerHTML = offersHTML();
   else if (tab==='orders') { main.innerHTML = ordersHTML(); renderOrdersTable(); }
   else if (tab==='enquiries') { main.innerHTML = enquiriesHTML(); markEnquiriesRead(); }
+  else if (tab==='crm') main.innerHTML = crmHTML();
   else if (tab==='files') { main.innerHTML = fileManagerHTML(); loadFileManager(); }
   else if (tab==='settings') { main.innerHTML = settingsHTML(); populateSettingsInputs(); }
 }
@@ -3108,6 +3113,143 @@ function offersHTML() {
       </div>
     </div>
   `;
+}
+
+function crmHTML() {
+  // Build customer profiles from orders
+  const customers = {};
+  orders.forEach(o => {
+    const key = (o.email || o.phone || o.customer).toLowerCase();
+    if (!customers[key]) {
+      customers[key] = {
+        name: o.customer,
+        email: o.email || '',
+        phone: o.phone || '',
+        orders: [],
+        totalSpent: 0,
+        products: {},
+        firstOrder: o.date,
+        lastOrder: o.date,
+      };
+    }
+    const c = customers[key];
+    c.orders.push(o);
+    c.totalSpent += (o.amount || 0);
+    if (o.date < c.firstOrder) c.firstOrder = o.date;
+    if (o.date > c.lastOrder) c.lastOrder = o.date;
+    (o.product || '').split(', ').forEach(p => {
+      const name = p.trim();
+      if (name) c.products[name] = (c.products[name] || 0) + 1;
+    });
+  });
+
+  const custList = Object.values(customers).sort((a, b) => b.totalSpent - a.totalSpent);
+  const vipThreshold = 1000;
+  const vipCount = custList.filter(c => c.totalSpent >= vipThreshold).length;
+  const totalCustomers = custList.length;
+  const repeatCustomers = custList.filter(c => c.orders.length >= 2).length;
+  const avgSpend = totalCustomers ? Math.round(custList.reduce((s, c) => s + c.totalSpent, 0) / totalCustomers) : 0;
+
+  const searchId = 'crmSearch';
+
+  const customerCards = custList.map((c, i) => {
+    const isVip = c.totalSpent >= vipThreshold;
+    const favProducts = Object.entries(c.products).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const lastOrderDays = Math.floor((Date.now() - new Date(c.lastOrder).getTime()) / 864e5);
+    const lastOrderLabel = lastOrderDays === 0 ? 'Today' : lastOrderDays === 1 ? 'Yesterday' : lastOrderDays + ' days ago';
+
+    return `<div class="ck-crm-card" data-search="${(c.name + c.email + c.phone).toLowerCase()}" style="background:rgba(255,255,255,0.03);border:1px solid rgba(212,184,150,${isVip ? '0.25' : '0.08'});border-radius:12px;padding:20px;${isVip ? 'box-shadow:0 0 0 1px rgba(200,184,138,0.15);' : ''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;font-weight:500;color:var(--ck-cream);">${c.name}</span>
+            ${isVip ? '<span style="font-size:10px;background:linear-gradient(135deg,#C8B88A,#A89060);color:#1C2512;padding:2px 8px;border-radius:3px;letter-spacing:0.08em;font-weight:600;">👑 VIP</span>' : ''}
+            ${c.orders.length >= 3 ? '<span style="font-size:10px;background:rgba(200,184,138,0.12);color:var(--ck-champagne);padding:2px 8px;border-radius:3px;letter-spacing:0.06em;">REGULAR</span>' : ''}
+          </div>
+          <div style="font-size:12px;color:rgba(212,184,150,0.5);margin-top:4px;">${c.email}${c.email && c.phone ? ' · ' : ''}${c.phone}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;color:var(--ck-champagne);font-family:var(--font-display);font-weight:400;">AED ${c.totalSpent.toLocaleString()}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.4);">Total spent</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:18px;color:var(--ck-cream);font-weight:500;">${c.orders.length}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.4);margin-top:2px;">Orders</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:18px;color:var(--ck-cream);font-weight:500;">AED ${Math.round(c.totalSpent / c.orders.length)}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.4);margin-top:2px;">Avg Order</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:14px;color:var(--ck-cream);font-weight:500;">${lastOrderLabel}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.4);margin-top:2px;">Last Order</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;letter-spacing:0.08em;color:rgba(212,184,150,0.4);text-transform:uppercase;margin-bottom:6px;">Favourite Products</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${favProducts.map(([name, count]) => `<span style="font-size:11px;background:rgba(200,184,138,0.08);color:rgba(247,237,216,0.7);padding:3px 8px;border-radius:4px;">${name} <span style="color:var(--ck-champagne);">×${count}</span></span>`).join('')}
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;letter-spacing:0.08em;color:rgba(212,184,150,0.4);text-transform:uppercase;margin-bottom:6px;">Important Dates</div>
+        <div style="font-size:12px;color:rgba(247,237,216,0.6);display:flex;gap:16px;">
+          <span>🛍 First: ${c.firstOrder}</span>
+          <span>🕐 Last: ${c.lastOrder}</span>
+          <span>📅 Customer for ${Math.max(1, Math.floor((new Date(c.lastOrder) - new Date(c.firstOrder)) / 864e5))} days</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:10px;letter-spacing:0.08em;color:rgba(212,184,150,0.4);text-transform:uppercase;margin-bottom:6px;">Order History</div>
+        <div style="max-height:120px;overflow-y:auto;">
+          ${c.orders.sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time)).map(o => {
+            const sc = o.status==='Delivered'?'#4A7C59':o.status==='Cancelled'?'#C04040':o.status==='In Transit'?'#C08030':'rgba(212,184,150,0.6)';
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(212,184,150,0.04);font-size:12px;">
+              <span style="color:rgba(247,237,216,0.6);">#${o.id} · ${o.date} · ${o.product}</span>
+              <span style="display:flex;align-items:center;gap:8px;">
+                <span style="color:${sc};font-size:11px;">${o.status}</span>
+                <span style="color:var(--ck-champagne);">AED ${o.amount}</span>
+              </span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">👥 Customer CRM</h2>
+      <input class="ck-input" style="width:240px;padding:6px 10px;" placeholder="Search by name, email, phone…" id="${searchId}" oninput="filterCRM(this.value)">
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="ck-admin-stats" style="margin-bottom:20px;">
+      <div class="ck-stat-card"><div class="ck-stat-label">Total Customers</div><div class="ck-stat-val">${totalCustomers}</div><div class="ck-stat-sub">Unique buyers</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">VIP Customers</div><div class="ck-stat-val" style="color:var(--ck-champagne);">👑 ${vipCount}</div><div class="ck-stat-sub">AED ${vipThreshold.toLocaleString()}+ spent</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Repeat Customers</div><div class="ck-stat-val" style="color:#4A7C59;">${repeatCustomers}</div><div class="ck-stat-sub">2+ orders</div></div>
+      <div class="ck-stat-card"><div class="ck-stat-label">Avg Spend</div><div class="ck-stat-val">AED ${avgSpend.toLocaleString()}</div><div class="ck-stat-sub">Per customer</div></div>
+    </div>
+
+    <!-- Customer Cards -->
+    <div id="crmCards" style="display:flex;flex-direction:column;gap:16px;">
+      ${customerCards || '<div style="text-align:center;padding:48px;color:rgba(212,184,150,0.3);font-size:14px;">No customer data yet — orders will appear here</div>'}
+    </div>
+  `;
+}
+
+function filterCRM(q) {
+  const cards = document.querySelectorAll('.ck-crm-card');
+  const query = q.toLowerCase();
+  cards.forEach(c => {
+    c.style.display = c.dataset.search.includes(query) ? '' : 'none';
+  });
 }
 
 function ordersHTML() {
@@ -3878,7 +4020,7 @@ function applyData(d) {
   if (adminEl && adminEl.classList.contains('active')) {
     const activeItem = document.querySelector('.ck-sidebar-item.active');
     if (activeItem) {
-      const tabMap = ['dashboard','products','offers','orders','enquiries','files','settings'];
+      const tabMap = ['dashboard','products','offers','orders','enquiries','crm','files','settings'];
       document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
         if (el === activeItem) adminTab(tabMap[i]);
       });
