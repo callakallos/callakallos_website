@@ -2114,6 +2114,10 @@ body {
           <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
           File Manager
         </div>
+        <div class="ck-sidebar-item" onclick="adminTab('admin-themes')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Admin Theme
+        </div>
         <div class="ck-sidebar-item" onclick="adminTab('logs')">
           <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           Activity Log
@@ -2967,7 +2971,7 @@ function applyRoleUI() {
   document.getElementById('adminUserName').textContent = isFlorist ? 'Florist' : 'Rinu Kurian';
   // Hide dashboard + settings sidebar items for florist
   const sidebarItems = document.querySelectorAll('.ck-sidebar-item');
-  const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','logs','settings'];
+  const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','admin-themes','logs','settings'];
   sidebarItems.forEach((el, i) => {
     if (isFlorist && (tabs[i] === 'dashboard' || tabs[i] === 'settings')) {
       el.style.display = 'none';
@@ -3053,7 +3057,7 @@ function adminTab(tab) {
   // Florist cannot access dashboard or settings
   if (currentRole === 'florist' && (tab === 'dashboard' || tab === 'settings')) return;
   document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
-    const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','logs','settings'];
+    const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','admin-themes','logs','settings'];
     el.classList.toggle('active', tabs[i]===tab);
   });
   const main = document.getElementById('adminMain');
@@ -3064,6 +3068,7 @@ function adminTab(tab) {
   else if (tab==='enquiries') main.innerHTML = enquiriesHTML();
   else if (tab==='crm') main.innerHTML = crmHTML();
   else if (tab==='files') { main.innerHTML = fileManagerHTML(); loadFileManager(); }
+  else if (tab==='admin-themes') main.innerHTML = adminThemesHTML();
   else if (tab==='logs') { main.innerHTML = '<div id="logsContainer"><div style="text-align:center;padding:48px;color:rgba(212,184,150,0.3);">Loading logs…</div></div>'; loadActivityLogs(); }
   else if (tab==='settings') { main.innerHTML = settingsHTML(); populateSettingsInputs(); }
 }
@@ -4471,7 +4476,7 @@ function applyData(d) {
   if (adminEl && adminEl.classList.contains('active')) {
     const activeItem = document.querySelector('.ck-sidebar-item.active');
     if (activeItem) {
-      const tabMap = ['dashboard','products','offers','orders','enquiries','crm','files','logs','settings'];
+      const tabMap = ['dashboard','products','offers','orders','enquiries','crm','files','admin-themes','logs','settings'];
       document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
         if (el === activeItem) adminTab(tabMap[i]);
       });
@@ -4891,6 +4896,225 @@ function enquiriesHTML() {
       <div style="padding:16px;">${rows}</div>
     </div>`;
 }
+
+// ============================================================
+//  ADMIN THEMES
+// ============================================================
+const adminThemes = {
+  default: {
+    name: 'Calla Kallos (Default)',
+    preview: '🌿',
+    desc: 'Dark forest green — the original look',
+    wrapper: '#141F0C',
+    nav: '#0D1508',
+    sidebar: '#111A09',
+    sidebarBorder: 'rgba(200,184,138,0.08)',
+    main: '#141F0C',
+    accent: '#C8B88A',
+    text: '#F7EDD8',
+    textMuted: 'rgba(212,184,150,0.5)',
+    panelBg: 'rgba(46,59,31,0.25)',
+    panelBorder: 'rgba(200,184,138,0.1)',
+    statBg: 'rgba(46,59,31,0.25)',
+    btnBg: '#C8B88A',
+    btnText: '#1C2512',
+    sidebarActive: 'rgba(212,184,150,0.06)',
+    sidebarActiveColor: '#C8B88A',
+  },
+  sap: {
+    name: 'SAP Fiori',
+    preview: '🔷',
+    desc: 'Clean SAP-inspired blue & white enterprise UI',
+    wrapper: '#F5F6FA',
+    nav: '#354A5F',
+    sidebar: '#FFFFFF',
+    sidebarBorder: '#E5E5E5',
+    main: '#F5F6FA',
+    accent: '#0A6ED1',
+    text: '#32363A',
+    textMuted: '#6A6D70',
+    panelBg: '#FFFFFF',
+    panelBorder: '#E5E5E5',
+    statBg: '#FFFFFF',
+    btnBg: '#0A6ED1',
+    btnText: '#FFFFFF',
+    sidebarActive: 'rgba(10,110,209,0.08)',
+    sidebarActiveColor: '#0A6ED1',
+  },
+  midnight: {
+    name: 'Midnight Blue',
+    preview: '🌙',
+    desc: 'Deep navy with electric blue accents',
+    wrapper: '#0F1923',
+    nav: '#0A1219',
+    sidebar: '#0D1720',
+    sidebarBorder: 'rgba(100,160,255,0.1)',
+    main: '#0F1923',
+    accent: '#4DA3FF',
+    text: '#E8EDF2',
+    textMuted: 'rgba(180,200,220,0.5)',
+    panelBg: 'rgba(20,40,60,0.5)',
+    panelBorder: 'rgba(100,160,255,0.12)',
+    statBg: 'rgba(20,40,60,0.5)',
+    btnBg: '#4DA3FF',
+    btnText: '#0A1219',
+    sidebarActive: 'rgba(77,163,255,0.1)',
+    sidebarActiveColor: '#4DA3FF',
+  },
+  charcoal: {
+    name: 'Charcoal Rose',
+    preview: '🖤',
+    desc: 'Dark charcoal with rose gold highlights',
+    wrapper: '#1A1A2E',
+    nav: '#16162B',
+    sidebar: '#141428',
+    sidebarBorder: 'rgba(200,160,140,0.1)',
+    main: '#1A1A2E',
+    accent: '#E8A87C',
+    text: '#EAE0D5',
+    textMuted: 'rgba(200,180,160,0.5)',
+    panelBg: 'rgba(30,30,50,0.6)',
+    panelBorder: 'rgba(200,160,140,0.12)',
+    statBg: 'rgba(30,30,50,0.6)',
+    btnBg: '#E8A87C',
+    btnText: '#1A1A2E',
+    sidebarActive: 'rgba(232,168,124,0.1)',
+    sidebarActiveColor: '#E8A87C',
+  },
+};
+
+let currentAdminTheme = localStorage.getItem('ck_admin_theme') || 'default';
+
+function applyAdminTheme(themeKey) {
+  const t = adminThemes[themeKey];
+  if (!t) return;
+  const w = document.querySelector('.ck-admin-wrapper');
+  if (!w) return;
+  w.style.background = t.wrapper;
+  w.style.color = t.text;
+  const nav = w.querySelector('.ck-admin-nav');
+  if (nav) { nav.style.background = t.nav; nav.style.borderBottomColor = t.sidebarBorder; }
+  const sb = w.querySelector('.ck-admin-sidebar');
+  if (sb) { sb.style.background = t.sidebar; sb.style.borderRightColor = t.sidebarBorder; }
+  const main = w.querySelector('.ck-admin-main');
+  if (main) main.style.background = t.main;
+
+  // Brand & user text
+  const brand = w.querySelector('.ck-admin-brand');
+  if (brand) brand.style.color = t.accent;
+  const user = w.querySelector('.ck-admin-user');
+  if (user) user.style.color = t.textMuted;
+
+  // CSS custom properties for dynamic elements
+  document.documentElement.style.setProperty('--admin-accent', t.accent);
+  document.documentElement.style.setProperty('--admin-text', t.text);
+  document.documentElement.style.setProperty('--admin-text-muted', t.textMuted);
+  document.documentElement.style.setProperty('--admin-panel-bg', t.panelBg);
+  document.documentElement.style.setProperty('--admin-panel-border', t.panelBorder);
+  document.documentElement.style.setProperty('--admin-btn-bg', t.btnBg);
+  document.documentElement.style.setProperty('--admin-btn-text', t.btnText);
+  document.documentElement.style.setProperty('--admin-sidebar-active', t.sidebarActive);
+  document.documentElement.style.setProperty('--admin-sidebar-active-color', t.sidebarActiveColor);
+  document.documentElement.style.setProperty('--admin-stat-bg', t.statBg);
+
+  // Apply to existing styled elements
+  w.querySelectorAll('.ck-sidebar-item').forEach(el => {
+    el.style.color = '';
+  });
+  w.querySelectorAll('.ck-stat-card').forEach(el => {
+    el.style.background = t.statBg;
+    el.style.borderColor = t.panelBorder;
+  });
+  w.querySelectorAll('.ck-admin-panel-block').forEach(el => {
+    el.style.background = t.panelBg;
+    el.style.borderColor = t.panelBorder;
+  });
+  w.querySelectorAll('.ck-panel-header').forEach(el => {
+    el.style.borderBottomColor = t.panelBorder;
+  });
+  w.querySelectorAll('.ck-admin-btn').forEach(el => {
+    el.style.background = t.btnBg;
+    el.style.color = t.btnText;
+  });
+}
+
+function selectAdminTheme(key) {
+  currentAdminTheme = key;
+  applyAdminTheme(key);
+  // Update selected state in UI
+  document.querySelectorAll('.ck-theme-card').forEach(c => {
+    c.style.borderColor = c.dataset.theme === key ? adminThemes[key].accent : 'rgba(200,184,138,0.1)';
+    c.style.boxShadow = c.dataset.theme === key ? '0 0 0 2px ' + adminThemes[key].accent : 'none';
+  });
+}
+
+function saveAdminTheme() {
+  localStorage.setItem('ck_admin_theme', currentAdminTheme);
+  logActivity('theme_save', `Applied admin theme: ${adminThemes[currentAdminTheme].name}`);
+  toast('Admin theme saved ✓');
+}
+
+function resetAdminTheme() {
+  currentAdminTheme = 'default';
+  localStorage.setItem('ck_admin_theme', 'default');
+  applyAdminTheme('default');
+  adminTab('admin-themes');
+  toast('Admin theme reset to default ✓');
+}
+
+function adminThemesHTML() {
+  const cards = Object.entries(adminThemes).map(([key, t]) => {
+    const isActive = key === currentAdminTheme;
+    return `
+      <div class="ck-theme-card" data-theme="${key}" onclick="selectAdminTheme('${key}')"
+        style="background:${t.panelBg};border:2px solid ${isActive ? t.accent : 'rgba(200,184,138,0.1)'};border-radius:12px;padding:0;cursor:pointer;overflow:hidden;transition:all 0.2s;${isActive ? 'box-shadow:0 0 0 2px '+t.accent+';' : ''}">
+        <!-- Mini preview -->
+        <div style="display:grid;grid-template-columns:40px 1fr;height:120px;overflow:hidden;border-radius:10px 10px 0 0;">
+          <div style="background:${t.sidebar};padding:8px 4px;display:flex;flex-direction:column;gap:4px;border-right:1px solid ${t.sidebarBorder};">
+            ${['','','','',''].map((_,i) => `<div style="height:4px;border-radius:2px;background:${i===0 ? t.sidebarActiveColor : t.textMuted};opacity:${i===0?1:0.3};"></div>`).join('')}
+          </div>
+          <div style="background:${t.main};padding:8px;">
+            <div style="height:6px;width:60%;background:${t.accent};border-radius:2px;margin-bottom:6px;opacity:0.8;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+              <div style="background:${t.statBg};border:1px solid ${t.panelBorder};border-radius:3px;height:28px;"></div>
+              <div style="background:${t.statBg};border:1px solid ${t.panelBorder};border-radius:3px;height:28px;"></div>
+            </div>
+            <div style="background:${t.panelBg};border:1px solid ${t.panelBorder};border-radius:3px;height:36px;margin-top:4px;"></div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;background:${t.wrapper};">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:18px;">${t.preview}</span>
+            <span style="font-size:14px;font-weight:500;color:${t.text};">${t.name}</span>
+            ${isActive ? `<span style="font-size:9px;background:${t.accent};color:${t.btnText};padding:2px 6px;border-radius:3px;letter-spacing:0.06em;margin-left:auto;">ACTIVE</span>` : ''}
+          </div>
+          <div style="font-size:11px;color:${t.textMuted};">${t.desc}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">🎨 Admin Panel Theme</h2>
+      <div style="display:flex;gap:10px;">
+        <button class="ck-admin-btn" onclick="saveAdminTheme()">✓ Apply & Save</button>
+        <button class="ck-admin-btn-ghost" onclick="resetAdminTheme()">↺ Reset to Default</button>
+      </div>
+    </div>
+    <p style="font-size:13px;color:rgba(212,184,150,0.5);margin-bottom:24px;">Select a theme to preview it instantly. Click "Apply & Save" to keep it across sessions.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+      ${cards}
+    </div>
+  `;
+}
+
+// Apply saved theme on load
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('ck_admin_theme');
+  if (saved && saved !== 'default') {
+    setTimeout(() => applyAdminTheme(saved), 100);
+  }
+});
 
 // ============================================================
 //  ACTIVITY LOG
