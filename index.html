@@ -3830,7 +3830,15 @@ function renderOrdersTable() {
   else if (sort==='amount-high') list.sort((a,b)=> b.amount-a.amount);
   else if (sort==='amount-low')  list.sort((a,b)=> a.amount-b.amount);
   else if (sort==='regular') list.sort((a,b)=> b.orderCount-a.orderCount);
-  else list.sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+  else {
+    // Newest first, but Pending orders always on top
+    list.sort((a,b) => {
+      const ap = a.status === 'Pending' ? 1 : 0;
+      const bp = b.status === 'Pending' ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      return (b.date+b.time).localeCompare(a.date+a.time);
+    });
+  }
 
   const label = document.getElementById('ordersCountLabel');
   if (label) label.textContent = `Orders (${list.length})`;
