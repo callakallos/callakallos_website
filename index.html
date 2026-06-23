@@ -3375,6 +3375,14 @@ function renderOrdersTable() {
           <button class="ck-admin-btn" onclick="saveOrderStatus(${o.id})" style="padding:5px 12px;font-size:11px;">Save</button>
           <button class="ck-admin-btn-danger" onclick="deleteOrder(${o.id})" style="padding:5px 10px;font-size:11px;margin-left:4px;">Delete</button>
         `}
+        <div style="margin-top:6px;">
+          <select class="ck-select" onchange="generateDoc(${o.id},this.value);this.selectedIndex=0;" style="padding:3px 6px;font-size:10px;width:110px;">
+            <option value="">🖨 Print…</option>
+            <option value="invoice">📄 Invoice</option>
+            <option value="delivery">📦 Delivery Note</option>
+            <option value="gift">🎁 Gift Receipt</option>
+          </select>
+        </div>
       </td>
     </tr>`;
   }).join('');
@@ -3439,6 +3447,132 @@ function deleteOrder(id) {
   renderOrdersTable();
   updateOrdersBadge();
   toast('Order #'+id+' deleted ✓');
+}
+
+function generateDoc(orderId, type) {
+  if (!type) return;
+  const o = orders.find(x => x.id === orderId);
+  if (!o) return;
+
+  const storeName = storeSettings.storeName || 'Calla Kallos';
+  const storePhone = storeSettings.phone || storeSettings.whatsapp || '';
+  const storeEmail = storeSettings.email || 'hello@callakallos.com';
+  const now = new Date();
+  const docDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const items = (o.product || '').split(', ').map(p => p.trim()).filter(Boolean);
+
+  const isGift = type === 'gift';
+  const isDelivery = type === 'delivery';
+  const title = isGift ? 'Gift Receipt' : isDelivery ? 'Delivery Note' : 'Invoice';
+  const docNum = isDelivery ? 'DN' : isGift ? 'GR' : 'INV';
+
+  const itemRows = items.map(name => {
+    const prod = products.find(p => p.name === name);
+    const price = prod ? prod.price : (o.amount || 0);
+    return isGift
+      ? `<tr><td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;">${name}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:center;">1</td><td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:right;color:#999;">—</td></tr>`
+      : `<tr><td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;">${name}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:center;">1</td><td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:right;">AED ${price.toLocaleString()}</td></tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${title} #${o.id}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', sans-serif; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #2E3B1F; }
+  .logo { font-family: Georgia, serif; font-size: 28px; color: #2E3B1F; font-weight: 400; }
+  .logo-sub { font-size: 11px; color: #999; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; }
+  .doc-info { text-align: right; }
+  .doc-title { font-size: 22px; color: #2E3B1F; font-weight: 300; letter-spacing: 0.05em; }
+  .doc-meta { font-size: 12px; color: #888; margin-top: 6px; line-height: 1.8; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #999; margin-bottom: 10px; font-weight: 600; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .detail-box { background: #f9f8f5; border-radius: 8px; padding: 16px; }
+  .detail-label { font-size: 11px; color: #999; margin-bottom: 4px; }
+  .detail-value { font-size: 14px; color: #333; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: #2E3B1F; color: #fff; padding: 10px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; text-align: left; }
+  thead th:last-child { text-align: right; }
+  thead th:nth-child(2) { text-align: center; }
+  .total-row { display: flex; justify-content: flex-end; padding: 16px 0; border-top: 2px solid #2E3B1F; margin-top: 8px; }
+  .total-label { font-size: 14px; color: #666; margin-right: 24px; }
+  .total-amount { font-size: 22px; color: #2E3B1F; font-weight: 600; }
+  .footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 11px; color: #bbb; }
+  .stamp { display: inline-block; border: 2px solid #4A7C59; color: #4A7C59; padding: 6px 16px; border-radius: 4px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; transform: rotate(-5deg); margin-top: 20px; }
+  ${isGift ? '.gift-msg { background: #f9f8f5; border-radius: 8px; padding: 20px; text-align: center; font-family: Georgia, serif; font-style: italic; color: #666; font-size: 16px; margin: 20px 0; }' : ''}
+  @media print { body { padding: 20px; } @page { margin: 15mm; } }
+</style></head><body>
+<div class="header">
+  <div>
+    <div class="logo">${storeName}</div>
+    <div class="logo-sub">Dubai's Luxury Florist</div>
+  </div>
+  <div class="doc-info">
+    <div class="doc-title">${title}</div>
+    <div class="doc-meta">
+      ${docNum}-${o.id}<br>
+      Date: ${docDate}<br>
+      Order #${o.id}
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">${isDelivery ? 'Delivery Details' : 'Bill To'}</div>
+  <div class="detail-grid">
+    <div class="detail-box">
+      <div class="detail-label">Customer</div>
+      <div class="detail-value">${o.customer}</div>
+      <div style="font-size:12px;color:#888;margin-top:6px;">${o.email}<br>${o.phone}</div>
+    </div>
+    <div class="detail-box">
+      <div class="detail-label">${isDelivery ? 'Delivery Address' : 'Delivery To'}</div>
+      <div class="detail-value">${o.location}</div>
+      <div style="font-size:12px;color:#888;margin-top:6px;">Order Date: ${o.date} ${o.time || ''}</div>
+    </div>
+  </div>
+</div>
+
+${isGift ? '<div class="gift-msg">🌸 With love and best wishes 🌸</div>' : ''}
+
+<div class="section">
+  <div class="section-title">Items</div>
+  <table>
+    <thead><tr><th>Product</th><th>Qty</th><th style="text-align:right;">${isGift ? '' : 'Amount'}</th></tr></thead>
+    <tbody>${itemRows}</tbody>
+  </table>
+  ${isGift ? '' : `
+  <div class="total-row">
+    <span class="total-label">Total Amount</span>
+    <span class="total-amount">AED ${(o.amount||0).toLocaleString()}</span>
+  </div>`}
+</div>
+
+${isDelivery ? `
+<div class="section">
+  <div class="section-title">Delivery Confirmation</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:10px;">
+    <div style="border-bottom:1px solid #ccc;padding:40px 0 8px;font-size:12px;color:#999;">Received by (signature)</div>
+    <div style="border-bottom:1px solid #ccc;padding:40px 0 8px;font-size:12px;color:#999;">Date & Time</div>
+  </div>
+</div>` : ''}
+
+<div style="text-align:center;margin-top:24px;">
+  <span class="stamp">${o.status === 'Delivered' ? '✓ Delivered' : o.status === 'Cancelled' ? '✕ Cancelled' : '⏳ ' + o.status}</span>
+</div>
+
+<div class="footer">
+  ${storeName} · ${storePhone} · ${storeEmail}<br>
+  Thank you for choosing ${storeName} 💐
+</div>
+
+<script>window.onload=()=>window.print();<\/script>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
 }
 
 function exportOrdersCSV() {
