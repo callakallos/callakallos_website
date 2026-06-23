@@ -2587,7 +2587,8 @@ function submitCheckout() {
     customer: name,
     email,
     phone,
-    product: cart.map(c => c.desc ? `${c.name} (${c.desc})` : c.name).join(', '),
+    product: cart.map(c => c.name).join(', '),
+    productDetails: cart.filter(c => c.desc).map(c => `${c.name}: ${c.desc}`).join(' | '),
     amount: total,
     location: address,
     status: 'Pending',
@@ -3668,7 +3669,7 @@ function crmHTML() {
           ${c.orders.sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time)).map(o => {
             const sc = o.status==='Delivered'?'#4A7C59':o.status==='Cancelled'?'#C04040':o.status==='In Transit'?'#4DA3FF':o.status==='Pending'?'#C08030':'rgba(212,184,150,0.5)';
             return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(212,184,150,0.04);font-size:12px;">
-              <span><strong>#${o.id}</strong> · ${o.date} · ${o.product}</span>
+              <span style="max-width:350px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;"><strong>#${o.id}</strong> · ${o.date} · ${o.product}</span>
               <span style="display:flex;align-items:center;gap:8px;">
                 <span style="color:${sc};font-size:11px;padding:1px 6px;border-radius:3px;background:${sc}12;">${o.status}</span>
                 <span style="font-weight:500;">AED ${o.amount}</span>
@@ -3859,7 +3860,7 @@ function renderOrdersTable() {
       </td>
       <td style="font-size:12px;">${o.email}</td>
       <td style="white-space:nowrap;">${o.phone}</td>
-      <td style="font-size:13px;">${o.product}</td>
+      <td style="font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(o.product||'').replace(/"/g,'&quot;')}${o.productDetails ? '\n\n' + o.productDetails.replace(/"/g,'&quot;') : ''}">${o.product}</td>
       <td style="white-space:nowrap;">AED ${o.amount}</td>
       <td style="font-size:12px;max-width:160px;">${o.location}</td>
       <td>
