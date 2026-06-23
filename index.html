@@ -3312,6 +3312,13 @@ function renderOrderCalendar() {
   const panel = document.getElementById('orderCalendarPanel');
   if (!panel) return;
 
+  const th = adminThemes[currentAdminTheme] || adminThemes['default'];
+  const _accent = th.accent;
+  const _text = th.text;
+  const _muted = th.textMuted;
+  const _border = th.panelBorder;
+  const _panelBg = th.panelBg;
+
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
   const firstDay = new Date(_calYear, _calMonth, 1).getDay();
@@ -3337,7 +3344,7 @@ function renderOrderCalendar() {
   const prevMonthDays = new Date(_calYear, _calMonth, 0).getDate();
   let trailingCells = '';
   for (let i = firstDay - 1; i >= 0; i--) {
-    trailingCells += `<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(212,184,150,0.15);border-radius:8px;">${prevMonthDays - i}</div>`;
+    trailingCells += `<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:${_muted};opacity:0.3;border-radius:8px;">${prevMonthDays - i}</div>`;
   }
 
   let dayCells = '';
@@ -3353,15 +3360,15 @@ function renderOrderCalendar() {
 
     let bg = 'transparent';
     let border = 'transparent';
-    let textColor = 'rgba(212,184,150,0.7)';
+    let textColor = _text;
     let shadow = 'none';
 
-    if (isSelected) { bg = 'rgba(200,184,138,0.2)'; border = 'var(--ck-champagne)'; textColor = 'var(--ck-champagne)'; shadow = '0 0 12px rgba(200,184,138,0.15)'; }
-    else if (isToday) { bg = 'var(--ck-champagne)'; border = 'var(--ck-champagne)'; textColor = 'var(--ck-plum-dark)'; shadow = '0 2px 8px rgba(200,184,138,0.3)'; }
+    if (isSelected) { bg = _accent + '20'; border = _accent; textColor = _accent; shadow = '0 0 12px ' + _accent + '25'; }
+    else if (isToday) { bg = _accent; border = _accent; textColor = th.btnText; shadow = '0 2px 8px ' + _accent + '40'; }
     else if (hasPending) { bg = 'rgba(192,128,48,0.12)'; border = 'rgba(192,128,48,0.35)'; }
     else if (hasTransit) { bg = 'rgba(100,160,255,0.1)'; border = 'rgba(100,160,255,0.25)'; }
     else if (hasDelivered) { bg = 'rgba(74,124,89,0.1)'; border = 'rgba(74,124,89,0.2)'; }
-    if (isFuture && !dayOrders.length) textColor = 'rgba(212,184,150,0.35)';
+    if (isFuture && !dayOrders.length) textColor = _muted;
 
     const dots = dayOrders.length ? `<div style="display:flex;gap:2px;margin-top:3px;">` +
       (hasPending ? '<span style="width:5px;height:5px;border-radius:50%;background:#C08030;"></span>' : '') +
@@ -3380,7 +3387,7 @@ function renderOrderCalendar() {
   const remaining = (7 - (totalCells % 7)) % 7;
   let leadingCells = '';
   for (let i = 1; i <= remaining; i++) {
-    leadingCells += `<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(212,184,150,0.15);border-radius:8px;">${i}</div>`;
+    leadingCells += `<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:${_muted};opacity:0.3;border-radius:8px;">${i}</div>`;
   }
 
   // Selected day detail
@@ -3391,46 +3398,46 @@ function renderOrderCalendar() {
     const dayName = selDate.toLocaleDateString('en', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
     const dayTotal = selOrders.reduce((s, o) => s + (o.amount || 0), 0);
     dayDetail = `
-      <div style="margin-top:16px;padding:16px;background:rgba(200,184,138,0.06);border:1px solid rgba(200,184,138,0.1);border-radius:10px;">
+      <div style="margin-top:16px;padding:16px;background:${_accent}08;border:1px solid ${_border};border-radius:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:14px;font-weight:500;color:var(--ck-cream);">${dayName}</span>
-          <span style="font-size:13px;color:var(--ck-champagne);font-weight:500;">AED ${dayTotal.toLocaleString()}</span>
+          <span style="font-size:14px;font-weight:500;color:${_text};">${dayName}</span>
+          <span style="font-size:13px;color:${_accent};font-weight:500;">AED ${dayTotal.toLocaleString()}</span>
         </div>
         ${selOrders.map(o => {
-          const sc = o.status==='Delivered'?'#4A7C59':o.status==='Cancelled'?'#C04040':o.status==='In Transit'?'#4DA3FF':o.status==='Pending'?'#C08030':'rgba(212,184,150,0.6)';
-          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(212,184,150,0.06);font-size:12px;">
+          const sc = o.status==='Delivered'?'#4A7C59':o.status==='Cancelled'?'#C04040':o.status==='In Transit'?'#4DA3FF':o.status==='Pending'?'#C08030':_muted;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid ${_border};font-size:12px;">
             <div>
-              <span style="color:var(--ck-cream);font-weight:500;">#${o.id}</span>
-              <span style="color:rgba(212,184,150,0.6);margin-left:8px;">${o.customer}</span>
-              <span style="color:rgba(212,184,150,0.4);margin-left:8px;">${o.product}</span>
+              <span style="color:${_text};font-weight:500;">#${o.id}</span>
+              <span style="color:${_muted};margin-left:8px;">${o.customer}</span>
+              <span style="color:${_muted};margin-left:8px;">${o.product}</span>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
               <span style="color:${sc};font-size:11px;padding:2px 6px;border-radius:3px;background:${sc}15;">${o.status}</span>
-              <span style="color:var(--ck-champagne);">AED ${o.amount}</span>
+              <span style="color:${_accent};">AED ${o.amount}</span>
             </div>
           </div>`;
         }).join('')}
       </div>`;
   } else if (_calSelectedDate) {
-    dayDetail = `<div style="margin-top:16px;padding:20px;text-align:center;color:rgba(212,184,150,0.3);font-size:13px;background:rgba(200,184,138,0.03);border-radius:10px;">No orders on this date</div>`;
+    dayDetail = `<div style="margin-top:16px;padding:20px;text-align:center;color:${_muted};font-size:13px;background:${_accent}06;border-radius:10px;">No orders on this date</div>`;
   }
 
   panel.innerHTML = `
     <div style="padding:20px;">
       <!-- Header with navigation -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <button onclick="calNav(-1)" style="background:none;border:1px solid rgba(200,184,138,0.15);color:var(--ck-champagne);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">‹</button>
+        <button onclick="calNav(-1)" style="background:none;border:1px solid ${_border};color:${_accent};width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">‹</button>
         <div style="text-align:center;">
-          <div style="font-family:var(--font-display);font-size:18px;color:var(--ck-champagne);font-weight:400;">${monthName}</div>
-          <div style="font-size:11px;color:rgba(212,184,150,0.4);margin-top:2px;">${monthOrderCount} orders · AED ${monthRevenue.toLocaleString()}</div>
+          <div style="font-family:var(--font-display);font-size:18px;color:${_accent};font-weight:400;">${monthName}</div>
+          <div style="font-size:11px;color:${_muted};margin-top:2px;">${monthOrderCount} orders · AED ${monthRevenue.toLocaleString()}</div>
         </div>
-        <button onclick="calNav(1)" style="background:none;border:1px solid rgba(200,184,138,0.15);color:var(--ck-champagne);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">›</button>
+        <button onclick="calNav(1)" style="background:none;border:1px solid ${_border};color:${_accent};width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">›</button>
       </div>
-      ${!isCurrentMonth ? `<div style="text-align:center;margin-bottom:12px;"><button onclick="calToday()" style="background:none;border:1px solid rgba(200,184,138,0.15);color:var(--ck-champagne);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:0.05em;">↻ Back to Today</button></div>` : ''}
+      ${!isCurrentMonth ? `<div style="text-align:center;margin-bottom:12px;"><button onclick="calToday()" style="background:none;border:1px solid ${_border};color:${_accent};padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:0.05em;">↻ Back to Today</button></div>` : ''}
 
       <!-- Day headers -->
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;">
-        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div style="text-align:center;font-size:10px;font-weight:600;color:rgba(212,184,150,0.35);letter-spacing:0.08em;padding:6px 0;text-transform:uppercase;">${d}</div>`).join('')}
+        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div style="text-align:center;font-size:10px;font-weight:600;color:${_muted};letter-spacing:0.08em;padding:6px 0;text-transform:uppercase;">${d}</div>`).join('')}
       </div>
 
       <!-- Calendar grid -->
@@ -3442,10 +3449,10 @@ function renderOrderCalendar() {
 
       <!-- Legend -->
       <div style="display:flex;gap:14px;margin-top:16px;justify-content:center;flex-wrap:wrap;">
-        <span style="font-size:10px;color:rgba(212,184,150,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--ck-champagne);"></span> Today</span>
-        <span style="font-size:10px;color:rgba(212,184,150,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#C08030;"></span> Pending</span>
-        <span style="font-size:10px;color:rgba(212,184,150,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#4DA3FF;"></span> In Transit</span>
-        <span style="font-size:10px;color:rgba(212,184,150,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#4A7C59;"></span> Delivered</span>
+        <span style="font-size:10px;color:${_muted};display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:${_accent};"></span> Today</span>
+        <span style="font-size:10px;color:${_muted};display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#C08030;"></span> Pending</span>
+        <span style="font-size:10px;color:${_muted};display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#4DA3FF;"></span> In Transit</span>
+        <span style="font-size:10px;color:${_muted};display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#4A7C59;"></span> Delivered</span>
       </div>
 
       <!-- Selected day detail -->
