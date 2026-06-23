@@ -5059,6 +5059,8 @@ const adminThemes = {
     desc: 'Clean SAP-inspired blue & slate enterprise UI',
     wrapper: '#EDF0F5',
     nav: '#2C3E50',
+    navText: '#FFFFFF',
+    navTextMuted: 'rgba(255,255,255,0.6)',
     sidebar: '#F5F7FA',
     sidebarBorder: '#D5DAE0',
     main: '#EDF0F5',
@@ -5271,11 +5273,13 @@ function applyAdminTheme(themeKey) {
   const main = w.querySelector('.ck-admin-main');
   if (main) main.style.background = t.main;
 
-  // Brand & user text
+  // Brand & user text — use navText if available (for dark nav bars)
+  const navTextColor = t.navText || t.accent;
+  const navTextMuted = t.navTextMuted || t.textMuted;
   const brand = w.querySelector('.ck-admin-brand');
-  if (brand) brand.style.color = t.accent;
+  if (brand) brand.style.color = navTextColor;
   const user = w.querySelector('.ck-admin-user');
-  if (user) user.style.color = t.textMuted;
+  if (user) user.style.color = navTextMuted;
 
   // CSS custom properties for dynamic elements
   document.documentElement.style.setProperty('--admin-accent', t.accent);
@@ -5320,7 +5324,7 @@ function applyAdminTheme(themeKey) {
     #adminSection .ck-admin-panel-block { background: ${t.panelBg} !important; border-color: ${t.panelBorder} !important; }
     #adminSection .ck-panel-header { border-bottom-color: ${t.panelBorder} !important; }
     #adminSection .ck-panel-title { color: ${t.accent} !important; }
-    #adminSection .ck-product-table th { background: ${t.nav} !important; color: ${t.textMuted} !important; }
+    #adminSection .ck-product-table th { background: ${t.nav} !important; color: ${t.navTextMuted || t.textMuted} !important; }
     #adminSection .ck-product-table td { color: ${t.text} !important; border-bottom-color: ${t.panelBorder} !important; }
     #adminSection .ck-product-table tr:hover td { background: ${t.sidebarActive} !important; }
     #adminSection .ck-sidebar-item { color: ${t.textMuted} !important; }
@@ -5334,9 +5338,10 @@ function applyAdminTheme(themeKey) {
     #adminSection .ck-admin-btn-danger { color: #C04040 !important; border-color: rgba(192,64,64,0.3) !important; }
     #adminSection .ck-input, #adminSection .ck-select, #adminSection .ck-textarea { background: ${t.main} !important; color: ${t.text} !important; border-color: ${t.panelBorder} !important; }
     #adminSection .ck-input::placeholder { color: ${t.textMuted} !important; }
-    #adminSection .ck-admin-brand span { color: ${t.textMuted} !important; }
-    #adminSection .ck-admin-user { color: ${t.textMuted} !important; }
-    #adminSection .ck-admin-user button, #adminSection .ck-admin-user a { color: ${t.textMuted} !important; }
+    #adminSection .ck-admin-brand span { color: ${t.navTextMuted || t.textMuted} !important; }
+    #adminSection .ck-admin-user { color: ${t.navTextMuted || t.textMuted} !important; }
+    #adminSection .ck-admin-user button, #adminSection .ck-admin-user a { color: ${t.navTextMuted || t.textMuted} !important; }
+    #adminSection .ck-admin-nav button { color: ${t.navTextMuted || t.textMuted} !important; border-color: ${t.navTextMuted || t.textMuted} !important; }
     #adminSection .ck-table-scroll::-webkit-scrollbar-thumb { background: ${t.textMuted} !important; }
     #adminSection .ck-form-label { color: ${t.textMuted} !important; }
     #adminSection .ck-badge { color: inherit !important; }
