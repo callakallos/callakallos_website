@@ -2204,13 +2204,13 @@ function submitCheckout() {
   msg += `\n*Items:* ${items}\n`;
   msg += `*Total:* AED ${total.toLocaleString()}`;
 
-  // Push to WhatsApp notification queue (Firebase Cloud Function picks it up)
-  try {
-    _fbDb.ref('ck-wa-queue/' + orderId).set({
-      message: msg,
-      timestamp: Date.now()
-    });
-  } catch(e) { console.warn('WA queue push failed:', e); }
+  // Use configured WhatsApp number from settings
+  const rawWa = (storeSettings.whatsapp || '').replace(/[^0-9]/g, '');
+  if (!rawWa) {
+    toast('No WhatsApp number configured — go to Admin → Settings', 'error');
+    return;
+  }
+  window.open(`https://wa.me/${rawWa}?text=${encodeURIComponent(msg)}`, '_blank');
 
   // Save order to orders list
   const newOrder = {
