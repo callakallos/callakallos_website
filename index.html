@@ -1978,6 +1978,10 @@ body {
           <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
           File Manager
         </div>
+        <div class="ck-sidebar-item" onclick="adminTab('logs')">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Activity Log
+        </div>
         <div class="ck-sidebar-item" onclick="adminTab('settings')">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           Settings
@@ -2671,7 +2675,7 @@ function applyRoleUI() {
   document.getElementById('adminUserName').textContent = isFlorist ? 'Florist' : 'Rinu Kurian';
   // Hide dashboard + settings sidebar items for florist
   const sidebarItems = document.querySelectorAll('.ck-sidebar-item');
-  const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','settings'];
+  const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','logs','settings'];
   sidebarItems.forEach((el, i) => {
     if (isFlorist && (tabs[i] === 'dashboard' || tabs[i] === 'settings')) {
       el.style.display = 'none';
@@ -2693,6 +2697,7 @@ function showStore() {
   document.getElementById('storeSection').style.display = 'block';
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.remove('active');
+  logActivity('logout', 'Logged out');
   _fbAuth.signOut().catch(() => {});
 }
 function selectLoginUser(role) {
@@ -2739,6 +2744,7 @@ async function doLogin() {
     updateEnquiriesBadge(); updateOrdersBadge();
     _fbStartRtListener();
     _startOrderQueueListener();
+    logActivity('login', `Logged in as ${role}`);
     _fbDb.ref('ck-data').once('value').then(snap => {
       if (snap.val()) { applyData(snap.val()); backfillProductCodes(); }
     });
@@ -2755,7 +2761,7 @@ function adminTab(tab) {
   // Florist cannot access dashboard or settings
   if (currentRole === 'florist' && (tab === 'dashboard' || tab === 'settings')) return;
   document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
-    const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','settings'];
+    const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','logs','settings'];
     el.classList.toggle('active', tabs[i]===tab);
   });
   const main = document.getElementById('adminMain');
@@ -2766,6 +2772,7 @@ function adminTab(tab) {
   else if (tab==='enquiries') main.innerHTML = enquiriesHTML();
   else if (tab==='crm') main.innerHTML = crmHTML();
   else if (tab==='files') { main.innerHTML = fileManagerHTML(); loadFileManager(); }
+  else if (tab==='logs') { main.innerHTML = '<div id="logsContainer"><div style="text-align:center;padding:48px;color:rgba(212,184,150,0.3);">Loading logs…</div></div>'; loadActivityLogs(); }
   else if (tab==='settings') { main.innerHTML = settingsHTML(); populateSettingsInputs(); }
 }
 
@@ -3072,13 +3079,15 @@ function filterTable(q) {
 }
 
 function deleteProduct(i) {
-  if (confirm(`Delete "${products[i].name}"?`)) {
+  const pName = products[i].name;
+  if (confirm(`Delete "${pName}"?`)) {
     const deletedId = products[i].id;
     products.splice(i, 1);
     localStorage.removeItem(LS_IMG_KEY + deletedId);
     adminTab('products');
     renderProducts();
     persistMeta();
+    logActivity('product_delete', `Deleted "${pName}"`);
     toast('Product deleted');
   }
 }
@@ -3402,7 +3411,7 @@ function saveOrderStatus(id) {
   const sel = document.getElementById('status_'+id);
   if (!sel) return;
   const o = orders.find(x => x.id===id);
-  if (o) { o.status = sel.value; persistMeta(); toast('Order #'+id+' status updated ✓'); }
+  if (o) { o.status = sel.value; persistMeta(); logActivity('order_status', `Order #${id} → ${sel.value}`); toast('Order #'+id+' status updated ✓'); }
 }
 
 function acceptOrder(id) {
@@ -3412,6 +3421,7 @@ function acceptOrder(id) {
   persistMeta();
   renderOrdersTable();
   updateOrdersBadge();
+  logActivity('order_accept', `Accepted order #${id} from ${o.customer} — AED ${o.amount}`);
   toast('Order #' + id + ' accepted ✓');
   // Send WhatsApp confirmation to customer
   const phone = (o.phone || '').replace(/[^0-9]/g, '');
@@ -3436,6 +3446,7 @@ function declineOrder(id) {
   persistMeta();
   renderOrdersTable();
   updateOrdersBadge();
+  logActivity('order_decline', `Declined order #${id} from ${o.customer} — ${reason}`);
   toast('Order #' + id + ' declined');
   // Open WhatsApp to customer with the decline message
   const phone = (o.phone || '').replace(/[^0-9]/g, '');
@@ -3454,6 +3465,7 @@ function deleteOrder(id) {
   persistMeta();
   renderOrdersTable();
   updateOrdersBadge();
+  logActivity('order_delete', `Deleted order #${id}`);
   toast('Order #'+id+' deleted ✓');
 }
 
@@ -3792,6 +3804,7 @@ async function changeAdminPassword() {
     await _fbAuth.currentUser.updatePassword(newPw);
     document.getElementById('pwAdminCurrent').value = '';
     document.getElementById('pwAdminNew').value = '';
+    logActivity('password_change', 'Changed admin password');
     _pwMsg(msgEl, '✓ Admin password updated successfully.', true);
   } catch(e) {
     const msg = e.code === 'auth/wrong-password' ? 'Current password is incorrect.' : e.message;
@@ -3816,6 +3829,7 @@ async function changeFloristPassword() {
     document.getElementById('pwFloristCurrent').value = '';
     document.getElementById('pwFloristNew').value = '';
     document.getElementById('pwAdminConfirm').value = '';
+    logActivity('password_change', 'Changed florist password');
     _pwMsg(msgEl, '✓ Florist password updated successfully.', true);
   } catch(e) {
     const msg = e.code === 'auth/wrong-password' ? 'One of the passwords is incorrect.' : e.message;
@@ -3859,6 +3873,7 @@ function saveTheme() {
     savedTheme[v] = getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   });
   persistMeta();
+  logActivity('theme_save', 'Updated website colour theme');
   toast('Theme saved ✓');
 }
 
@@ -3866,6 +3881,7 @@ function resetTheme() {
   Object.entries(defaultTheme).forEach(([v,c]) => {
     document.documentElement.style.setProperty(v, c);
   });
+  logActivity('theme_save', 'Reset theme to default');
   toast('Theme reset to default');
   adminTab('settings');
 }
@@ -4009,8 +4025,8 @@ async function saveProduct() {
     imgData,
   };
 
-  if (idx >= 0) { product.id = products[idx].id; products[idx] = product; }
-  else { products.push(product); }
+  if (idx >= 0) { product.id = products[idx].id; products[idx] = product; logActivity('product_edit', `Edited "${name}" (${product.code || 'CK-'+String(product.id).padStart(4,'0')})`); }
+  else { products.push(product); logActivity('product_add', `Added "${name}" — AED ${price} (${product.code})`); }
   closeModal();
   adminTab('products');
   renderProducts();
@@ -4065,6 +4081,7 @@ function saveSettings() {
   if (tok) { storeSettings.ghToken = tok; localStorage.setItem('ck_gh_token', tok); }
   applyStoreSettings();
   persistMeta();
+  logActivity('settings_save', 'Updated store settings');
   toast('Settings saved ✓');
   // Persist config to Firebase so it survives across devices
   saveRemoteConfig({
@@ -4162,7 +4179,7 @@ function applyData(d) {
   if (adminEl && adminEl.classList.contains('active')) {
     const activeItem = document.querySelector('.ck-sidebar-item.active');
     if (activeItem) {
-      const tabMap = ['dashboard','products','offers','orders','enquiries','crm','files','settings'];
+      const tabMap = ['dashboard','products','offers','orders','enquiries','crm','files','logs','settings'];
       document.querySelectorAll('.ck-sidebar-item').forEach((el, i) => {
         if (el === activeItem) adminTab(tabMap[i]);
       });
@@ -4531,10 +4548,12 @@ function markEnquiriesRead() {
 }
 
 function deleteEnquiry(id) {
+  const enq = enquiries.find(e => e.id === id);
   enquiries = enquiries.filter(e => e.id !== id);
   persistMeta();
   document.getElementById('adminMain').innerHTML = enquiriesHTML();
   updateEnquiriesBadge(); updateOrdersBadge();
+  logActivity('enquiry_delete', `Deleted enquiry from ${enq ? enq.name : 'unknown'}`);
   toast('Enquiry deleted ✓');
 }
 function toggleEnquiryRead(id) {
@@ -4579,6 +4598,107 @@ function enquiriesHTML() {
       <div class="ck-panel-header"><span class="ck-panel-title">All Messages</span></div>
       <div style="padding:16px;">${rows}</div>
     </div>`;
+}
+
+// ============================================================
+//  ACTIVITY LOG
+// ============================================================
+function logActivity(action, details) {
+  if (!_fbAuth || !_fbAuth.currentUser) return;
+  const entry = {
+    action,
+    details: details || '',
+    user: _fbAuth.currentUser.email || 'unknown',
+    role: currentRole || 'unknown',
+    timestamp: Date.now(),
+    date: new Date().toISOString().slice(0, 10),
+    time: new Date().toTimeString().slice(0, 8),
+  };
+  _fbDb.ref('ck-activity-log').push(entry).catch(() => {});
+}
+
+function loadActivityLogs() {
+  _fbDb.ref('ck-activity-log').orderByChild('timestamp').limitToLast(200).once('value').then(snap => {
+    const data = snap.val();
+    const container = document.getElementById('logsContainer');
+    if (!container) return;
+    if (!data) {
+      container.innerHTML = '<div style="text-align:center;padding:48px;color:rgba(212,184,150,0.3);font-size:14px;">No activity logged yet</div>';
+      return;
+    }
+    const logs = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+
+    const actionIcons = {
+      login: '🔐', logout: '🚪', product_add: '➕', product_edit: '✏️', product_delete: '🗑️',
+      order_accept: '✅', order_decline: '❌', order_status: '📦', order_delete: '🗑️',
+      enquiry_delete: '🗑️', enquiry_read: '👁️', settings_save: '⚙️', theme_save: '🎨',
+      password_change: '🔑', data_sync: '🔄',
+    };
+    const actionColors = {
+      login: '#4A7C59', logout: '#888', product_add: '#4A7C59', product_edit: '#C08030', product_delete: '#C04040',
+      order_accept: '#4A7C59', order_decline: '#C04040', order_status: '#C08030', order_delete: '#C04040',
+      enquiry_delete: '#C04040', enquiry_read: '#888', settings_save: '#C08030', theme_save: '#C08030',
+      password_change: '#C08030', data_sync: '#888',
+    };
+
+    // Group by date
+    const grouped = {};
+    logs.forEach(l => {
+      if (!grouped[l.date]) grouped[l.date] = [];
+      grouped[l.date].push(l);
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+
+    let html = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">📋 Activity Log</h2>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:12px;color:rgba(212,184,150,0.4);">${logs.length} entries</span>
+          <input class="ck-input" style="width:200px;padding:6px 10px;" placeholder="Search logs…" id="logSearch" oninput="filterLogs(this.value)">
+        </div>
+      </div>`;
+
+    Object.entries(grouped).forEach(([date, entries]) => {
+      const dateLabel = date === today ? 'Today' : date === yesterday ? 'Yesterday' : date;
+      html += `
+        <div class="ck-admin-panel-block" style="margin-bottom:16px;">
+          <div class="ck-panel-header">
+            <span class="ck-panel-title">${dateLabel}</span>
+            <span style="font-size:11px;color:rgba(212,184,150,0.4);">${entries.length} actions</span>
+          </div>
+          <div style="padding:8px 16px;">`;
+
+      entries.forEach(l => {
+        const icon = actionIcons[l.action] || '📌';
+        const color = actionColors[l.action] || '#888';
+        const userName = l.user === 'admin@callakallos.com' ? 'Admin' : l.user === 'florist@callakallos.com' ? 'Florist' : l.user;
+        html += `
+          <div class="ck-log-row" data-search="${(l.action + ' ' + l.details + ' ' + userName).toLowerCase()}" style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(212,184,150,0.04);">
+            <span style="font-size:16px;flex-shrink:0;margin-top:2px;">${icon}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="font-size:13px;color:${color};font-weight:500;text-transform:capitalize;">${l.action.replace(/_/g, ' ')}</span>
+                <span style="font-size:11px;background:rgba(200,184,138,0.08);color:rgba(212,184,150,0.6);padding:1px 6px;border-radius:3px;">${userName}</span>
+                <span style="font-size:11px;color:rgba(212,184,150,0.3);margin-left:auto;">${l.time}</span>
+              </div>
+              ${l.details ? `<div style="font-size:12px;color:rgba(212,184,150,0.5);margin-top:4px;">${l.details}</div>` : ''}
+            </div>
+          </div>`;
+      });
+
+      html += '</div></div>';
+    });
+
+    container.innerHTML = html;
+  });
+}
+
+function filterLogs(q) {
+  const rows = document.querySelectorAll('.ck-log-row');
+  const query = q.toLowerCase();
+  rows.forEach(r => { r.style.display = r.dataset.search.includes(query) ? '' : 'none'; });
 }
 
 // ============================================================
