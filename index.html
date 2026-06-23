@@ -2582,7 +2582,7 @@ function submitCheckout() {
   // Save order to orders list
   const newOrder = {
     id: orderId,
-    date: new Date().toISOString().slice(0, 10),
+    date: localDate(),
     time: new Date().toTimeString().slice(0, 5),
     customer: name,
     email,
@@ -2883,7 +2883,7 @@ function submitCorpOrder() {
   const orderId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1001;
   const newOrder = {
     id: orderId,
-    date: new Date().toISOString().slice(0, 10),
+    date: localDate(),
     time: new Date().toTimeString().slice(0, 5),
     customer: `${company} (${contact})`,
     email, phone,
@@ -3078,10 +3078,10 @@ function adminTab(tab) {
 
 function dashboardHTML() {
   const now   = new Date();
-  const todayStr     = now.toISOString().slice(0,10);
-  const yesterdayStr = new Date(now - 864e5).toISOString().slice(0,10);
-  const weekAgo      = new Date(now - 6*864e5).toISOString().slice(0,10);
-  const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
+  const todayStr     = localDate(now);
+  const yesterdayStr = localDate(new Date(now - 864e5));
+  const weekAgo      = localDate(new Date(now - 6*864e5));
+  const monthStart   = localDate(new Date(now.getFullYear(), now.getMonth(), 1));
 
   const totalRev   = orders.reduce((s,o)=>s+(o.amount||0), 0);
   const todayRev   = orders.filter(o=>o.date===todayStr).reduce((s,o)=>s+(o.amount||0),0);
@@ -3130,7 +3130,7 @@ function dashboardHTML() {
   const last7 = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now - i * 864e5);
-    const ds = d.toISOString().slice(0,10);
+    const ds = localDate(d);
     const dayRev = orders.filter(o => o.date === ds).reduce((s,o) => s+(o.amount||0), 0);
     const dayCount = orders.filter(o => o.date === ds).length;
     last7.push({ label: d.toLocaleDateString('en',{weekday:'short'}), date: ds, rev: dayRev, count: dayCount });
@@ -3321,7 +3321,7 @@ function renderOrderCalendar() {
   const _panelBg = th.panelBg;
 
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const todayStr = localDate(now);
   const firstDay = new Date(_calYear, _calMonth, 1).getDay();
   const daysInMonth = new Date(_calYear, _calMonth + 1, 0).getDate();
   const monthName = new Date(_calYear, _calMonth).toLocaleString('en', { month: 'long', year: 'numeric' });
@@ -4100,7 +4100,7 @@ function exportOrdersCSV() {
   const blob = new Blob([csv], { type:'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'calla_kallos_orders_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download = 'calla_kallos_orders_'+localDate()+'.csv';
   a.click();
   toast('Orders exported ✓');
 }
@@ -4637,6 +4637,11 @@ function currentTheme() {
 }
 
 // Firebase RTDB returns objects with numeric keys instead of arrays — convert back
+function localDate(d) {
+  const dt = d || new Date();
+  return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+}
+
 function toArray(val) {
   if (!val) return [];
   if (Array.isArray(val)) return val;
@@ -5005,7 +5010,7 @@ function sendEnquiry() {
   }
   const enq = {
     id: Date.now(),
-    date: new Date().toISOString().slice(0,10),
+    date: localDate(),
     time: new Date().toTimeString().slice(0,5),
     name, contact, topic: topic || 'General', message,
     read: false
@@ -5524,7 +5529,7 @@ function logActivity(action, details) {
     user: _fbAuth.currentUser.email || 'unknown',
     role: currentRole || 'unknown',
     timestamp: Date.now(),
-    date: new Date().toISOString().slice(0, 10),
+    date: localDate(),
     time: new Date().toTimeString().slice(0, 8),
   };
   _fbDb.ref('ck-activity-log').push(entry).catch(() => {});
@@ -5561,8 +5566,8 @@ function loadActivityLogs() {
       grouped[l.date].push(l);
     });
 
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+    const today = localDate();
+    const yesterday = localDate(new Date(Date.now() - 864e5));
 
     let html = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
