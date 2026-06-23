@@ -1243,6 +1243,31 @@ body {
   .ck-gb-items { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* Corporate Portal */
+.ck-corp { background: var(--ck-cream); padding: 72px 40px; }
+.ck-corp-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.ck-corp-panel { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+.ck-corp-panel h3 { font-family: var(--font-display); font-size: 18px; color: var(--ck-plum-dark); font-weight: 400; margin-bottom: 16px; }
+.ck-corp-input { width: 100%; padding: 10px 14px; border: 1px solid rgba(46,59,31,0.15); border-radius: 6px; font-size: 13px; font-family: var(--font-body); color: var(--ck-text); background: #fff; margin-bottom: 10px; box-sizing: border-box; }
+.ck-corp-input:focus { outline: none; border-color: var(--ck-champagne); }
+.ck-corp-textarea { width: 100%; padding: 10px 14px; border: 1px solid rgba(46,59,31,0.15); border-radius: 6px; font-size: 13px; font-family: var(--font-body); color: var(--ck-text); background: #fff; min-height: 80px; resize: vertical; margin-bottom: 10px; box-sizing: border-box; }
+.ck-corp-btn { padding: 12px 24px; background: var(--ck-plum-dark); color: var(--ck-cream); border: none; border-radius: 6px; font-size: 13px; font-weight: 500; letter-spacing: 0.06em; cursor: pointer; transition: background 0.2s; }
+.ck-corp-btn:hover { background: #2a3a18; }
+.ck-corp-btn-outline { padding: 8px 16px; background: none; color: var(--ck-plum-dark); border: 1px solid rgba(46,59,31,0.2); border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.ck-corp-btn-outline:hover { border-color: var(--ck-champagne); color: var(--ck-champagne); }
+.ck-corp-recipient { background: rgba(46,59,31,0.03); border: 1px solid rgba(46,59,31,0.1); border-radius: 8px; padding: 14px; margin-bottom: 10px; position: relative; }
+.ck-corp-recipient-remove { position: absolute; top: 8px; right: 8px; background: none; border: none; color: #C04040; font-size: 16px; cursor: pointer; padding: 0; line-height: 1; }
+.ck-corp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 1100px; margin: 32px auto 0; }
+.ck-corp-feat { text-align: center; padding: 20px 12px; background: #fff; border-radius: 10px; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+.ck-corp-feat-icon { font-size: 28px; margin-bottom: 8px; }
+.ck-corp-feat-title { font-size: 13px; color: var(--ck-plum-dark); font-weight: 500; margin-bottom: 4px; }
+.ck-corp-feat-sub { font-size: 11px; color: #888; }
+@media(max-width:768px) {
+  .ck-corp { padding: 48px var(--space-md); }
+  .ck-corp-grid { grid-template-columns: 1fr; }
+  .ck-corp-features { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* Checkout payment options */
 .co-pay-opt {
   display: inline-flex;
@@ -1597,6 +1622,7 @@ body {
           <a href="#section-shop" onclick="filterAndScroll('Wedding')">Wedding</a>
         </div>
       </li>
+      <li><a href="#section-corporate" data-en="Corporate" data-ar="للشركات">Corporate</a></li>
       <li><a href="#section-about" data-en="About" data-ar="عن المتجر">About</a></li>
       <li><a href="#section-contact" data-en="Contact" data-ar="تواصل">Contact</a></li>
     </ul>
@@ -1634,6 +1660,7 @@ body {
     <a class="sub" href="#section-shop" onclick="filterAndScroll('Eid Special');toggleMobileMenu()">Eid Special</a>
     <a class="sub" href="#section-shop" onclick="filterAndScroll('Sympathy');toggleMobileMenu()">Sympathy</a>
     <div class="ck-mobile-nav-section">More</div>
+    <a href="#section-corporate" onclick="toggleMobileMenu()">Corporate</a>
     <a href="#section-about" onclick="toggleMobileMenu()">About</a>
     <a href="#section-contact" onclick="toggleMobileMenu()">Contact</a>
   </div>
@@ -1760,6 +1787,115 @@ body {
           <span class="ck-gb-total-price" id="gbTotal">AED 0</span>
         </div>
         <button class="ck-gb-add-btn" onclick="addGiftBoxToCart()">ADD GIFT BOX TO CART →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CORPORATE PORTAL ========== -->
+  <section class="ck-corp" id="section-corporate">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ck-plum-light);margin-bottom:10px;">🏢 For Businesses</div>
+      <h2 style="font-family:var(--font-display);font-size:36px;font-weight:300;color:var(--ck-plum-dark);margin:0;">Corporate Gifting Portal</h2>
+      <p style="color:#888;font-size:14px;margin-top:10px;max-width:600px;margin-left:auto;margin-right:auto;">Elegant floral gifts for your team, clients, and partners. Bulk pricing, scheduled deliveries, and dedicated account management.</p>
+    </div>
+
+    <div class="ck-corp-grid">
+      <!-- Bulk Order Form -->
+      <div class="ck-corp-panel">
+        <h3>📦 Place Bulk Order</h3>
+        <input class="ck-corp-input" id="corpCompany" placeholder="Company Name *">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <input class="ck-corp-input" id="corpContact" placeholder="Contact Person *">
+          <input class="ck-corp-input" id="corpPhone" placeholder="Phone *">
+        </div>
+        <input class="ck-corp-input" id="corpEmail" placeholder="Business Email *">
+        <select class="ck-corp-input" id="corpProduct" style="cursor:pointer;">
+          <option value="">— Select Product —</option>
+        </select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <input class="ck-corp-input" id="corpQty" type="number" min="1" placeholder="Quantity *" oninput="updateCorpTotal()">
+          <input class="ck-corp-input" id="corpBudget" placeholder="Budget per item (AED)" oninput="updateCorpTotal()">
+        </div>
+        <div id="corpTotalDisplay" style="font-size:14px;color:var(--ck-plum-dark);font-weight:500;margin-bottom:10px;display:none;"></div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px;color:#888;margin-bottom:6px;display:block;">Delivery Schedule</label>
+          <select class="ck-corp-input" id="corpSchedule" onchange="document.getElementById('corpRecurDate').style.display=this.value==='recurring'?'':'none'">
+            <option value="one-time">One-time Delivery</option>
+            <option value="recurring">Recurring (Weekly / Monthly)</option>
+          </select>
+          <div id="corpRecurDate" style="display:none;margin-top:6px;">
+            <select class="ck-corp-input" id="corpRecurFreq">
+              <option value="weekly">Every Week</option>
+              <option value="biweekly">Every 2 Weeks</option>
+              <option value="monthly">Every Month</option>
+            </select>
+          </div>
+        </div>
+        <input class="ck-corp-input" id="corpDate" type="date" placeholder="Delivery Date *">
+        <input class="ck-corp-input" id="corpAddress" placeholder="Delivery Address *">
+        <textarea class="ck-corp-textarea" id="corpNote" placeholder="Special instructions, branding requirements, card messages…"></textarea>
+        <button class="ck-corp-btn" onclick="submitCorpOrder()" style="width:100%;">Submit Corporate Order →</button>
+      </div>
+
+      <!-- Employee Gifting -->
+      <div>
+        <div class="ck-corp-panel" style="margin-bottom:20px;">
+          <h3>🎁 Employee / Client Gifting</h3>
+          <p style="font-size:12px;color:#888;margin-bottom:14px;">Add multiple recipients — each gets a personalised delivery with optional gift message.</p>
+          <div id="corpRecipients">
+            <div class="ck-corp-recipient">
+              <button class="ck-corp-recipient-remove" onclick="removeCorpRecipient(this)" title="Remove">✕</button>
+              <input class="ck-corp-input" placeholder="Recipient Name *" style="margin-bottom:6px;">
+              <input class="ck-corp-input" placeholder="Delivery Address *" style="margin-bottom:6px;">
+              <input class="ck-corp-input" placeholder="Phone" style="margin-bottom:6px;">
+              <input class="ck-corp-input" placeholder="Gift message (optional)" style="margin-bottom:0;">
+            </div>
+          </div>
+          <button class="ck-corp-btn-outline" onclick="addCorpRecipient()" style="width:100%;margin-top:8px;">+ Add Another Recipient</button>
+          <div style="margin-top:12px;padding:12px;background:rgba(46,59,31,0.04);border-radius:6px;">
+            <div style="font-size:12px;color:#888;">Total Recipients: <strong id="corpRecipCount" style="color:var(--ck-plum-dark);">1</strong></div>
+          </div>
+        </div>
+
+        <div class="ck-corp-panel">
+          <h3>📄 Quick Actions</h3>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="ck-corp-btn-outline" onclick="downloadCorpTemplate()" style="text-align:left;padding:12px 16px;">
+              <span style="font-size:16px;margin-right:8px;">📥</span> Download Bulk Order Template (CSV)
+            </button>
+            <button class="ck-corp-btn-outline" onclick="window.location.href='#section-contact'" style="text-align:left;padding:12px 16px;">
+              <span style="font-size:16px;margin-right:8px;">💬</span> Request Dedicated Account Manager
+            </button>
+            <button class="ck-corp-btn-outline" onclick="window.location.href='#section-contact'" style="text-align:left;padding:12px 16px;">
+              <span style="font-size:16px;margin-right:8px;">📞</span> Schedule a Consultation Call
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Strip -->
+    <div class="ck-corp-features">
+      <div class="ck-corp-feat">
+        <div class="ck-corp-feat-icon">📦</div>
+        <div class="ck-corp-feat-title">Bulk Pricing</div>
+        <div class="ck-corp-feat-sub">Special rates for 10+ orders</div>
+      </div>
+      <div class="ck-corp-feat">
+        <div class="ck-corp-feat-icon">🔄</div>
+        <div class="ck-corp-feat-title">Recurring Deliveries</div>
+        <div class="ck-corp-feat-sub">Weekly or monthly schedules</div>
+      </div>
+      <div class="ck-corp-feat">
+        <div class="ck-corp-feat-icon">📄</div>
+        <div class="ck-corp-feat-title">Tax Invoices</div>
+        <div class="ck-corp-feat-sub">Downloadable PDF invoices</div>
+      </div>
+      <div class="ck-corp-feat">
+        <div class="ck-corp-feat-icon">🎨</div>
+        <div class="ck-corp-feat-title">Custom Branding</div>
+        <div class="ck-corp-feat-sub">Your logo on cards & wrapping</div>
       </div>
     </div>
   </section>
@@ -2618,7 +2754,163 @@ function addGiftBoxToCart() {
 document.addEventListener('DOMContentLoaded', () => {
   renderGiftBoxItems();
   updateGbSummary();
+  populateCorpProducts();
 });
+
+// ============================================================
+//  CORPORATE PORTAL
+// ============================================================
+function populateCorpProducts() {
+  const sel = document.getElementById('corpProduct');
+  if (!sel) return;
+  const opts = products.map(p => `<option value="${p.name}" data-price="${p.price}">${p.name} — AED ${p.price}</option>`).join('');
+  sel.innerHTML = '<option value="">— Select Product —</option>' + opts;
+}
+
+function updateCorpTotal() {
+  const qty = parseInt(document.getElementById('corpQty').value) || 0;
+  const sel = document.getElementById('corpProduct');
+  const opt = sel.options[sel.selectedIndex];
+  const budget = parseFloat(document.getElementById('corpBudget').value);
+  const price = budget || (opt && opt.dataset.price ? parseFloat(opt.dataset.price) : 0);
+  const display = document.getElementById('corpTotalDisplay');
+  if (qty > 0 && price > 0) {
+    const total = qty * price;
+    const discount = qty >= 50 ? 15 : qty >= 20 ? 10 : qty >= 10 ? 5 : 0;
+    const discounted = Math.round(total * (1 - discount / 100));
+    display.innerHTML = `Estimated Total: <strong>AED ${discounted.toLocaleString()}</strong>` +
+      (discount ? ` <span style="color:#4A7C59;font-size:12px;">(${discount}% bulk discount applied)</span>` : '');
+    display.style.display = 'block';
+  } else {
+    display.style.display = 'none';
+  }
+}
+
+function addCorpRecipient() {
+  const container = document.getElementById('corpRecipients');
+  const div = document.createElement('div');
+  div.className = 'ck-corp-recipient';
+  div.innerHTML = `
+    <button class="ck-corp-recipient-remove" onclick="removeCorpRecipient(this)" title="Remove">✕</button>
+    <input class="ck-corp-input" placeholder="Recipient Name *" style="margin-bottom:6px;">
+    <input class="ck-corp-input" placeholder="Delivery Address *" style="margin-bottom:6px;">
+    <input class="ck-corp-input" placeholder="Phone" style="margin-bottom:6px;">
+    <input class="ck-corp-input" placeholder="Gift message (optional)" style="margin-bottom:0;">`;
+  container.appendChild(div);
+  document.getElementById('corpRecipCount').textContent = container.children.length;
+}
+
+function removeCorpRecipient(btn) {
+  const container = document.getElementById('corpRecipients');
+  if (container.children.length <= 1) { toast('At least one recipient required', 'error'); return; }
+  btn.parentElement.remove();
+  document.getElementById('corpRecipCount').textContent = container.children.length;
+}
+
+function submitCorpOrder() {
+  const company = document.getElementById('corpCompany').value.trim();
+  const contact = document.getElementById('corpContact').value.trim();
+  const phone   = document.getElementById('corpPhone').value.trim();
+  const email   = document.getElementById('corpEmail').value.trim();
+  const product = document.getElementById('corpProduct').value;
+  const qty     = document.getElementById('corpQty').value;
+  const budget  = document.getElementById('corpBudget').value;
+  const schedule = document.getElementById('corpSchedule').value;
+  const recurFreq = document.getElementById('corpRecurFreq').value;
+  const date    = document.getElementById('corpDate').value;
+  const address = document.getElementById('corpAddress').value.trim();
+  const note    = document.getElementById('corpNote').value.trim();
+
+  if (!company || !contact || !phone || !email || !product || !qty || !date || !address) {
+    toast('Please fill in all required fields', 'error'); return;
+  }
+
+  // Gather recipients
+  const recipientEls = document.querySelectorAll('.ck-corp-recipient');
+  const recipients = [];
+  recipientEls.forEach(r => {
+    const inputs = r.querySelectorAll('input');
+    const name = inputs[0]?.value.trim();
+    const addr = inputs[1]?.value.trim();
+    const ph = inputs[2]?.value.trim();
+    const msg = inputs[3]?.value.trim();
+    if (name) recipients.push({ name, address: addr, phone: ph, message: msg });
+  });
+
+  const sel = document.getElementById('corpProduct');
+  const opt = sel.options[sel.selectedIndex];
+  const unitPrice = parseFloat(budget) || (opt?.dataset.price ? parseFloat(opt.dataset.price) : 0);
+  const total = parseInt(qty) * unitPrice;
+  const discount = parseInt(qty) >= 50 ? 15 : parseInt(qty) >= 20 ? 10 : parseInt(qty) >= 10 ? 5 : 0;
+  const finalTotal = Math.round(total * (1 - discount / 100));
+
+  // WhatsApp message
+  let msg = `🏢 *CORPORATE ORDER — Calla Kallos*\n\n`;
+  msg += `*Company:* ${company}\n`;
+  msg += `*Contact:* ${contact}\n`;
+  msg += `*Phone:* ${phone}\n`;
+  msg += `*Email:* ${email}\n\n`;
+  msg += `*Product:* ${product}\n`;
+  msg += `*Quantity:* ${qty}\n`;
+  if (budget) msg += `*Budget/item:* AED ${budget}\n`;
+  msg += `*Estimated Total:* AED ${finalTotal.toLocaleString()}`;
+  if (discount) msg += ` (${discount}% bulk discount)\n`;
+  else msg += `\n`;
+  msg += `\n*Delivery:* ${schedule === 'recurring' ? 'Recurring — ' + recurFreq : 'One-time'}\n`;
+  msg += `*Date:* ${date}\n`;
+  msg += `*Address:* ${address}\n`;
+  if (note) msg += `*Notes:* ${note}\n`;
+  if (recipients.length > 0) {
+    msg += `\n*Recipients (${recipients.length}):*\n`;
+    recipients.forEach((r, i) => {
+      msg += `${i+1}. ${r.name}`;
+      if (r.address) msg += ` — ${r.address}`;
+      if (r.message) msg += ` [${r.message}]`;
+      msg += `\n`;
+    });
+  }
+
+  const rawWa = (storeSettings.whatsapp || '').replace(/[^0-9]/g, '');
+  if (!rawWa) { toast('No WhatsApp number configured', 'error'); return; }
+  window.open(`https://wa.me/${rawWa}?text=${encodeURIComponent(msg)}`, '_blank');
+
+  // Save as order
+  const orderId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1001;
+  const newOrder = {
+    id: orderId,
+    date: new Date().toISOString().slice(0, 10),
+    time: new Date().toTimeString().slice(0, 5),
+    customer: `${company} (${contact})`,
+    email, phone,
+    product: `[CORPORATE] ${product} x${qty}`,
+    amount: finalTotal,
+    location: address,
+    status: 'Pending',
+    orderCount: orders.filter(o => o.email === email).length + 1,
+    corporate: true,
+    recipients: recipients.length,
+    schedule: schedule === 'recurring' ? recurFreq : 'one-time',
+  };
+  orders.unshift(newOrder);
+  try { localStorage.setItem(LS_KEY, JSON.stringify({ products, orders, enquiries, regularOffers, storeSettings, theme: currentTheme(), nextId })); } catch(e) {}
+  _fbDb.ref('ck-new-orders/' + orderId).set(newOrder).catch(() => {});
+
+  toast('Corporate order submitted! We\'ll confirm via WhatsApp shortly ✓');
+}
+
+function downloadCorpTemplate() {
+  const csv = 'Recipient Name,Delivery Address,Phone,Gift Message,Product,Quantity\n' +
+    'John Smith,Office Tower A Floor 12 Dubai Marina,+971501234567,Happy Birthday!,Rose Velvet Luxe,1\n' +
+    'Sarah Ahmed,Villa 5 Emirates Hills,+971509876543,Thank you for your hard work,Peony Blush Gift Box,1\n';
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Calla_Kallos_Bulk_Order_Template.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Template downloaded ✓');
+}
 
 // ============================================================
 //  OCCASION FILTER
