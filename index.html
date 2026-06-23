@@ -2227,9 +2227,9 @@ function submitCheckout() {
     orderCount: orders.filter(o => o.email === email).length + 1
   };
   orders.unshift(newOrder);
-  // Save locally; only sync to Firebase if logged in (customers aren't authenticated)
   try { localStorage.setItem(LS_KEY, JSON.stringify({ products, orders, enquiries, regularOffers, storeSettings, theme: currentTheme(), nextId })); } catch(e) {}
-  if (_fbAuth.currentUser) persistMeta();
+  // Push order to public queue (no auth needed); admin listener merges it
+  _fbDb.ref('ck-new-orders/' + orderId).set(newOrder).catch(() => {});
 
   closeCheckout();
   cart = [];
@@ -2369,6 +2369,7 @@ async function doLogin() {
     adminTab(role === 'florist' ? 'products' : 'dashboard');
     updateEnquiriesBadge();
     _fbStartRtListener();
+    _startOrderQueueListener();
     _fbDb.ref('ck-data').once('value').then(snap => {
       if (snap.val()) { applyData(snap.val()); backfillProductCodes(); }
     });
@@ -3646,7 +3647,8 @@ function sendEnquiry() {
     read: false
   };
   enquiries.unshift(enq);
-  persistMeta();
+  if (_fbAuth.currentUser) persistMeta();
+  else _fbDb.ref('ck-new-enquiries/' + enq.id).set(enq).catch(() => {});
   updateEnquiriesBadge();
   // Clear form
   ['cqName','cqContact','cqMessage'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
@@ -3742,9 +3744,38 @@ function _fbStartRtListener() {
   _fbDb.ref('ck-data').on('value', snapshot => {
     const d = snapshot.val();
     if (!d) return;
-    applyData(d); // applyData now handles admin tab refresh + applyStoreSettings
+    applyData(d);
     try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e) {}
     renderProducts();
+  });
+}
+
+let _orderQueueActive = false;
+function _startOrderQueueListener() {
+  if (_orderQueueActive) return;
+  _orderQueueActive = true;
+  _fbDb.ref('ck-new-orders').on('child_added', snapshot => {
+    const order = snapshot.val();
+    if (!order || !order.id) return;
+    // Only add if not already in orders list
+    if (!orders.some(o => o.id === order.id)) {
+      orders.unshift(order);
+      persistMeta();
+      updateEnquiriesBadge();
+      toast('📦 New order #' + order.id + ' from ' + order.customer);
+    }
+    // Remove from queue
+    snapshot.ref.remove().catch(() => {});
+  });
+  _fbDb.ref('ck-new-enquiries').on('child_added', snapshot => {
+    const enq = snapshot.val();
+    if (!enq || !enq.id) return;
+    if (!enquiries.some(e => e.id === enq.id)) {
+      enquiries.unshift(enq);
+      persistMeta();
+      updateEnquiriesBadge();
+    }
+    snapshot.ref.remove().catch(() => {});
   });
 }
 
@@ -3753,6 +3784,7 @@ _fbAuth.onAuthStateChanged(user => {
     currentRole = FB_USER_ROLE[user.email] || 'florist';
     document.getElementById('adminUserName').textContent = FB_USER_NAME[user.email] || user.email;
     _fbStartRtListener();
+    _startOrderQueueListener();
     const adminEl = document.getElementById('adminSection');
     if (!adminEl.classList.contains('active')) {
       document.getElementById('storeSection').style.display = 'none';
