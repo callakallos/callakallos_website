@@ -2404,7 +2404,11 @@ function submitCheckout() {
   }
 
   const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
-  const items = cart.map(c => `${c.name} x${c.qty} (AED ${c.price * c.qty})`).join(', ');
+  const items = cart.map(c => {
+    let line = `${c.name} x${c.qty} (AED ${c.price * c.qty})`;
+    if (c.desc) line += `\n   ↳ ${c.desc}`;
+    return line;
+  }).join(', ');
   const deliveryDate = document.getElementById('coDate').value;
 
   // Generate order ID first so it can go into the WhatsApp message
@@ -2439,7 +2443,7 @@ function submitCheckout() {
     customer: name,
     email,
     phone,
-    product: cart.map(c => c.name).join(', '),
+    product: cart.map(c => c.desc ? `${c.name} (${c.desc})` : c.name).join(', '),
     amount: total,
     location: address,
     status: 'Pending',
