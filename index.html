@@ -2227,7 +2227,9 @@ function submitCheckout() {
     orderCount: orders.filter(o => o.email === email).length + 1
   };
   orders.unshift(newOrder);
-  persistMeta();
+  // Save locally; only sync to Firebase if logged in (customers aren't authenticated)
+  try { localStorage.setItem(LS_KEY, JSON.stringify({ products, orders, enquiries, regularOffers, storeSettings, theme: currentTheme(), nextId })); } catch(e) {}
+  if (_fbAuth.currentUser) persistMeta();
 
   closeCheckout();
   cart = [];
