@@ -2737,6 +2737,18 @@ function acceptOrder(id) {
   renderOrdersTable();
   updateOrdersBadge();
   toast('Order #' + id + ' accepted ✓');
+  // Send WhatsApp confirmation to customer
+  const phone = (o.phone || '').replace(/[^0-9]/g, '');
+  if (phone) {
+    let msg = `🌸 *Calla Kallos — Order Confirmed!*\n\n`;
+    msg += `Hi ${o.customer},\n`;
+    msg += `Your order *#${o.id}* has been accepted and is now being prepared!\n\n`;
+    msg += `*Items:* ${o.product}\n`;
+    msg += `*Total:* AED ${o.amount}\n`;
+    msg += `*Delivery to:* ${o.location}\n\n`;
+    msg += `We'll update you when it's on the way. Thank you for choosing Calla Kallos! 💐`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
 }
 
 function declineOrder(id) {
