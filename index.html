@@ -4608,6 +4608,14 @@ function settingsHTML() {
   return `
     <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">Store Settings</h2>
 
+    <!-- Storage Usage -->
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">💾 Storage Usage</span></div>
+      <div style="padding:20px;max-width:700px;" id="storagePanel">
+        <div style="color:rgba(212,184,150,0.3);font-size:13px;">Loading storage data…</div>
+      </div>
+    </div>
+
     <!-- Store Info -->
     <div class="ck-admin-panel-block" style="margin-bottom:20px;">
       <div class="ck-panel-header"><span class="ck-panel-title">Store Info</span></div>
@@ -5087,6 +5095,104 @@ function populateSettingsInputs() {
   set('settingAnnounce',   s.announce);
   set('settingAnnounceAr', s.announceAr);
   set('settingGhToken',    s.ghToken || localStorage.getItem('ck_gh_token') || '');
+  loadStorageUsage();
+}
+
+async function loadStorageUsage() {
+  const panel = document.getElementById('storagePanel');
+  if (!panel) return;
+
+  try {
+    const MAX_MB = 1024;
+    let repoSizeMB = 0;
+    let heroCount = 0, heroSize = 0;
+    let prodCount = 0, prodSize = 0;
+    let logoCount = 0, logoSize = 0;
+    let otherSize = 0;
+
+    // Fetch repo info from GitHub API
+    const tok = ghToken();
+    const headers = tok ? { 'Authorization': 'token ' + tok, 'Accept': 'application/vnd.github+json' } : { 'Accept': 'application/vnd.github+json' };
+
+    const repoRes = await fetch('https://api.github.com/repos/' + GH_REPO, { headers });
+    if (repoRes.ok) {
+      const repoData = await repoRes.json();
+      repoSizeMB = (repoData.size || 0) / 1024;
+    }
+
+    // Fetch folder sizes
+    if (tok) {
+      const folders = [
+        { path: 'images/hero', setCount: v => heroCount = v, setSize: v => heroSize = v },
+        { path: 'images/products', setCount: v => prodCount = v, setSize: v => prodSize = v },
+        { path: 'images/logo', setCount: v => logoCount = v, setSize: v => logoSize = v },
+      ];
+      for (const f of folders) {
+        const res = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + f.path, { headers });
+        if (res.ok) {
+          const files = await res.json();
+          f.setCount(files.length);
+          f.setSize(files.reduce((s, file) => s + (file.size || 0), 0));
+        }
+      }
+    }
+
+    const totalFiles = heroCount + prodCount + logoCount;
+    const usedPct = Math.min(100, (repoSizeMB / MAX_MB) * 100);
+    const barColor = usedPct > 80 ? '#C04040' : usedPct > 50 ? '#C08030' : '#4A7C59';
+
+    const fmtSize = bytes => {
+      if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+      if (bytes >= 1024) return (bytes / 1024).toFixed(0) + ' KB';
+      return bytes + ' B';
+    };
+
+    panel.innerHTML = `
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+          <span style="font-size:14px;font-weight:500;">Total: ${repoSizeMB.toFixed(1)} MB</span>
+          <span style="font-size:12px;color:rgba(212,184,150,0.5);">of ${MAX_MB} MB (GitHub limit)</span>
+        </div>
+        <div style="background:rgba(200,184,138,0.1);border-radius:6px;height:10px;overflow:hidden;">
+          <div style="width:${usedPct}%;height:100%;background:${barColor};border-radius:6px;transition:width 0.5s;"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(212,184,150,0.4);margin-top:4px;">${usedPct.toFixed(1)}% used · ${(MAX_MB - repoSizeMB).toFixed(0)} MB remaining</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+        <div style="padding:12px;background:rgba(74,124,89,0.08);border:1px solid rgba(74,124,89,0.15);border-radius:8px;text-align:center;">
+          <div style="font-size:18px;margin-bottom:4px;">🖼</div>
+          <div style="font-size:16px;font-weight:500;">${heroCount}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.5);">Hero Images</div>
+          <div style="font-size:11px;color:rgba(212,184,150,0.4);margin-top:2px;">${fmtSize(heroSize)}</div>
+        </div>
+        <div style="padding:12px;background:rgba(192,128,48,0.08);border:1px solid rgba(192,128,48,0.15);border-radius:8px;text-align:center;">
+          <div style="font-size:18px;margin-bottom:4px;">📦</div>
+          <div style="font-size:16px;font-weight:500;">${prodCount}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.5);">Product Images</div>
+          <div style="font-size:11px;color:rgba(212,184,150,0.4);margin-top:2px;">${fmtSize(prodSize)}</div>
+        </div>
+        <div style="padding:12px;background:rgba(100,160,255,0.08);border:1px solid rgba(100,160,255,0.15);border-radius:8px;text-align:center;">
+          <div style="font-size:18px;margin-bottom:4px;">🎨</div>
+          <div style="font-size:16px;font-weight:500;">${logoCount}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.5);">Logo Files</div>
+          <div style="font-size:11px;color:rgba(212,184,150,0.4);margin-top:2px;">${fmtSize(logoSize)}</div>
+        </div>
+        <div style="padding:12px;background:rgba(200,184,138,0.08);border:1px solid rgba(200,184,138,0.15);border-radius:8px;text-align:center;">
+          <div style="font-size:18px;margin-bottom:4px;">📄</div>
+          <div style="font-size:16px;font-weight:500;">${totalFiles}</div>
+          <div style="font-size:10px;color:rgba(212,184,150,0.5);">Total Files</div>
+          <div style="font-size:11px;color:rgba(212,184,150,0.4);margin-top:2px;">${fmtSize(heroSize + prodSize + logoSize)}</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;font-size:11px;color:rgba(212,184,150,0.3);">
+        Data: ${products.length} products · ${orders.length} orders · ${enquiries.length} enquiries
+      </div>
+    `;
+  } catch(e) {
+    panel.innerHTML = '<div style="color:rgba(212,184,150,0.4);font-size:13px;">Unable to load storage data. Set GitHub token for detailed stats.</div>';
+  }
 }
 
 function applyStoreSettings() {
