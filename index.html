@@ -560,6 +560,226 @@ body {
   transition: background 0.2s;
 }
 .ck-slide-dot.active { background: #fff; }
+
+/* Product Detail Modal */
+.ck-pd-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 600;
+  overflow-y: auto;
+  padding: 40px 20px;
+  backdrop-filter: blur(4px);
+}
+.ck-pd-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+.ck-pd-modal {
+  background: var(--ck-cream);
+  border-radius: 16px;
+  max-width: 1000px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.ck-pd-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ck-pd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.ck-pd-gallery {
+  position: relative;
+  background: #f0ede6;
+  min-height: 400px;
+}
+.ck-pd-main-img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+}
+.ck-pd-thumbs {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  background: rgba(0,0,0,0.03);
+}
+.ck-pd-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.6;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.ck-pd-thumb.active, .ck-pd-thumb:hover { border-color: var(--ck-plum-dark); opacity: 1; }
+.ck-pd-info {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+.ck-pd-badges { display: flex; gap: 6px; margin-bottom: 12px; }
+.ck-pd-cat {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ck-plum-light);
+  margin-bottom: 6px;
+}
+.ck-pd-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--ck-plum-dark);
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+.ck-pd-name-ar {
+  font-family: var(--font-ar);
+  font-size: 16px;
+  color: rgba(46,59,31,0.4);
+  direction: rtl;
+  margin-bottom: 12px;
+}
+.ck-pd-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ck-pd-price {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ck-plum-dark);
+}
+.ck-pd-old-price {
+  font-size: 16px;
+  color: #999;
+  text-decoration: line-through;
+}
+.ck-pd-save {
+  font-size: 12px;
+  background: #C04040;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+.ck-pd-desc {
+  font-size: 14px;
+  color: rgba(46,59,31,0.7);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  flex: 1;
+}
+.ck-pd-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.ck-pd-feat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(46,59,31,0.6);
+  padding: 8px 10px;
+  background: rgba(46,59,31,0.04);
+  border-radius: 6px;
+}
+.ck-pd-feat-icon { font-size: 16px; }
+.ck-pd-qty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ck-pd-qty-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(46,59,31,0.2);
+  background: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ck-plum-dark);
+}
+.ck-pd-qty-btn:hover { background: rgba(46,59,31,0.05); }
+.ck-pd-qty-val {
+  font-size: 18px;
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
+  color: var(--ck-plum-dark);
+}
+.ck-pd-add-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--ck-plum-dark);
+  color: var(--ck-cream);
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 12px;
+}
+.ck-pd-add-btn:hover { background: #2a3a18; }
+.ck-pd-whatsapp {
+  width: 100%;
+  padding: 12px;
+  background: #25D366;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.ck-pd-whatsapp:hover { background: #1fb855; }
+.ck-pd-code {
+  font-size: 11px;
+  color: #999;
+  margin-top: 12px;
+  letter-spacing: 0.05em;
+}
+@media(max-width:768px) {
+  .ck-pd-grid { grid-template-columns: 1fr; }
+  .ck-pd-main-img { height: 300px; }
+  .ck-pd-info { padding: 24px 20px; }
+  .ck-pd-name { font-size: 22px; }
+  .ck-pd-features { grid-template-columns: 1fr; }
+}
 .ck-product-thumb-placeholder {
   width: 100%;
   height: 100%;
@@ -2157,6 +2377,46 @@ body {
   </div>
 </div>
 
+<!-- Product Detail Modal -->
+<div class="ck-pd-overlay" id="pdOverlay" onclick="if(event.target===this)closePD()">
+  <div class="ck-pd-modal">
+    <button class="ck-pd-close" onclick="closePD()">✕</button>
+    <div class="ck-pd-grid">
+      <div class="ck-pd-gallery">
+        <img id="pdMainImg" class="ck-pd-main-img" src="" alt="">
+        <div class="ck-pd-thumbs" id="pdThumbs"></div>
+      </div>
+      <div class="ck-pd-info">
+        <div class="ck-pd-badges" id="pdBadges"></div>
+        <div class="ck-pd-cat" id="pdCat"></div>
+        <div class="ck-pd-name" id="pdName"></div>
+        <div class="ck-pd-name-ar" id="pdNameAr"></div>
+        <div class="ck-pd-price-row">
+          <span class="ck-pd-price" id="pdPrice"></span>
+          <span class="ck-pd-old-price" id="pdOldPrice"></span>
+          <span class="ck-pd-save" id="pdSave" style="display:none"></span>
+        </div>
+        <div class="ck-pd-desc" id="pdDesc"></div>
+        <div class="ck-pd-features">
+          <div class="ck-pd-feat"><span class="ck-pd-feat-icon">🚚</span> Same-day delivery</div>
+          <div class="ck-pd-feat"><span class="ck-pd-feat-icon">🌸</span> Freshly arranged</div>
+          <div class="ck-pd-feat"><span class="ck-pd-feat-icon">💯</span> Quality guaranteed</div>
+          <div class="ck-pd-feat"><span class="ck-pd-feat-icon">🎁</span> Gift wrapping included</div>
+        </div>
+        <div class="ck-pd-qty">
+          <span style="font-size:13px;color:rgba(46,59,31,0.6);">Quantity:</span>
+          <button class="ck-pd-qty-btn" onclick="pdQtyChange(-1)">−</button>
+          <span class="ck-pd-qty-val" id="pdQty">1</span>
+          <button class="ck-pd-qty-btn" onclick="pdQtyChange(1)">+</button>
+        </div>
+        <button class="ck-pd-add-btn" id="pdAddBtn" onclick="pdAddToCart()">🛒 ADD TO CART</button>
+        <button class="ck-pd-whatsapp" id="pdWhatsapp" onclick="pdEnquire()">💬 Enquire on WhatsApp</button>
+        <div class="ck-pd-code" id="pdCode"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Cart Drawer -->
 <div class="ck-drawer-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="ck-cart-drawer" id="cartDrawer">
@@ -2449,7 +2709,7 @@ function renderProducts() {
       ? imgs.map((src, i) => '<img src="'+src+'" alt="'+p.name+'" class="'+(i===0?'ck-slide-active':'')+'">').join('')
       : '<div class="ck-product-thumb-placeholder">'+(p.emoji||'🌸')+'</div>';
     const dots = hasMulti ? '<div class="ck-slide-dots">'+imgs.map(function(_,i){ return '<span class="ck-slide-dot'+(i===0?' active':'')+'"></span>'; }).join('')+'</div>' : '';
-    return '<div class="ck-product-card" onclick="addToCart('+p.id+')" '+(hasMulti ? 'onmouseenter="startSlide(this,'+imgs.length+')" onmouseleave="stopSlide(this)"' : '')+'>'
+    return '<div class="ck-product-card" onclick="openProductDetail('+p.id+')" '+(hasMulti ? 'onmouseenter="startSlide(this,'+imgs.length+')" onmouseleave="stopSlide(this)"' : '')+'>'
       + '<div class="ck-product-thumb">'
       + imgTags
       + dots
@@ -2967,6 +3227,99 @@ function stopSlide(card) {
   const dots = card.querySelectorAll('.ck-slide-dot');
   imgs.forEach((img, i) => { img.classList.toggle('ck-slide-active', i === 0); });
   dots.forEach((dot, i) => { dot.classList.toggle('active', i === 0); });
+}
+
+// ============================================================
+//  PRODUCT DETAIL MODAL
+// ============================================================
+let _pdProductId = null;
+let _pdQty = 1;
+
+function openProductDetail(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  _pdProductId = id;
+  _pdQty = 1;
+
+  const imgs = (p.images && p.images.length) ? p.images : (p.imgData ? [p.imgData] : []);
+  const mainImg = document.getElementById('pdMainImg');
+  mainImg.src = imgs[0] || '';
+  mainImg.alt = p.name;
+
+  // Thumbnails
+  const thumbsEl = document.getElementById('pdThumbs');
+  if (imgs.length > 1) {
+    thumbsEl.innerHTML = imgs.map((src, i) => '<img src="'+src+'" class="ck-pd-thumb'+(i===0?' active':'')+'" onclick="pdSwitchImg(this,\''+src+'\')">').join('');
+    thumbsEl.style.display = 'flex';
+  } else {
+    thumbsEl.innerHTML = '';
+    thumbsEl.style.display = 'none';
+  }
+
+  // Badges
+  const badgesEl = document.getElementById('pdBadges');
+  badgesEl.innerHTML = badgeHTML(p.badges);
+
+  // Info
+  document.getElementById('pdCat').textContent = p.cat;
+  document.getElementById('pdName').textContent = p.name;
+  const nameAr = document.getElementById('pdNameAr');
+  if (p.nameAr) { nameAr.textContent = p.nameAr; nameAr.style.display = ''; }
+  else nameAr.style.display = 'none';
+
+  document.getElementById('pdPrice').textContent = 'AED ' + p.price;
+  const oldPriceEl = document.getElementById('pdOldPrice');
+  const saveEl = document.getElementById('pdSave');
+  if (p.oldPrice) {
+    oldPriceEl.textContent = 'AED ' + p.oldPrice;
+    oldPriceEl.style.display = '';
+    const pct = Math.round((1 - p.price / p.oldPrice) * 100);
+    saveEl.textContent = 'SAVE ' + pct + '%';
+    saveEl.style.display = '';
+  } else {
+    oldPriceEl.style.display = 'none';
+    saveEl.style.display = 'none';
+  }
+
+  document.getElementById('pdDesc').textContent = (lang === 'ar' && p.descAr) ? p.descAr : (p.desc || 'A beautiful floral arrangement crafted with care by Calla Kallos.');
+  document.getElementById('pdQty').textContent = '1';
+  document.getElementById('pdCode').textContent = p.code ? 'Product Code: ' + p.code : '';
+
+  document.getElementById('pdOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePD() {
+  document.getElementById('pdOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function pdSwitchImg(thumb, src) {
+  document.getElementById('pdMainImg').src = src;
+  document.querySelectorAll('.ck-pd-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+
+function pdQtyChange(delta) {
+  _pdQty = Math.max(1, _pdQty + delta);
+  document.getElementById('pdQty').textContent = _pdQty;
+}
+
+function pdAddToCart() {
+  const p = products.find(x => x.id === _pdProductId);
+  if (!p) return;
+  for (let i = 0; i < _pdQty; i++) addToCart(p.id);
+  closePD();
+  toast(p.name + ' × ' + _pdQty + ' added to cart ✓');
+}
+
+function pdEnquire() {
+  const p = products.find(x => x.id === _pdProductId);
+  if (!p) return;
+  const rawWa = (storeSettings.whatsapp || '').replace(/[^0-9]/g, '');
+  if (!rawWa) { toast('WhatsApp not configured', 'error'); return; }
+  const msg = '🌸 Hi! I\'m interested in:\n\n*' + p.name + '*\nPrice: AED ' + p.price + '\nCode: ' + (p.code || '') + '\n\nCould you share more details?';
+  window.open('https://wa.me/' + rawWa + '?text=' + encodeURIComponent(msg), '_blank');
 }
 
 // ============================================================
