@@ -2974,6 +2974,19 @@ function stopSlide(card) {
 // ============================================================
 let pendingImages = [];
 
+function compressImage(dataUrl, maxSize, quality, callback) {
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    callback(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = dataUrl;
+}
+
 function previewMultiImg(input) {
   if (!input.files || !input.files.length) return;
   Array.from(input.files).forEach(file => {
@@ -2982,7 +2995,6 @@ function previewMultiImg(input) {
       compressImage(e.target.result, 1200, 0.85, compressed => {
         pendingImages.push({ src: compressed, file: file.name, b64: compressed.split(',')[1] });
         renderMultiImgPreviews();
-        // Set first image as main preview for backward compat
         const preview = document.getElementById('imgPreview');
         if (pendingImages.length === 1) {
           preview.src = compressed;
