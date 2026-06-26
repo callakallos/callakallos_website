@@ -528,15 +528,38 @@ body {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform 0.4s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
   display: block;
   position: absolute;
   inset: 0;
+  opacity: 0;
 }
+.ck-product-thumb img:first-child,
+.ck-product-thumb img.ck-slide-active { opacity: 1; }
 .ck-product-thumb {
   position: relative;
 }
-.ck-product-card:hover .ck-product-thumb img { transform: scale(1.05); }
+.ck-product-card:hover .ck-product-thumb img.ck-slide-active { transform: scale(1.05); }
+.ck-slide-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.ck-product-card:hover .ck-slide-dots { opacity: 1; }
+.ck-slide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transition: background 0.2s;
+}
+.ck-slide-dot.active { background: #fff; }
 .ck-product-thumb-placeholder {
   width: 100%;
   height: 100%;
@@ -2256,12 +2279,13 @@ body {
     </div>
     <div class="ck-modal-body">
       <div style="margin-bottom:16px;">
-        <label class="ck-form-label">Product Image</label>
-        <div class="ck-img-upload" onclick="document.getElementById('imgInput').click()">
-          <input type="file" id="imgInput" accept="image/*" onchange="previewImg(this)">
+        <label class="ck-form-label">Product Images <span style="font-size:10px;color:var(--ck-text-hint);text-transform:none;">(upload multiple — first image is the main photo)</span></label>
+        <div id="multiImgPreviews" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;"></div>
+        <div class="ck-img-upload" onclick="document.getElementById('imgInput').click()" style="min-height:80px;">
+          <input type="file" id="imgInput" accept="image/*" multiple onchange="previewMultiImg(this)">
           <div class="ck-img-upload-icon">📷</div>
-          <div class="ck-img-upload-text">Click to upload product photo (JPG, PNG)</div>
-          <img id="imgPreview" class="ck-img-preview" alt="Preview">
+          <div class="ck-img-upload-text">Click to add photos (JPG, PNG)</div>
+          <img id="imgPreview" class="ck-img-preview" alt="Preview" style="display:none;">
         </div>
       </div>
       <div class="ck-form-group" style="margin-bottom:14px;">
@@ -2418,15 +2442,26 @@ function badgeHTML(badges) {
 function renderProducts() {
   const grid = document.getElementById('productsGrid');
   if (!grid) return;
-  grid.innerHTML = products.map(p => `
-    <div class="ck-product-card" onclick="addToCart(${p.id})">
+  grid.innerHTML = products.map(p => {
+    const imgs = (p.images && p.images.length) ? p.images : (p.imgData ? [p.imgData] : []);
+    const hasMulti = imgs.length > 1;
+    const imgTags = imgs.length
+      ? imgs.map((src, i) => `<img src="${src}" alt="${p.name}" class="${i===0?'ck-slide-active':''}">`).join('')
+      : `<div class="ck-product-thumb-placeholder">${p.emoji||'🌸'}</div>`;
+    const dots = hasMulti ? `<div class="ck-slide-dots">${imgs.map((_, i) => `<span class="ck-slide-dot${i===0?' active':''}"></span>`).join('')}</div>` : '';
+    return `
+    <div class="ck-product-card" onclick="addToCart(${p.id})" ${hasMulti ? `onmouseenter="startSlide(this,${imgs.length})" onmouseleave="stopSlide(this)"` : ''}>
       <div class="ck-product-thumb">
-        ${p.imgData ? `<img src="${p.imgData}" alt="${p.name}">` : `<div class="ck-product-thumb-placeholder">${p.emoji||'🌸'}</div>`}
+        ${imgTags}
+        ${dots}
         <div class="ck-badge-wrap">${badgeHTML(p.badges)}</div>
         <div class="ck-product-wish" onclick="event.stopPropagation()">
           <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
-      </div>
+      </div>`;
+  }).map((card, i) => {
+    const p = products[i];
+    return card + `
       <div class="ck-product-info">
         <div class="ck-product-cat">${p.cat}</div>
         <div class="ck-product-name">${lang==='ar'&&p.nameAr ? p.nameAr : p.name}</div>
@@ -2915,6 +2950,86 @@ function downloadCorpTemplate() {
   a.click();
   URL.revokeObjectURL(url);
   toast('Template downloaded ✓');
+}
+
+// ============================================================
+//  PRODUCT IMAGE SLIDESHOW
+// ============================================================
+function startSlide(card, count) {
+  if (card._slideTimer) return;
+  let idx = 0;
+  const imgs = card.querySelectorAll('.ck-product-thumb img');
+  const dots = card.querySelectorAll('.ck-slide-dot');
+  card._slideTimer = setInterval(() => {
+    imgs[idx].classList.remove('ck-slide-active');
+    if (dots[idx]) dots[idx].classList.remove('active');
+    idx = (idx + 1) % count;
+    imgs[idx].classList.add('ck-slide-active');
+    if (dots[idx]) dots[idx].classList.add('active');
+  }, 1200);
+}
+
+function stopSlide(card) {
+  clearInterval(card._slideTimer);
+  card._slideTimer = null;
+  const imgs = card.querySelectorAll('.ck-product-thumb img');
+  const dots = card.querySelectorAll('.ck-slide-dot');
+  imgs.forEach((img, i) => { img.classList.toggle('ck-slide-active', i === 0); });
+  dots.forEach((dot, i) => { dot.classList.toggle('active', i === 0); });
+}
+
+// ============================================================
+//  MULTI-IMAGE UPLOAD
+// ============================================================
+let pendingImages = [];
+
+function previewMultiImg(input) {
+  if (!input.files || !input.files.length) return;
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      compressImage(e.target.result, 1200, 0.85, compressed => {
+        pendingImages.push({ src: compressed, file: file.name, b64: compressed.split(',')[1] });
+        renderMultiImgPreviews();
+        // Set first image as main preview for backward compat
+        const preview = document.getElementById('imgPreview');
+        if (pendingImages.length === 1) {
+          preview.src = compressed;
+          preview.style.display = 'block';
+          preview.dataset.pendingB64 = pendingImages[0].b64;
+          preview.dataset.pendingFile = pendingImages[0].file;
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderMultiImgPreviews() {
+  const container = document.getElementById('multiImgPreviews');
+  if (!container) return;
+  container.innerHTML = pendingImages.map((img, i) => `
+    <div style="position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;border:2px solid ${i===0?'var(--ck-champagne)':'rgba(200,184,138,0.15)'};flex-shrink:0;">
+      <img src="${img.src}" style="width:100%;height:100%;object-fit:cover;">
+      <button onclick="event.stopPropagation();removePendingImg(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      ${i===0 ? '<span style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:#fff;font-size:8px;text-align:center;padding:1px;letter-spacing:0.05em;">MAIN</span>' : ''}
+    </div>
+  `).join('');
+}
+
+function removePendingImg(idx) {
+  pendingImages.splice(idx, 1);
+  renderMultiImgPreviews();
+  const preview = document.getElementById('imgPreview');
+  if (pendingImages.length > 0) {
+    preview.src = pendingImages[0].src;
+    preview.dataset.pendingB64 = pendingImages[0].b64;
+    preview.dataset.pendingFile = pendingImages[0].file;
+  } else {
+    preview.style.display = 'none';
+    preview.dataset.pendingB64 = '';
+  }
 }
 
 // ============================================================
@@ -4422,6 +4537,7 @@ let selectedBadges = [];
 
 function openAddModal() {
   selectedBadges = [];
+  pendingImages = [];
   document.getElementById('editIdx').value = -1;
   document.getElementById('modalTitle').textContent = 'Add New Product';
   ['fldName','fldNameAr','fldDesc','fldDescAr','fldPrice','fldOldPrice'].forEach(id => document.getElementById(id).value = '');
@@ -4429,6 +4545,8 @@ function openAddModal() {
   document.getElementById('fldOcc').value = '';
   document.getElementById('fldCode').value = 'CK-' + String(nextId).padStart(4, '0');
   document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('imgPreview').dataset.pendingB64 = '';
+  document.getElementById('multiImgPreviews').innerHTML = '';
   document.querySelectorAll('.ck-badge-opt').forEach(b => b.classList.remove('selected'));
   document.getElementById('productModal').classList.add('open');
 }
@@ -4436,6 +4554,7 @@ function openAddModal() {
 function openEditModal(i) {
   const p = products[i];
   selectedBadges = [...(p.badges||[])];
+  pendingImages = [];
   document.getElementById('editIdx').value = i;
   document.getElementById('modalTitle').textContent = 'Edit Product';
   document.getElementById('fldName').value = p.name;
@@ -4447,8 +4566,13 @@ function openEditModal(i) {
   document.getElementById('fldCat').value = p.cat;
   document.getElementById('fldOcc').value = p.occ || '';
   document.getElementById('fldCode').value = p.code || ('CK-' + String(p.id).padStart(4, '0'));
+  // Load existing images into pending previews
+  const existingImgs = (p.images && p.images.length) ? p.images : (p.imgData ? [p.imgData] : []);
+  existingImgs.forEach(src => pendingImages.push({ src, file: '', b64: '' }));
+  renderMultiImgPreviews();
   if (p.imgData) { const img = document.getElementById('imgPreview'); img.src = p.imgData; img.style.display='block'; }
   else document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('imgPreview').dataset.pendingB64 = '';
   document.querySelectorAll('.ck-badge-opt').forEach(b => b.classList.toggle('selected', selectedBadges.includes(b.dataset.val)));
   document.getElementById('productModal').classList.add('open');
 }
@@ -4503,6 +4627,10 @@ async function saveProduct() {
   const idx = parseInt(document.getElementById('editIdx').value);
   const productId = idx >= 0 ? products[idx].id : nextId++;
 
+  // Build images array from pendingImages (existing URLs + new uploads)
+  const existingUrls = pendingImages.filter(img => !img.b64 && img.src.startsWith('http')).map(img => img.src);
+  const newUploads = pendingImages.filter(img => img.b64);
+
   const product = {
     id: productId,
     code: document.getElementById('fldCode').value || ('CK-' + String(productId).padStart(4, '0')),
@@ -4516,8 +4644,9 @@ async function saveProduct() {
     occ: document.getElementById('fldOcc').value,
     badges: [...selectedBadges],
     emoji: '🌸',
-    stock: 'in',
-    imgData,
+    stock: idx >= 0 ? products[idx].stock : 'in',
+    imgData: pendingImages.length ? pendingImages[0].src : imgData,
+    images: existingUrls,
   };
 
   if (idx >= 0) { product.id = products[idx].id; products[idx] = product; logActivity('product_edit', `Edited "${name}" (${product.code || 'CK-'+String(product.id).padStart(4,'0')})`); }
@@ -4525,24 +4654,30 @@ async function saveProduct() {
   closeModal();
   adminTab('products');
   renderProducts();
-  persistImage(product.id, imgData); // save base64 locally for instant display on this device
+  persistImage(product.id, product.imgData);
 
-  if (pendingB64 && ghToken()) {
-    // Has a new image — upload first, then sync everything to GitHub in one shot
+  if (newUploads.length && ghToken()) {
     const uploadId = product.id;
-    const ext = pendingFile.split('.').pop().toLowerCase() || 'jpg';
-    const ghPath = `images/products/product_${uploadId}.${ext}`;
-    toast('Uploading image…');
-    uploadToGitHub(ghPath, pendingB64, pendingFile).then(url => {
-      imgPreview.dataset.pendingB64 = '';
-      const live = products.find(p => p.id === uploadId);
-      if (live) live.imgData = url || live.imgData;
-      persistMeta(); // single GitHub write — image URL already in product
-      renderProducts();
-      toast(url ? 'Product saved — image synced to all devices ✓' : 'Product saved ✓');
-    });
+    toast(`Uploading ${newUploads.length} image${newUploads.length>1?'s':''}…`);
+    let uploaded = 0;
+    for (let i = 0; i < newUploads.length; i++) {
+      const img = newUploads[i];
+      const ext = (img.file || 'product.jpg').split('.').pop().toLowerCase() || 'jpg';
+      const imgIdx = existingUrls.length + i;
+      const ghPath = `images/products/product_${uploadId}_${imgIdx}.${ext}`;
+      const url = await uploadToGitHub(ghPath, img.b64, img.file);
+      if (url) existingUrls.push(url);
+      uploaded++;
+    }
+    const live = products.find(p => p.id === uploadId);
+    if (live) {
+      live.images = [...existingUrls];
+      live.imgData = existingUrls[0] || live.imgData;
+    }
+    persistMeta();
+    renderProducts();
+    toast(`Product saved — ${uploaded} image${uploaded>1?'s':''} synced ✓`);
   } else {
-    // No new image — sync immediately
     persistMeta();
     toast('Product saved ✓');
   }
