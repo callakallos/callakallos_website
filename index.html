@@ -5362,10 +5362,10 @@ function fileManagerHTML() {
     </div>
     <div class="ck-admin-panel-block" style="margin-bottom:20px;">
       <div class="ck-panel-header">
-        <span class="ck-panel-title">📁 images/products &nbsp;<span style="font-size:11px;opacity:.5;">— Product images</span></span>
+        <span class="ck-panel-title">📁 Product Images &nbsp;<span style="font-size:11px;opacity:.5;">— Grouped by product</span></span>
       </div>
-      <div id="fmProducts" style="padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;">
-        <div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">Loading…</div>
+      <div id="fmProducts" style="padding:16px;">
+        <div style="color:rgba(212,184,150,0.3);font-size:12px;">Loading…</div>
       </div>
     </div>
     <div class="ck-admin-panel-block">
@@ -5380,22 +5380,78 @@ function fileManagerHTML() {
 }
 
 async function loadFileManager() {
-  const folders = ['images/hero','images/products','images/logo'];
-  const ids     = ['fmHero','fmProducts','fmLogo'];
-  for (let i = 0; i < folders.length; i++) {
-    const container = document.getElementById(ids[i]);
+  // Load hero and logo normally
+  for (const [folder, id] of [['images/hero','fmHero'],['images/logo','fmLogo']]) {
+    const container = document.getElementById(id);
     if (!container) continue;
-    if (!ghToken()) {
-      container.innerHTML = renderLocalImages(folders[i]);
-      continue;
-    }
-    const files = await listGitHubFolder(folders[i]);
-    if (!files.length) {
-      container.innerHTML = '<div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">No images yet.</div>';
-    } else {
-      container.innerHTML = files.map(f => fmFileCard(f, folders[i])).join('');
-    }
+    if (!ghToken()) { container.innerHTML = renderLocalImages(folder); continue; }
+    const files = await listGitHubFolder(folder);
+    container.innerHTML = files.length
+      ? files.map(f => fmFileCard(f, folder)).join('')
+      : '<div style="color:rgba(212,184,150,0.3);font-size:12px;grid-column:1/-1;">No images yet.</div>';
   }
+
+  // Load product images grouped by product
+  const prodContainer = document.getElementById('fmProducts');
+  if (!prodContainer) return;
+
+  // Build product image map from product data + GitHub files
+  const productImgMap = {};
+  products.forEach(p => {
+    const key = p.id;
+    if (!productImgMap[key]) productImgMap[key] = { name: p.name, code: p.code || 'CK-'+String(p.id).padStart(4,'0'), imgData: p.imgData, images: [], id: p.id };
+    const imgs = (p.images && p.images.length) ? p.images : (p.imgData ? [p.imgData] : []);
+    productImgMap[key].images = imgs;
+  });
+
+  if (ghToken()) {
+    const ghFiles = await listGitHubFolder('images/products');
+    ghFiles.forEach(f => {
+      const match = f.name.match(/product_(\d+)/);
+      if (match) {
+        const pid = parseInt(match[1]);
+        if (!productImgMap[pid]) productImgMap[pid] = { name: 'Product #'+pid, code: '', images: [], id: pid };
+        const url = 'https://raw.githubusercontent.com/'+GH_REPO+'/'+GH_BRANCH+'/images/products/'+f.name;
+        if (!productImgMap[pid].images.includes(url)) productImgMap[pid].images.push(url);
+        productImgMap[pid].ghFiles = productImgMap[pid].ghFiles || [];
+        productImgMap[pid].ghFiles.push(f);
+      }
+    });
+  }
+
+  const entries = Object.values(productImgMap).filter(p => p.images.length > 0);
+  if (!entries.length) {
+    prodContainer.innerHTML = '<div style="color:rgba(212,184,150,0.3);font-size:12px;">No product images yet.</div>';
+    return;
+  }
+
+  prodContainer.innerHTML = entries.map(p => {
+    const imgCards = p.images.map((src, i) => {
+      const isMain = i === 0;
+      const ghFile = (p.ghFiles || []).find(f => src.includes(f.name));
+      return '<div style="background:rgba(46,59,31,0.15);border:1px solid rgba(212,184,150,'+(isMain?'0.3':'0.08')+');border-radius:6px;overflow:hidden;text-align:center;position:relative;">'
+        + '<div style="height:100px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;">'
+        + '<img src="'+src+'" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML=\'📷\'">'
+        + '</div>'
+        + (isMain ? '<div style="position:absolute;top:4px;left:4px;background:var(--ck-champagne);color:var(--ck-plum-dark);font-size:8px;padding:1px 5px;border-radius:2px;font-weight:600;">MAIN</div>' : '')
+        + (ghFile ? '<button onclick="fmDeleteFile(\'images/products/'+ghFile.name+'\',\''+ghFile.sha+'\')" style="position:absolute;top:4px;right:4px;background:rgba(192,64,64,0.8);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;">✕</button>' : '')
+        + '<div style="padding:4px 6px;font-size:9px;color:rgba(212,184,150,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(src.split('/').pop())+'</div>'
+        + '</div>';
+    }).join('');
+
+    return '<div style="margin-bottom:20px;border:1px solid rgba(212,184,150,0.08);border-radius:10px;overflow:hidden;">'
+      + '<div style="padding:12px 16px;background:rgba(46,59,31,0.12);display:flex;align-items:center;justify-content:space-between;">'
+      + '<div style="display:flex;align-items:center;gap:10px;">'
+      + '<span style="font-size:14px;font-weight:500;color:var(--ck-cream);">'+p.name+'</span>'
+      + '<span style="font-size:10px;color:rgba(212,184,150,0.4);letter-spacing:0.06em;">'+p.code+'</span>'
+      + '</div>'
+      + '<span style="font-size:11px;color:rgba(212,184,150,0.5);">'+p.images.length+' image'+(p.images.length>1?'s':'')+'</span>'
+      + '</div>'
+      + '<div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;">'
+      + imgCards
+      + '</div>'
+      + '</div>';
+  }).join('');
 }
 
 function renderLocalImages(folder) {
