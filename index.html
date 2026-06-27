@@ -5217,7 +5217,11 @@ function saveSettings() {
   saveRemoteConfig({
     whatsapp:  storeSettings.whatsapp,
     storeName: storeSettings.storeName,
-    ghToken:   storeSettings.ghToken
+    ghToken:   storeSettings.ghToken,
+    maintenanceMode: !!storeSettings.maintenanceMode,
+    maintenanceType: storeSettings.maintenanceType || 'coming-soon',
+    maintenanceTitle: storeSettings.maintenanceTitle || '',
+    maintenanceMsg: storeSettings.maintenanceMsg || '',
   }).then(() => toast('Settings synced ✓'));
 }
 
