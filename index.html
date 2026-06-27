@@ -5390,7 +5390,12 @@ function applyMaintenanceBanner() {
   const storeEl = document.getElementById('storeSection');
   if (!storeSettings.maintenanceMode) {
     banner.style.display = 'none';
-    if (storeEl) { storeEl.style.filter = ''; storeEl.style.pointerEvents = ''; }
+    if (storeEl) {
+      storeEl.querySelectorAll('section, .ck-hero, footer, .ck-occasions-strip, #section-giftbox, #section-corporate, #section-about, #section-contact').forEach(el => {
+        el.style.filter = '';
+        el.style.pointerEvents = '';
+      });
+    }
     return;
   }
   const type = storeSettings.maintenanceType || 'coming-soon';
@@ -5402,8 +5407,13 @@ function applyMaintenanceBanner() {
   if (title) title.textContent = type === 'custom' ? (storeSettings.maintenanceTitle || 'Notice') : preset.title;
   if (msg) msg.textContent = type === 'custom' ? (storeSettings.maintenanceMsg || '') : preset.msg;
   banner.style.display = '';
-  // Blur everything behind the banner
-  if (storeEl) { storeEl.style.filter = 'blur(8px)'; storeEl.style.pointerEvents = 'none'; }
+  // Blur content but keep navbar accessible for admin login
+  if (storeEl) {
+    storeEl.querySelectorAll('section, .ck-hero, footer, .ck-occasions-strip, #section-giftbox, #section-corporate, #section-about, #section-contact').forEach(el => {
+      el.style.filter = 'blur(8px)';
+      el.style.pointerEvents = 'none';
+    });
+  }
 }
 
 function populateMaintenanceInputs() {
