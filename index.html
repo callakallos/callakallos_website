@@ -3527,6 +3527,8 @@ function showAdminLogin() {
   document.getElementById('storeSection').style.display = 'none';
   document.getElementById('adminSection').classList.remove('active');
   document.getElementById('loginSection').style.display = 'block';
+  const mb = document.getElementById('maintenanceBanner');
+  if (mb) mb.style.display = 'none';
   setTimeout(() => document.getElementById('loginPass').focus(), 100);
 }
 function showStore() {
