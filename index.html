@@ -6470,9 +6470,20 @@ renderProducts();
   _fbStartRtListener();
 })();
 
-// Customer image slideshow
+// Customer image slideshow — refresh from GitHub with cache buster
 (function() {
   const imgs = document.querySelectorAll('.ck-cust-img');
+  const t = Date.now();
+  imgs.forEach((img, i) => {
+    // Check localStorage first for GitHub URLs
+    const saved = localStorage.getItem(LS_HERO_KEY + i);
+    if (saved && saved.startsWith('http')) {
+      img.src = saved + (saved.includes('?') ? '&' : '?') + 'v=' + t;
+    } else {
+      // Use raw GitHub URL with cache buster
+      img.src = `https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/images/hero/C${i+1}.jpg?v=${t}`;
+    }
+  });
   let current = 0;
   imgs[current].classList.add('active');
   setInterval(function() {
