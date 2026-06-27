@@ -3444,24 +3444,36 @@ function toast(msg, type='success') {
   el.textContent = (type==='success' ? '✓ ' : '⚠ ') + msg;
   el.className = `ck-toast show ${type==='success'?'ck-toast-success':'ck-toast-error'}`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 5000);
 }
+
+let _audioCtx = null;
+function _getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+// Unlock audio on first user interaction
+document.addEventListener('click', function _unlock() {
+  _getAudioCtx();
+  document.removeEventListener('click', _unlock);
+}, { once: true });
 
 function playNotificationSound() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _getAudioCtx();
     const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 — pleasant chime
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
       osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.12);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.4);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.5);
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(ctx.currentTime + i * 0.12);
-      osc.stop(ctx.currentTime + i * 0.12 + 0.4);
+      osc.start(ctx.currentTime + i * 0.15);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.5);
     });
   } catch(e) {}
 }
@@ -3607,10 +3619,11 @@ function dashboardHTML() {
   const weekAgo      = localDate(new Date(now - 6*864e5));
   const monthStart   = localDate(new Date(now.getFullYear(), now.getMonth(), 1));
 
-  const totalRev   = orders.reduce((s,o)=>s+(o.amount||0), 0);
-  const todayRev   = orders.filter(o=>o.date===todayStr).reduce((s,o)=>s+(o.amount||0),0);
-  const weeklyRev  = orders.filter(o=>o.date>=weekAgo).reduce((s,o)=>s+(o.amount||0),0);
-  const monthlyRev = orders.filter(o=>o.date>=monthStart).reduce((s,o)=>s+(o.amount||0),0);
+  const delivered = orders.filter(o => o.status === 'Delivered');
+  const totalRev   = delivered.reduce((s,o)=>s+(o.amount||0), 0);
+  const todayRev   = delivered.filter(o=>o.date===todayStr).reduce((s,o)=>s+(o.amount||0),0);
+  const weeklyRev  = delivered.filter(o=>o.date>=weekAgo).reduce((s,o)=>s+(o.amount||0),0);
+  const monthlyRev = delivered.filter(o=>o.date>=monthStart).reduce((s,o)=>s+(o.amount||0),0);
 
   const todayOrders     = orders.filter(o=>o.date===todayStr).length;
   const yesterdayOrders = orders.filter(o=>o.date===yesterdayStr).length;
@@ -3655,7 +3668,7 @@ function dashboardHTML() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now - i * 864e5);
     const ds = localDate(d);
-    const dayRev = orders.filter(o => o.date === ds).reduce((s,o) => s+(o.amount||0), 0);
+    const dayRev = orders.filter(o => o.date === ds && o.status === 'Delivered').reduce((s,o) => s+(o.amount||0), 0);
     const dayCount = orders.filter(o => o.date === ds).length;
     last7.push({ label: d.toLocaleDateString('en',{weekday:'short'}), date: ds, rev: dayRev, count: dayCount });
   }
@@ -3861,7 +3874,7 @@ function renderOrderCalendar() {
     const od = new Date(o.date);
     if (od.getFullYear() === _calYear && od.getMonth() === _calMonth) {
       monthOrderCount++;
-      monthRevenue += (o.amount || 0);
+      if (o.status === 'Delivered') monthRevenue += (o.amount || 0);
     }
   });
 
