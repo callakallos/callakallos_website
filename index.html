@@ -2714,7 +2714,7 @@ function badgeHTML(badges) {
 function renderProducts() {
   const grid = document.getElementById('productsGrid');
   if (!grid) return;
-  grid.innerHTML = products.map(p => {
+  grid.innerHTML = products.filter(p => !p.hidden).map(p => {
     const imgs = (p.images && p.images.length) ? p.images : (p.imgData ? [p.imgData] : []);
     const hasMulti = imgs.length > 1;
     const imgTags = imgs.length
@@ -3978,7 +3978,7 @@ function productsHTML() {
       </div>
       <div class="ck-table-scroll">
         <table class="ck-product-table" id="productTable">
-          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Badges</th><th>Stock</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Badges</th><th>Stock</th><th style="text-align:center;">Visibility</th><th>Actions</th></tr></thead>
           <tbody>${productRows()}</tbody>
         </table>
       </div>
@@ -4002,6 +4002,9 @@ function productRows() {
       <td>AED ${p.price}${p.oldPrice?`<br><span style="font-size:11px;text-decoration:line-through;color:rgba(212,184,150,0.3);">AED ${p.oldPrice}</span>`:''}</td>
       <td>${(p.badges||[]).length ? (p.badges||[]).map(b=>`<span class="ck-badge ${b==='new'?'ck-badge-new':b==='sale'?'ck-badge-sale':'ck-badge-popular'}">${b}</span>`).join(' ') : '<span style="color:rgba(212,184,150,0.25);font-size:11px;">none</span>'}</td>
       <td><span class="ck-stock-dot ck-stock-${p.stock}"></span>${p.stock==='in'?'In Stock':p.stock==='low'?'Low Stock':'Out of Stock'}</td>
+      <td style="text-align:center;">
+        <button onclick="toggleProductVisibility(${i})" style="padding:4px 10px;font-size:11px;border-radius:4px;cursor:pointer;border:1px solid ${p.hidden?'rgba(192,64,64,0.3)':'rgba(74,124,89,0.3)'};background:${p.hidden?'rgba(192,64,64,0.1)':'rgba(74,124,89,0.1)'};color:${p.hidden?'#C04040':'#4A7C59'};">${p.hidden?'👁‍🗨 Hidden':'👁 Visible'}</button>
+      </td>
       <td>
         <div class="ck-table-actions">
           <button class="ck-admin-btn-ghost" onclick="openEditModal(${i})" style="padding:5px 10px;font-size:11px;">Edit</button>
@@ -4010,6 +4013,15 @@ function productRows() {
       </td>
     </tr>
   `).join('');
+}
+
+function toggleProductVisibility(i) {
+  products[i].hidden = !products[i].hidden;
+  persistMeta();
+  adminTab('products');
+  renderProducts();
+  logActivity(products[i].hidden ? 'product_edit' : 'product_edit', `${products[i].hidden ? 'Hidden' : 'Unhidden'} "${products[i].name}" on store`);
+  toast(products[i].hidden ? products[i].name + ' hidden from store' : products[i].name + ' visible on store');
 }
 
 function filterTable(q) {
