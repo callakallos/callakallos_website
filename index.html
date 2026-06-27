@@ -5334,7 +5334,7 @@ const maintPresets = {
   'custom': { badge: '📢 Notice', title: '', msg: '' },
 };
 
-function toggleMaintenanceMode(on) {
+function toggleMaintenanceMode(on, skipSave) {
   const btn = document.getElementById('maintToggleBtn');
   const settings = document.getElementById('maintSettings');
   if (btn) {
@@ -5345,6 +5345,16 @@ function toggleMaintenanceMode(on) {
   if (settings) settings.style.display = on ? '' : 'none';
   storeSettings.maintenanceMode = on;
   applyMaintenanceBanner();
+  if (!skipSave) {
+    saveRemoteConfig({
+      maintenanceMode: on,
+      maintenanceType: storeSettings.maintenanceType || 'coming-soon',
+      maintenanceTitle: storeSettings.maintenanceTitle || '',
+      maintenanceMsg: storeSettings.maintenanceMsg || '',
+    });
+    logActivity('settings_save', on ? 'Enabled maintenance mode' : 'Disabled maintenance mode');
+    toast(on ? 'Maintenance mode enabled ✓' : 'Site is live ✓');
+  }
 }
 
 function updateMaintPreview() {
@@ -5363,15 +5373,14 @@ function saveMaintenanceMode() {
     storeSettings.maintenanceMsg = document.getElementById('maintCustomMsg').value.trim();
   }
   applyMaintenanceBanner();
-  // Save to ck-config (readable by all visitors, no auth needed)
   saveRemoteConfig({
     maintenanceMode: !!storeSettings.maintenanceMode,
-    maintenanceType: storeSettings.maintenanceType,
+    maintenanceType: type,
     maintenanceTitle: storeSettings.maintenanceTitle || '',
     maintenanceMsg: storeSettings.maintenanceMsg || '',
   });
-  logActivity('settings_save', storeSettings.maintenanceMode ? 'Enabled maintenance mode: ' + type : 'Disabled maintenance mode');
-  toast(storeSettings.maintenanceMode ? 'Maintenance mode enabled ✓' : 'Maintenance mode disabled — site is live ✓');
+  logActivity('settings_save', 'Updated maintenance message: ' + type);
+  toast('Maintenance message updated ✓');
 }
 
 function applyMaintenanceBanner() {
@@ -5396,7 +5405,7 @@ function populateMaintenanceInputs() {
   const btn = document.getElementById('maintToggleBtn');
   if (!btn) return;
   const on = !!storeSettings.maintenanceMode;
-  toggleMaintenanceMode(on);
+  toggleMaintenanceMode(on, true);
   const typeEl = document.getElementById('maintModeType');
   if (typeEl) typeEl.value = storeSettings.maintenanceType || 'coming-soon';
   const customTitle = document.getElementById('maintCustomTitle');
