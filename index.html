@@ -5362,6 +5362,7 @@ function toggleMaintenanceMode(on, skipSave) {
   storeSettings.maintenanceMode = on;
   applyMaintenanceBanner();
   if (!skipSave) {
+    persistMeta();
     _fbDb.ref('ck-config/maintenanceMode').set(on).then(() => {
       toast(on ? 'Maintenance mode enabled ✓' : 'Site is live ✓');
     }).catch(e => toast('Error: ' + e.message, 'error'));
