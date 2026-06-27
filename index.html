@@ -2853,7 +2853,7 @@ function submitCheckout() {
 
   const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
   const items = cart.map(c => {
-    let line = `${c.name} x${c.qty} (AED ${c.price * c.qty})`;
+    let line = `${c.code ? '['+c.code+'] ' : ''}${c.name} x${c.qty} (AED ${c.price * c.qty})`;
     if (c.desc) line += `\n   ↳ ${c.desc}`;
     return line;
   }).join(', ');
@@ -2891,7 +2891,7 @@ function submitCheckout() {
     customer: name,
     email,
     phone,
-    product: cart.map(c => c.name).join(', '),
+    product: cart.map(c => (c.code ? '['+c.code+'] ' : '') + c.name).join(', '),
     productDetails: cart.filter(c => c.desc).map(c => `${c.name}: ${c.desc}`).join(' | '),
     amount: total,
     location: address,
