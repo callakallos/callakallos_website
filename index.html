@@ -4723,15 +4723,15 @@ function settingsHTML() {
           <input type="hidden" id="maintToggle">
         </div>
         <div id="maintSettings" style="display:none;">
-          <select class="ck-input" id="maintModeType" onchange="updateMaintPreview()" style="margin-bottom:10px;">
+          <select class="ck-input" id="maintModeType" onchange="updateMaintPreview();saveMaintenanceMode()" style="margin-bottom:10px;">
             <option value="coming-soon">✨ Coming Soon</option>
             <option value="maintenance">🔧 Under Maintenance</option>
             <option value="holiday">🌴 Holiday Break</option>
             <option value="custom">✏️ Custom Message</option>
           </select>
-          <input class="ck-input" id="maintCustomTitle" placeholder="Custom title…" style="margin-bottom:8px;display:none;" oninput="updateMaintPreview()">
-          <textarea class="ck-textarea" id="maintCustomMsg" placeholder="Custom message…" style="min-height:60px;display:none;" oninput="updateMaintPreview()"></textarea>
-          <button class="ck-admin-btn" onclick="saveMaintenanceMode()" style="margin-top:10px;">Save Maintenance Settings</button>
+          <input class="ck-input" id="maintCustomTitle" placeholder="Custom title…" style="margin-bottom:8px;display:none;">
+          <textarea class="ck-textarea" id="maintCustomMsg" placeholder="Custom message…" style="min-height:60px;display:none;"></textarea>
+          <button class="ck-admin-btn" onclick="saveMaintenanceMode()" style="margin-top:10px;display:none;" id="maintSaveCustomBtn">Save Custom Message</button>
         </div>
       </div>
     </div>
@@ -5365,8 +5365,10 @@ function updateMaintPreview() {
   const type = document.getElementById('maintModeType').value;
   const customTitle = document.getElementById('maintCustomTitle');
   const customMsg = document.getElementById('maintCustomMsg');
+  const saveBtn = document.getElementById('maintSaveCustomBtn');
   customTitle.style.display = type === 'custom' ? '' : 'none';
   customMsg.style.display = type === 'custom' ? '' : 'none';
+  if (saveBtn) saveBtn.style.display = type === 'custom' ? '' : 'none';
 }
 
 function saveMaintenanceMode() {
