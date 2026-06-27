@@ -5335,6 +5335,10 @@ const maintPresets = {
 };
 
 function toggleMaintenanceMode(on, skipSave) {
+  if (!skipSave) {
+    const msg = on ? 'Enable maintenance mode? Visitors will see the banner.' : 'Disable maintenance mode? Site will go live.';
+    if (!confirm(msg)) return;
+  }
   const btn = document.getElementById('maintToggleBtn');
   const settings = document.getElementById('maintSettings');
   if (btn) {
