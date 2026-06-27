@@ -3542,6 +3542,7 @@ function showStore() {
   document.getElementById('storeSection').style.display = 'block';
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').classList.remove('active');
+  applyMaintenanceBanner();
   logActivity('logout', 'Logged out');
   _fbAuth.signOut().catch(() => {});
 }
