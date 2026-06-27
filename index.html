@@ -1531,24 +1531,27 @@ body {
 /* Toast */
 .ck-toast {
   position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-100%);
   background: var(--ck-plum-dark);
   color: var(--ck-cream);
-  border: 1px solid rgba(212,184,150,0.2);
-  padding: 11px 22px;
-  border-radius: 4px;
+  border-bottom: 2px solid rgba(74,124,89,0.5);
+  padding: 14px 24px;
   font-size: 13px;
   z-index: 1000;
-  transition: transform 0.3s ease;
-  white-space: nowrap;
+  transition: transform 0.35s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
-.ck-toast.show { transform: translateX(-50%) translateY(0); }
-.ck-toast-success { border-color: rgba(74,124,89,0.4); }
+.ck-toast.show { transform: translateY(0); }
+.ck-toast-success { border-bottom-color: rgba(74,124,89,0.6); }
+.ck-toast-error { border-bottom-color: rgba(192,64,64,0.6); }
 
 /* =============================================
    CART DRAWER
@@ -3439,9 +3442,28 @@ let toastTimer;
 function toast(msg, type='success') {
   const el = document.getElementById('toast');
   el.textContent = (type==='success' ? '✓ ' : '⚠ ') + msg;
-  el.className = `ck-toast show ${type==='success'?'ck-toast-success':''}`;
+  el.className = `ck-toast show ${type==='success'?'ck-toast-success':'ck-toast-error'}`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+function playNotificationSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 — pleasant chime
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.4);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.12);
+      osc.stop(ctx.currentTime + i * 0.12 + 0.4);
+    });
+  } catch(e) {}
 }
 
 // ============================================================
@@ -6373,6 +6395,7 @@ function _startOrderQueueListener() {
       persistMeta();
       updateEnquiriesBadge(); updateOrdersBadge();
       toast('📦 New order #' + order.id + ' from ' + order.customer);
+      playNotificationSound();
     }
     // Remove from queue
     snapshot.ref.remove().catch(() => {});
@@ -6384,6 +6407,8 @@ function _startOrderQueueListener() {
       enquiries.unshift(enq);
       persistMeta();
       updateEnquiriesBadge(); updateOrdersBadge();
+      toast('💬 New enquiry from ' + (enq.name || 'customer'));
+      playNotificationSound();
     }
     snapshot.ref.remove().catch(() => {});
   });
