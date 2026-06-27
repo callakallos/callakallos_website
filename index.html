@@ -3967,9 +3967,13 @@ function renderOrderCalendar() {
 
 function productsHTML() {
   return `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
       <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">Products</h2>
-      <button class="ck-admin-btn" onclick="openAddModal()">+ Add New Product</button>
+      <div style="display:flex;gap:8px;">
+        ${products.some(p=>!p.hidden) ? `<button class="ck-admin-btn-ghost" onclick="toggleAllProducts(true)" style="padding:6px 14px;font-size:11px;">🚫 Hide All</button>` : ''}
+        ${products.some(p=>p.hidden) ? `<button class="ck-admin-btn-ghost" onclick="toggleAllProducts(false)" style="padding:6px 14px;font-size:11px;">👁 Show All</button>` : ''}
+        <button class="ck-admin-btn" onclick="openAddModal()">+ Add New Product</button>
+      </div>
     </div>
     <div class="ck-admin-panel-block">
       <div class="ck-panel-header">
@@ -4013,6 +4017,15 @@ function productRows() {
       </td>
     </tr>
   `).join('');
+}
+
+function toggleAllProducts(hide) {
+  products.forEach(p => p.hidden = hide);
+  persistMeta();
+  adminTab('products');
+  renderProducts();
+  logActivity('product_edit', hide ? 'Hidden all products from store' : 'Made all products visible on store');
+  toast(hide ? 'All products hidden from store' : 'All products visible on store');
 }
 
 function toggleProductVisibility(i) {
