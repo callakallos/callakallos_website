@@ -5347,10 +5347,6 @@ const maintPresets = {
 };
 
 function toggleMaintenanceMode(on, skipSave) {
-  if (!skipSave) {
-    const msg = on ? 'Enable maintenance mode? Visitors will see the banner.' : 'Disable maintenance mode? Site will go live.';
-    if (!confirm(msg)) return;
-  }
   const btn = document.getElementById('maintToggleBtn');
   const settings = document.getElementById('maintSettings');
   if (btn) {
@@ -5362,14 +5358,10 @@ function toggleMaintenanceMode(on, skipSave) {
   storeSettings.maintenanceMode = on;
   applyMaintenanceBanner();
   if (!skipSave) {
-    saveRemoteConfig({
-      maintenanceMode: on,
-      maintenanceType: storeSettings.maintenanceType || 'coming-soon',
-      maintenanceTitle: storeSettings.maintenanceTitle || '',
-      maintenanceMsg: storeSettings.maintenanceMsg || '',
-    });
+    _fbDb.ref('ck-config/maintenanceMode').set(on).then(() => {
+      toast(on ? 'Maintenance mode enabled ✓' : 'Site is live ✓');
+    }).catch(e => toast('Error: ' + e.message, 'error'));
     logActivity('settings_save', on ? 'Enabled maintenance mode' : 'Disabled maintenance mode');
-    toast(on ? 'Maintenance mode enabled ✓' : 'Site is live ✓');
   }
 }
 
