@@ -4719,11 +4719,8 @@ function settingsHTML() {
             <div style="font-size:14px;font-weight:500;">Show maintenance banner on main page</div>
             <div style="font-size:12px;color:rgba(212,184,150,0.5);margin-top:4px;">When enabled, visitors see a "Coming Soon" or custom message. All features still work behind the scenes.</div>
           </div>
-          <label style="position:relative;display:inline-block;width:52px;height:28px;cursor:pointer;">
-            <input type="checkbox" id="maintToggle" onchange="toggleMaintenanceMode(this.checked)" style="opacity:0;width:0;height:0;">
-            <span style="position:absolute;inset:0;background:rgba(200,184,138,0.15);border-radius:14px;transition:0.3s;"></span>
-            <span style="position:absolute;top:3px;left:3px;width:22px;height:22px;background:#888;border-radius:50%;transition:0.3s;" id="maintToggleKnob"></span>
-          </label>
+          <button id="maintToggleBtn" onclick="toggleMaintenanceMode(!storeSettings.maintenanceMode)" style="padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;border:none;transition:all 0.2s;"></button>
+          <input type="hidden" id="maintToggle">
         </div>
         <div id="maintSettings" style="display:none;">
           <select class="ck-input" id="maintModeType" onchange="updateMaintPreview()" style="margin-bottom:10px;">
@@ -5338,12 +5335,12 @@ const maintPresets = {
 };
 
 function toggleMaintenanceMode(on) {
-  const knob = document.getElementById('maintToggleKnob');
+  const btn = document.getElementById('maintToggleBtn');
   const settings = document.getElementById('maintSettings');
-  if (knob) {
-    knob.style.left = on ? '27px' : '3px';
-    knob.style.background = on ? '#C04040' : '#888';
-    knob.parentElement.querySelector('span').style.background = on ? 'rgba(192,64,64,0.2)' : 'rgba(200,184,138,0.15)';
+  if (btn) {
+    btn.textContent = on ? '🔴 ON — Click to Disable' : '🟢 OFF — Click to Enable';
+    btn.style.background = on ? 'rgba(192,64,64,0.15)' : 'rgba(74,124,89,0.15)';
+    btn.style.color = on ? '#C04040' : '#4A7C59';
   }
   if (settings) settings.style.display = on ? '' : 'none';
   storeSettings.maintenanceMode = on;
@@ -5360,14 +5357,19 @@ function updateMaintPreview() {
 
 function saveMaintenanceMode() {
   const type = document.getElementById('maintModeType').value;
-  storeSettings.maintenanceMode = document.getElementById('maintToggle').checked;
   storeSettings.maintenanceType = type;
   if (type === 'custom') {
     storeSettings.maintenanceTitle = document.getElementById('maintCustomTitle').value.trim();
     storeSettings.maintenanceMsg = document.getElementById('maintCustomMsg').value.trim();
   }
-  persistMeta();
   applyMaintenanceBanner();
+  // Save to ck-config (readable by all visitors, no auth needed)
+  saveRemoteConfig({
+    maintenanceMode: !!storeSettings.maintenanceMode,
+    maintenanceType: storeSettings.maintenanceType,
+    maintenanceTitle: storeSettings.maintenanceTitle || '',
+    maintenanceMsg: storeSettings.maintenanceMsg || '',
+  });
   logActivity('settings_save', storeSettings.maintenanceMode ? 'Enabled maintenance mode: ' + type : 'Disabled maintenance mode');
   toast(storeSettings.maintenanceMode ? 'Maintenance mode enabled ✓' : 'Maintenance mode disabled — site is live ✓');
 }
@@ -5391,10 +5393,9 @@ function applyMaintenanceBanner() {
 }
 
 function populateMaintenanceInputs() {
-  const toggle = document.getElementById('maintToggle');
-  if (!toggle) return;
+  const btn = document.getElementById('maintToggleBtn');
+  if (!btn) return;
   const on = !!storeSettings.maintenanceMode;
-  toggle.checked = on;
   toggleMaintenanceMode(on);
   const typeEl = document.getElementById('maintModeType');
   if (typeEl) typeEl.value = storeSettings.maintenanceType || 'coming-soon';
@@ -5846,9 +5847,14 @@ async function loadRemoteConfig() {
     const snap = await _fbDb.ref('ck-config').once('value');
     const cfg = snap.val();
     if (!cfg) return;
-    if (cfg.whatsapp)  { storeSettings.whatsapp  = cfg.whatsapp;  applyStoreSettings(); }
+    if (cfg.whatsapp)  { storeSettings.whatsapp  = cfg.whatsapp; }
     if (cfg.storeName) { storeSettings.storeName = cfg.storeName; }
     if (cfg.ghToken)   { storeSettings.ghToken = cfg.ghToken; localStorage.setItem('ck_gh_token', cfg.ghToken); }
+    if (cfg.maintenanceMode !== undefined) storeSettings.maintenanceMode = cfg.maintenanceMode;
+    if (cfg.maintenanceType) storeSettings.maintenanceType = cfg.maintenanceType;
+    if (cfg.maintenanceTitle) storeSettings.maintenanceTitle = cfg.maintenanceTitle;
+    if (cfg.maintenanceMsg) storeSettings.maintenanceMsg = cfg.maintenanceMsg;
+    applyStoreSettings();
   } catch(e) { /* offline — use localStorage fallback */ }
 }
 
