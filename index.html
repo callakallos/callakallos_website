@@ -3620,10 +3620,11 @@ function dashboardHTML() {
   const monthStart   = localDate(new Date(now.getFullYear(), now.getMonth(), 1));
 
   const delivered = orders.filter(o => o.status === 'Delivered');
+  const revDate = o => o.deliveredDate || o.date;
   const totalRev   = delivered.reduce((s,o)=>s+(o.amount||0), 0);
-  const todayRev   = delivered.filter(o=>o.date===todayStr).reduce((s,o)=>s+(o.amount||0),0);
-  const weeklyRev  = delivered.filter(o=>o.date>=weekAgo).reduce((s,o)=>s+(o.amount||0),0);
-  const monthlyRev = delivered.filter(o=>o.date>=monthStart).reduce((s,o)=>s+(o.amount||0),0);
+  const todayRev   = delivered.filter(o=>revDate(o)===todayStr).reduce((s,o)=>s+(o.amount||0),0);
+  const weeklyRev  = delivered.filter(o=>revDate(o)>=weekAgo).reduce((s,o)=>s+(o.amount||0),0);
+  const monthlyRev = delivered.filter(o=>revDate(o)>=monthStart).reduce((s,o)=>s+(o.amount||0),0);
 
   const todayOrders     = orders.filter(o=>o.date===todayStr).length;
   const yesterdayOrders = orders.filter(o=>o.date===yesterdayStr).length;
@@ -3668,7 +3669,7 @@ function dashboardHTML() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now - i * 864e5);
     const ds = localDate(d);
-    const dayRev = orders.filter(o => o.date === ds && o.status === 'Delivered').reduce((s,o) => s+(o.amount||0), 0);
+    const dayRev = orders.filter(o => o.status === 'Delivered' && (o.deliveredDate || o.date) === ds).reduce((s,o) => s+(o.amount||0), 0);
     const dayCount = orders.filter(o => o.date === ds).length;
     last7.push({ label: d.toLocaleDateString('en',{weekday:'short'}), date: ds, rev: dayRev, count: dayCount });
   }
@@ -3874,7 +3875,9 @@ function renderOrderCalendar() {
     const od = new Date(o.date);
     if (od.getFullYear() === _calYear && od.getMonth() === _calMonth) {
       monthOrderCount++;
-      if (o.status === 'Delivered') monthRevenue += (o.amount || 0);
+      const rd = o.deliveredDate || o.date;
+      const rdd = new Date(rd);
+      if (o.status === 'Delivered' && rdd.getFullYear() === _calYear && rdd.getMonth() === _calMonth) monthRevenue += (o.amount || 0);
     }
   });
 
@@ -4468,7 +4471,11 @@ function saveOrderStatus(id) {
   const sel = document.getElementById('status_'+id);
   if (!sel) return;
   const o = orders.find(x => x.id===id);
-  if (o) { o.status = sel.value; persistMeta(); logActivity('order_status', `Order #${id} → ${sel.value}`); toast('Order #'+id+' status updated ✓'); }
+  if (o) {
+    o.status = sel.value;
+    if (sel.value === 'Delivered') o.deliveredDate = localDate();
+    persistMeta(); logActivity('order_status', `Order #${id} → ${sel.value}`); toast('Order #'+id+' status updated ✓');
+  }
 }
 
 function acceptOrder(id) {
