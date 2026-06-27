@@ -5386,8 +5386,11 @@ function saveMaintenanceMode() {
 function applyMaintenanceBanner() {
   const banner = document.getElementById('maintenanceBanner');
   if (!banner) return;
+  // Get all content sections after the banner
+  const storeEl = document.getElementById('storeSection');
   if (!storeSettings.maintenanceMode) {
     banner.style.display = 'none';
+    if (storeEl) { storeEl.style.filter = ''; storeEl.style.pointerEvents = ''; }
     return;
   }
   const type = storeSettings.maintenanceType || 'coming-soon';
@@ -5399,6 +5402,8 @@ function applyMaintenanceBanner() {
   if (title) title.textContent = type === 'custom' ? (storeSettings.maintenanceTitle || 'Notice') : preset.title;
   if (msg) msg.textContent = type === 'custom' ? (storeSettings.maintenanceMsg || '') : preset.msg;
   banner.style.display = '';
+  // Blur everything behind the banner
+  if (storeEl) { storeEl.style.filter = 'blur(8px)'; storeEl.style.pointerEvents = 'none'; }
 }
 
 function populateMaintenanceInputs() {
