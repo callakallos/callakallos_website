@@ -1833,12 +1833,12 @@ body {
       🌸 <strong>Free delivery</strong> within Dubai on orders over AED 300 &nbsp;|&nbsp; Same-day delivery available until 4pm
     </div>
     <div style="display:flex;gap:8px;align-items:center;">
-      <button class="lang-btn" onclick="showAdminLogin()" style="font-size:10px;">⚙ Admin</button>
+      <!-- Admin access: triple-click the logo -->
     </div>
   </div>
 
   <nav class="ck-nav">
-    <a href="#" class="ck-logo">
+    <a href="#" class="ck-logo" id="storeLogo">
       <img src="images/logo/logo-2-transparent.png" alt="Calla Kallos" class="ck-logo-img">
     </a>
     <ul class="ck-nav-menu">
@@ -3464,6 +3464,25 @@ function applyRoleUI() {
     }
   });
 }
+
+// Secret admin access: triple-click the logo
+(function() {
+  let clickCount = 0;
+  let clickTimer = null;
+  const logo = document.getElementById('storeLogo');
+  if (logo) {
+    logo.addEventListener('click', function(e) {
+      e.preventDefault();
+      clickCount++;
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+      if (clickCount >= 3) {
+        clickCount = 0;
+        showAdminLogin();
+      }
+    });
+  }
+})();
 
 function showAdminLogin() {
   currentRole = 'admin';
