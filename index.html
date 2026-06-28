@@ -2338,7 +2338,7 @@ body {
 <div id="adminSection">
   <div class="ck-admin-wrapper">
     <div class="ck-admin-nav">
-      <div class="ck-admin-brand">Calla Kallos <span>Admin</span></div>
+      <div class="ck-admin-brand">Calla Kallos <span id="adminRoleLabel">Admin</span> <span style="font-size:9px;opacity:0.4;margin-left:4px;" id="adminVersionLabel"></span></div>
       <div class="ck-admin-user">
         <span id="adminUserName">Rinu Kurian</span> &nbsp;|&nbsp;
         <button onclick="showStore()" style="background:none;border:1px solid rgba(212,184,150,0.2);color:rgba(212,184,150,0.5);font-size:11px;padding:4px 10px;border-radius:2px;cursor:pointer;">View Store</button>
@@ -2711,7 +2711,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '0.3';
+const CK_VERSION = '0.4';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -3548,6 +3548,10 @@ window.currentRole = 'admin'; // 'admin' or 'florist' — on window so Firebase 
 function applyRoleUI() {
   const isFlorist = currentRole === 'florist';
   document.getElementById('adminUserName').textContent = isFlorist ? 'Florist' : 'Rinu Kurian';
+  const roleLabel = document.getElementById('adminRoleLabel');
+  if (roleLabel) roleLabel.textContent = isFlorist ? 'Florist' : 'Admin';
+  const verLabel = document.getElementById('adminVersionLabel');
+  if (verLabel) verLabel.textContent = 'v' + CK_VERSION;
   const sidebarItems = document.querySelectorAll('.ck-sidebar-item');
   const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','admin-themes','logs','settings'];
   const floristHidden = ['dashboard', 'settings', 'logs', 'admin-themes'];

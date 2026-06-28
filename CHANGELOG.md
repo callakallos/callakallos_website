@@ -3,6 +3,13 @@
 
 ---
 
+## v0.4 — 2026-06-28
+### Fixed
+- Top banner now shows "Florist" instead of "Admin" when logged in as florist
+- Version code (v0.4) displayed on top banner for both admin and florist
+
+---
+
 ## v0.3 — 2026-06-28
 ### Added
 - Activity Log now captures device info (iPhone/Android/Mac/Windows + browser)
