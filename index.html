@@ -3449,7 +3449,7 @@ function toast(msg, type='success') {
   el.textContent = (type==='success' ? '✓ ' : '⚠ ') + msg;
   el.className = `ck-toast show ${type==='success'?'ck-toast-success':'ck-toast-error'}`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1500);
 }
 
 let _audioCtx = null;
