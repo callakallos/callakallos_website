@@ -2630,7 +2630,7 @@ body {
       <div class="ck-form-row">
         <div class="ck-form-group">
           <label class="ck-form-label">Product Name (English) <span>*</span></label>
-          <input class="ck-input" id="fldName" placeholder="Rose Velvet Luxe">
+          <input class="ck-input" id="fldName" placeholder="Rose Velvet Luxe" onblur="autoTranslate('fldName','fldNameAr')">
         </div>
         <div class="ck-form-group">
           <label class="ck-form-label">اسم المنتج (عربي) <button type="button" onclick="autoTranslate('fldName','fldNameAr')" style="background:none;border:1px solid rgba(200,184,138,0.3);color:var(--ck-champagne);font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;margin-left:6px;">🔄 Auto Translate</button></label>
@@ -2640,7 +2640,7 @@ body {
       <div class="ck-form-row full">
         <div class="ck-form-group">
           <label class="ck-form-label">Description (English)</label>
-          <textarea class="ck-textarea" id="fldDesc" placeholder="A luxurious hand-tied bouquet…"></textarea>
+          <textarea class="ck-textarea" id="fldDesc" placeholder="A luxurious hand-tied bouquet…" onblur="autoTranslate('fldDesc','fldDescAr')"></textarea>
         </div>
       </div>
       <div class="ck-form-row full">
@@ -5176,8 +5176,9 @@ let selectedBadges = [];
 
 async function autoTranslate(fromId, toId) {
   const text = document.getElementById(fromId).value.trim();
-  if (!text) { toast('Enter English text first', 'error'); return; }
+  if (!text) return;
   const target = document.getElementById(toId);
+  if (target.value.trim()) return;
   target.value = 'Translating…';
   try {
     const res = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=en|ar');
