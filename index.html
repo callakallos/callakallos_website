@@ -5679,13 +5679,8 @@ function applyData(d) {
   }
   const ords = toArray(d.orders);
   if (ords.length) orders = ords;
-  // Merge enquiries: union of local + remote by ID so async load never erases a just-submitted message
   const enqs = toArray(d.enquiries);
-  if (enqs.length) {
-    const localIds = new Set(enquiries.map(e => e.id));
-    const merged = [...enquiries, ...enqs.filter(e => !localIds.has(e.id))];
-    enquiries = merged.sort((a,b) => b.id - a.id);
-  }
+  if (enqs.length) enquiries = enqs.sort((a,b) => b.id - a.id);
   if (d.regularOffers) regularOffers = d.regularOffers;
   if (d.nextId && d.nextId > nextId)  nextId = d.nextId;
   if (d.storeSettings) Object.assign(storeSettings, d.storeSettings);
