@@ -2897,6 +2897,7 @@ function submitCheckout() {
     productDetails: cart.filter(c => c.desc).map(c => `${c.name}: ${c.desc}`).join(' | '),
     amount: total,
     location: address,
+    note: note || '',
     status: 'Pending',
     orderCount: orders.filter(o => o.email === email).length + 1
   };
@@ -4375,7 +4376,7 @@ function ordersHTML() {
           <thead>
             <tr>
               <th>#</th><th>Date & Time</th><th>Customer</th><th>Email</th><th>Phone</th>
-              <th>Product</th><th>Amount</th><th>Delivery Location</th><th>Status</th><th>Save</th>
+              <th>Product</th><th>Amount</th><th>Delivery Location</th><th>Note</th><th>Status</th><th>Save</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody"></tbody>
@@ -4450,6 +4451,7 @@ function renderOrdersTable() {
       <td style="font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(o.product||'').replace(/"/g,'&quot;')}${o.productDetails ? '\n\n' + o.productDetails.replace(/"/g,'&quot;') : ''}">${o.product}</td>
       <td style="white-space:nowrap;">AED ${o.amount}</td>
       <td style="font-size:12px;max-width:160px;">${o.location}</td>
+      <td style="font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${o.note?'color:#C08030;':'color:rgba(212,184,150,0.25);'}" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note || '—'}</td>
       <td>
         <div style="display:inline-flex;align-items:center;gap:6px;background:${sm.bg};border:1px solid ${sm.border};border-radius:4px;padding:3px 8px;margin-bottom:6px;white-space:nowrap;">
           <span style="color:${sm.color};font-size:12px;">${sm.icon} ${o.status}</span>
