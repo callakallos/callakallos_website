@@ -4502,7 +4502,7 @@ function acceptOrder(id) {
   logActivity('order_accept', `Accepted order #${id} from ${o.customer} — AED ${o.amount}`);
   toast('Order #' + id + ' accepted ✓');
   // Send WhatsApp confirmation to customer
-  const phone = (o.phone || '').replace(/[^0-9]/g, '');
+  const phone = normalizePhone(o.phone);
   if (phone) {
     let msg = `🌸 *Calla Kallos — Order Confirmed!*\n\n`;
     msg += `Hi ${o.customer},\n`;
@@ -4527,7 +4527,7 @@ function declineOrder(id) {
   logActivity('order_decline', `Declined order #${id} from ${o.customer} — ${reason}`);
   toast('Order #' + id + ' declined');
   // Open WhatsApp to customer with the decline message
-  const phone = (o.phone || '').replace(/[^0-9]/g, '');
+  const phone = normalizePhone(o.phone);
   if (phone) {
     let msg = `🌸 *Calla Kallos — Order Update*\n`;
     msg += `*Order #:* ${o.id}\n`;
@@ -5483,6 +5483,18 @@ function currentTheme() {
 }
 
 // Firebase RTDB returns objects with numeric keys instead of arrays — convert back
+function normalizePhone(raw) {
+  let num = (raw || '').replace(/[^0-9+]/g, '');
+  // Remove leading +
+  if (num.startsWith('+')) num = num.slice(1);
+  // 05xxxxxxxx → 971 5xxxxxxxx
+  if (num.startsWith('0') && num.length >= 9) num = '971' + num.slice(1);
+  // 5xxxxxxxx (no country code) → 971 5xxxxxxxx
+  if (num.startsWith('5') && num.length <= 10) num = '971' + num;
+  // Already 971... leave as is
+  return num;
+}
+
 function localDate(d) {
   const dt = d || new Date();
   return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
@@ -5955,7 +5967,7 @@ function markEnquiriesRead() {
 }
 
 function replyWhatsApp(phone, name, topic) {
-  const num = phone.replace(/[^0-9]/g, '');
+  const num = normalizePhone(phone);
   const msg = '🌸 *Calla Kallos*\n\nHi ' + name + ',\nThank you for your enquiry about "' + topic + '".\n\n';
   window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
 }
