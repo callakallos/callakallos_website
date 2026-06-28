@@ -3,6 +3,17 @@
 
 ---
 
+## v0.6 — 2026-06-28
+### Added
+- Qty column in orders table (auto-counts items per order)
+
+### Changed
+- Action buttons redesigned — stacked vertically with rounded corners, subtle backgrounds
+- Accept (green), Decline (red), Save (champagne), Delete (red) with icons
+- Print dropdown with rounded styling
+
+---
+
 ## v0.5 — 2026-06-28
 ### Changed
 - Orders table compacted — removed separate Email, Phone, Location columns
