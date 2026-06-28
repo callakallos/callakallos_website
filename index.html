@@ -2437,6 +2437,61 @@ body {
   </div>
 </div>
 
+<!-- Manual Order Modal -->
+<div class="ck-modal-overlay" id="manualOrderModal">
+  <div class="ck-modal" style="max-width:520px;">
+    <div class="ck-modal-head">
+      <span class="ck-modal-title">Add Manual Order</span>
+      <button class="ck-modal-close" onclick="closeManualOrderModal()">✕</button>
+    </div>
+    <div class="ck-modal-body">
+      <div class="ck-form-row">
+        <div class="ck-form-group"><label class="ck-form-label">Customer Name <span>*</span></label><input class="ck-input" id="moName" placeholder="Customer name"></div>
+        <div class="ck-form-group"><label class="ck-form-label">Phone <span>*</span></label><input class="ck-input" id="moPhone" placeholder="+971 50 000 0000"></div>
+      </div>
+      <div class="ck-form-row">
+        <div class="ck-form-group"><label class="ck-form-label">Email</label><input class="ck-input" id="moEmail" type="email" placeholder="email@example.com"></div>
+        <div class="ck-form-group"><label class="ck-form-label">Order Date</label><input class="ck-input" id="moDate" type="date"></div>
+      </div>
+      <div class="ck-form-row">
+        <div class="ck-form-group"><label class="ck-form-label">Product / Items <span>*</span></label><input class="ck-input" id="moProduct" placeholder="e.g. Rose Velvet Luxe, Peony Gift Box"></div>
+        <div class="ck-form-group"><label class="ck-form-label">Amount (AED) <span>*</span></label><input class="ck-input" id="moAmount" type="number" placeholder="350"></div>
+      </div>
+      <div class="ck-form-row full">
+        <div class="ck-form-group"><label class="ck-form-label">Delivery Address</label><input class="ck-input" id="moAddress" placeholder="Delivery location"></div>
+      </div>
+      <div class="ck-form-row">
+        <div class="ck-form-group">
+          <label class="ck-form-label">Status</label>
+          <select class="ck-select" id="moStatus">
+            <option>Pending</option>
+            <option>Preparing</option>
+            <option>In Transit</option>
+            <option selected>Delivered</option>
+            <option>Cancelled</option>
+          </select>
+        </div>
+        <div class="ck-form-group">
+          <label class="ck-form-label">Payment Method</label>
+          <select class="ck-select" id="moPayment">
+            <option>Cash</option>
+            <option>Card</option>
+            <option>Bank Transfer</option>
+            <option>WhatsApp</option>
+          </select>
+        </div>
+      </div>
+      <div class="ck-form-row full">
+        <div class="ck-form-group"><label class="ck-form-label">Note</label><textarea class="ck-textarea" id="moNote" placeholder="Special instructions, card message…" style="min-height:50px;"></textarea></div>
+      </div>
+    </div>
+    <div class="ck-modal-footer">
+      <button class="ck-admin-btn-ghost" onclick="closeManualOrderModal()">Cancel</button>
+      <button class="ck-admin-btn" onclick="saveManualOrder()">Save Order</button>
+    </div>
+  </div>
+</div>
+
 <!-- Cart Drawer -->
 <div class="ck-drawer-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="ck-cart-drawer" id="cartDrawer">
@@ -4341,7 +4396,10 @@ function ordersHTML() {
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
       <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">Orders</h2>
-      <button class="ck-admin-btn" onclick="exportOrdersCSV()">⬇ Export to Excel</button>
+      <div style="display:flex;gap:8px;">
+        <button class="ck-admin-btn" onclick="openManualOrderModal()">+ Add Manual Order</button>
+        <button class="ck-admin-btn-ghost" onclick="exportOrdersCSV()" style="padding:6px 14px;font-size:11px;">⬇ Export to Excel</button>
+      </div>
     </div>
     <div class="ck-admin-panel-block" style="margin-bottom:16px;">
       <div style="padding:14px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -4674,6 +4732,64 @@ ${isDelivery ? `
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
+}
+
+function openManualOrderModal() {
+  ['moName','moPhone','moEmail','moProduct','moAmount','moAddress','moNote'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('moDate').value = localDate();
+  document.getElementById('moStatus').value = 'Delivered';
+  document.getElementById('moPayment').value = 'Cash';
+  document.getElementById('manualOrderModal').classList.add('open');
+}
+
+function closeManualOrderModal() {
+  document.getElementById('manualOrderModal').classList.remove('open');
+}
+
+function saveManualOrder() {
+  const name = document.getElementById('moName').value.trim();
+  const phone = document.getElementById('moPhone').value.trim();
+  const email = document.getElementById('moEmail').value.trim();
+  const product = document.getElementById('moProduct').value.trim();
+  const amount = parseFloat(document.getElementById('moAmount').value);
+  const address = document.getElementById('moAddress').value.trim();
+  const date = document.getElementById('moDate').value || localDate();
+  const status = document.getElementById('moStatus').value;
+  const payment = document.getElementById('moPayment').value;
+  const note = document.getElementById('moNote').value.trim();
+
+  if (!name || !phone || !product || !amount) {
+    toast('Please fill name, phone, product, and amount', 'error'); return;
+  }
+
+  const orderId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1001;
+  const newOrder = {
+    id: orderId,
+    date,
+    time: new Date().toTimeString().slice(0, 5),
+    customer: name,
+    email: email || '',
+    phone,
+    product: '[Manual] ' + product,
+    amount,
+    location: address || '',
+    note: note || '',
+    status,
+    payment,
+    orderCount: orders.filter(o => o.email === email || o.phone === phone).length + 1,
+    manual: true,
+  };
+
+  if (status === 'Delivered') newOrder.deliveredDate = date;
+
+  orders.unshift(newOrder);
+  persistMeta();
+  closeManualOrderModal();
+  adminTab('orders');
+  renderOrdersTable();
+  updateOrdersBadge();
+  logActivity('order_status', `Added manual order #${orderId} — ${name} — AED ${amount}`);
+  toast('Manual order #' + orderId + ' added ✓');
 }
 
 function exportOrdersCSV() {
