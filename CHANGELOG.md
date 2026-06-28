@@ -3,6 +3,15 @@
 
 ---
 
+## v0.7 — 2026-06-28
+### Changed
+- All admin buttons now have subtle hover animation (lift + shadow)
+- Export orders redesigned — professional HTML report with summary cards, dark header, status pills, striped rows, totals footer
+- Report opens in print view (save as PDF or print)
+- Landscape orientation for better table fit
+
+---
+
 ## v0.6 — 2026-06-28
 ### Added
 - Qty column in orders table (auto-counts items per order)

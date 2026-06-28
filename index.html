@@ -1095,7 +1095,8 @@ body {
   align-items: center;
   gap: 6px;
 }
-.ck-admin-btn:hover { background: var(--ck-cream); }
+.ck-admin-btn:hover { background: var(--ck-cream); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(200,184,138,0.3); }
+.ck-admin-btn:active { transform: translateY(0); box-shadow: none; }
 .ck-admin-btn-ghost {
   background: transparent;
   border: 1px solid rgba(212,184,150,0.25);
@@ -1105,9 +1106,10 @@ body {
   font-size: 12px;
   cursor: pointer;
   font-family: var(--font-body);
-  transition: var(--transition);
+  transition: all 0.2s ease;
 }
-.ck-admin-btn-ghost:hover { border-color: var(--ck-champagne); color: var(--ck-champagne); }
+.ck-admin-btn-ghost:hover { border-color: var(--ck-champagne); color: var(--ck-champagne); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(200,184,138,0.15); }
+.ck-admin-btn-ghost:active { transform: translateY(0); box-shadow: none; }
 .ck-admin-btn-danger {
   background: rgba(160,48,48,0.3);
   border: 1px solid rgba(160,48,48,0.4);
@@ -1117,8 +1119,10 @@ body {
   font-size: 11px;
   cursor: pointer;
   font-family: var(--font-body);
-  transition: var(--transition);
+  transition: all 0.2s ease;
 }
+.ck-admin-btn-danger:hover { background: rgba(160,48,48,0.5); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(160,48,48,0.2); }
+.ck-admin-btn-danger:active { transform: translateY(0); box-shadow: none; }
 
 /* Product table */
 .ck-table-scroll { max-height: 550px; overflow-y: auto; }
@@ -2711,7 +2715,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '0.6';
+const CK_VERSION = '0.7';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -4813,18 +4817,101 @@ function saveManualOrder() {
 }
 
 function exportOrdersCSV() {
-  const headers = ['Order #','Date','Time','Customer','Email','Phone','Product','Amount (AED)','Delivery Location','Status','Order Count'];
-  const rows = orders.map(o => [
-    '#'+o.id, o.date, o.time, o.customer, o.email, o.phone,
-    o.product, o.amount, '"'+o.location+'"', o.status, o.orderCount
-  ]);
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-  const blob = new Blob([csv], { type:'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'calla_kallos_orders_'+localDate()+'.csv';
-  a.click();
-  toast('Orders exported ✓');
+  const totalAmount = orders.reduce((s,o) => s + (o.amount||0), 0);
+  const delivered = orders.filter(o => o.status === 'Delivered');
+  const deliveredAmount = delivered.reduce((s,o) => s + (o.amount||0), 0);
+  const pending = orders.filter(o => o.status === 'Pending' || o.status === 'Preparing').length;
+
+  const statusColor = s => s==='Delivered'?'#2E7D32':s==='In Transit'?'#E65100':s==='Cancelled'?'#C62828':s==='Pending'?'#546E7A':'#6D4C00';
+  const statusBg = s => s==='Delivered'?'#E8F5E9':s==='In Transit'?'#FFF3E0':s==='Cancelled'?'#FFEBEE':s==='Pending'?'#ECEFF1':'#FFF8E1';
+
+  const rows = orders.map((o, i) => `
+    <tr style="background:${i%2===0?'#FFFFFF':'#F8FAFC'};">
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:12px;font-weight:500;">#${o.id}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:12px;white-space:nowrap;">${o.date}<br><span style="color:#94A3B8;font-size:10px;">${o.time||''}</span></td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:12px;font-weight:500;">${o.customer}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:11px;color:#64748B;">${o.email||''}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:12px;">${o.phone||''}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:12px;max-width:200px;">${o.product||''}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:12px;text-align:right;font-weight:600;">AED ${(o.amount||0).toLocaleString()}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:11px;max-width:150px;">${o.location||''}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;font-size:11px;">${o.note||''}</td>
+      <td style="padding:10px 12px;border:1px solid #E2E8F0;text-align:center;">
+        <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;color:${statusColor(o.status)};background:${statusBg(o.status)};">${o.status}</span>
+      </td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Calla Kallos — Orders Report</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', -apple-system, sans-serif; color: #1E293B; padding: 40px; }
+  @media print { body { padding: 20px; } @page { margin: 10mm; size: landscape; } }
+</style></head><body>
+
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;border-bottom:3px solid #1E293B;padding-bottom:20px;">
+  <div>
+    <div style="font-size:28px;font-weight:300;letter-spacing:0.05em;font-family:Georgia,serif;">Calla Kallos</div>
+    <div style="font-size:11px;color:#94A3B8;letter-spacing:0.15em;text-transform:uppercase;margin-top:4px;">Orders Report</div>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:13px;color:#64748B;">Generated: ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})} at ${new Date().toTimeString().slice(0,5)}</div>
+    <div style="font-size:12px;color:#94A3B8;margin-top:4px;">callakallos.ae</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:16px;margin-bottom:24px;">
+  <div style="flex:1;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px 18px;">
+    <div style="font-size:11px;color:#166534;text-transform:uppercase;letter-spacing:0.1em;">Total Revenue (Delivered)</div>
+    <div style="font-size:22px;font-weight:600;color:#166534;margin-top:4px;">AED ${deliveredAmount.toLocaleString()}</div>
+  </div>
+  <div style="flex:1;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:14px 18px;">
+    <div style="font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;">Total Orders</div>
+    <div style="font-size:22px;font-weight:600;color:#1E293B;margin-top:4px;">${orders.length}</div>
+  </div>
+  <div style="flex:1;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:14px 18px;">
+    <div style="font-size:11px;color:#9A3412;text-transform:uppercase;letter-spacing:0.1em;">Pending</div>
+    <div style="font-size:22px;font-weight:600;color:#9A3412;margin-top:4px;">${pending}</div>
+  </div>
+  <div style="flex:1;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:14px 18px;">
+    <div style="font-size:11px;color:#0369A1;text-transform:uppercase;letter-spacing:0.1em;">Gross Amount</div>
+    <div style="font-size:22px;font-weight:600;color:#0369A1;margin-top:4px;">AED ${totalAmount.toLocaleString()}</div>
+  </div>
+</div>
+
+<table style="width:100%;border-collapse:collapse;">
+  <thead>
+    <tr style="background:#1E293B;">
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Order #</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Date</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Customer</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Email</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Phone</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Product</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:right;border:1px solid #334155;">Amount</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Location</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:left;border:1px solid #334155;">Note</th>
+      <th style="padding:10px 12px;color:#fff;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;text-align:center;border:1px solid #334155;">Status</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+  <tfoot>
+    <tr style="background:#F1F5F9;">
+      <td colspan="6" style="padding:12px;border:1px solid #E2E8F0;font-size:12px;font-weight:600;text-align:right;">TOTAL</td>
+      <td style="padding:12px;border:1px solid #E2E8F0;font-size:14px;font-weight:700;text-align:right;color:#1E293B;">AED ${totalAmount.toLocaleString()}</td>
+      <td colspan="3" style="border:1px solid #E2E8F0;"></td>
+    </tr>
+  </tfoot>
+</table>
+
+<div style="margin-top:24px;text-align:center;font-size:10px;color:#CBD5E1;">Calla Kallos · callakallos.ae · Dubai's Luxury Florist</div>
+
+<script>window.onload=()=>window.print();<\/script>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  toast('Orders report generated ✓');
 }
 
 function renderRegularOffers() {
