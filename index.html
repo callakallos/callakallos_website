@@ -2711,7 +2711,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '0.2';
+const CK_VERSION = '0.3';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -3547,18 +3547,21 @@ window.currentRole = 'admin'; // 'admin' or 'florist' — on window so Firebase 
 
 function applyRoleUI() {
   const isFlorist = currentRole === 'florist';
-  // Update displayed name
   document.getElementById('adminUserName').textContent = isFlorist ? 'Florist' : 'Rinu Kurian';
-  // Hide dashboard + settings sidebar items for florist
   const sidebarItems = document.querySelectorAll('.ck-sidebar-item');
   const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','admin-themes','logs','settings'];
+  const floristHidden = ['dashboard', 'settings', 'logs', 'admin-themes'];
   sidebarItems.forEach((el, i) => {
-    if (isFlorist && (tabs[i] === 'dashboard' || tabs[i] === 'settings')) {
+    if (isFlorist && floristHidden.includes(tabs[i])) {
       el.style.display = 'none';
     } else {
       el.style.display = '';
     }
   });
+  // Apply role-specific theme
+  const savedTheme = localStorage.getItem('ck_admin_theme_' + currentRole) || 'default';
+  currentAdminTheme = savedTheme;
+  if (savedTheme !== 'default') applyAdminTheme(savedTheme);
 }
 
 // Secret admin access: triple-click or long-press the logo
@@ -3662,8 +3665,8 @@ async function doLogin() {
 //  ADMIN TABS
 // ============================================================
 function adminTab(tab) {
-  // Florist cannot access dashboard or settings
-  if (currentRole === 'florist' && (tab === 'dashboard' || tab === 'settings')) return;
+  // Florist cannot access these tabs
+  if (currentRole === 'florist' && ['dashboard','settings','logs','admin-themes'].includes(tab)) return;
   document.querySelectorAll('.ck-sidebar-item').forEach((el,i) => {
     const tabs = ['dashboard','products','offers','orders','enquiries','crm','files','admin-themes','logs','settings'];
     el.classList.toggle('active', tabs[i]===tab);
@@ -6578,14 +6581,14 @@ function selectAdminTheme(key) {
 }
 
 function saveAdminTheme() {
-  localStorage.setItem('ck_admin_theme', currentAdminTheme);
+  localStorage.setItem('ck_admin_theme_' + currentRole, currentAdminTheme);
   logActivity('theme_save', `Applied admin theme: ${adminThemes[currentAdminTheme].name}`);
   toast('Admin theme saved ✓');
 }
 
 function resetAdminTheme() {
   currentAdminTheme = 'default';
-  localStorage.setItem('ck_admin_theme', 'default');
+  localStorage.setItem('ck_admin_theme_' + currentRole, 'default');
   applyAdminTheme('default');
   adminTab('admin-themes');
   toast('Admin theme reset to default ✓');
@@ -6639,7 +6642,7 @@ function adminThemesHTML() {
 
 // Apply saved theme on load
 document.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('ck_admin_theme');
+  const saved = localStorage.getItem('ck_admin_theme_' + (currentRole || 'admin'));
   if (saved && saved !== 'default') {
     setTimeout(() => applyAdminTheme(saved), 100);
   }
@@ -6648,6 +6651,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 //  ACTIVITY LOG
 // ============================================================
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
+  let device = 'Unknown';
+  if (/iPhone/i.test(ua)) device = 'iPhone';
+  else if (/iPad/i.test(ua)) device = 'iPad';
+  else if (/Android/i.test(ua)) device = 'Android';
+  else if (/Mac/i.test(ua)) device = 'Mac';
+  else if (/Windows/i.test(ua)) device = 'Windows';
+  else if (/Linux/i.test(ua)) device = 'Linux';
+  let browser = 'Unknown';
+  if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) browser = 'Chrome';
+  else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+  else if (/Firefox/i.test(ua)) browser = 'Firefox';
+  else if (/Edge/i.test(ua)) browser = 'Edge';
+  return device + ' / ' + browser;
+}
+
 function logActivity(action, details) {
   if (!_fbAuth || !_fbAuth.currentUser) return;
   const entry = {
@@ -6658,6 +6678,7 @@ function logActivity(action, details) {
     timestamp: Date.now(),
     date: localDate(),
     time: new Date().toTimeString().slice(0, 8),
+    device: getDeviceInfo(),
   };
   _fbDb.ref('ck-activity-log').push(entry).catch(() => {});
 }
@@ -6726,6 +6747,7 @@ function loadActivityLogs() {
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span style="font-size:13px;color:${color};font-weight:500;text-transform:capitalize;">${l.action.replace(/_/g, ' ')}</span>
                 <span style="font-size:11px;background:rgba(200,184,138,0.08);color:rgba(212,184,150,0.6);padding:1px 6px;border-radius:3px;">${userName}</span>
+                ${l.device ? `<span style="font-size:10px;color:rgba(212,184,150,0.25);background:rgba(200,184,138,0.06);padding:1px 6px;border-radius:3px;">${l.device}</span>` : ''}
                 <span style="font-size:11px;color:rgba(212,184,150,0.3);margin-left:auto;">${l.time}</span>
               </div>
               ${l.details ? `<div style="font-size:12px;color:rgba(212,184,150,0.5);margin-top:4px;">${l.details}</div>` : ''}

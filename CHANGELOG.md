@@ -3,6 +3,21 @@
 
 ---
 
+## v0.3 — 2026-06-28
+### Added
+- Activity Log now captures device info (iPhone/Android/Mac/Windows + browser)
+- Device badge shown in each log entry
+- Role-specific admin themes (admin and florist have separate theme selections)
+- Themes saved per role in localStorage
+
+### Changed
+- Activity Log tab hidden from florist users
+- Admin Theme tab hidden from florist users
+- Florist cannot access dashboard, settings, logs, or admin-themes tabs
+- Theme selection persists independently per role
+
+---
+
 ## v0.2 — 2026-06-28
 ### Added
 - Visitor tracking (total, today, yesterday, weekly) on admin dashboard
