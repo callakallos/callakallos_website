@@ -2633,7 +2633,7 @@ body {
           <input class="ck-input" id="fldName" placeholder="Rose Velvet Luxe">
         </div>
         <div class="ck-form-group">
-          <label class="ck-form-label">اسم المنتج (عربي)</label>
+          <label class="ck-form-label">اسم المنتج (عربي) <button type="button" onclick="autoTranslate('fldName','fldNameAr')" style="background:none;border:1px solid rgba(200,184,138,0.3);color:var(--ck-champagne);font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;margin-left:6px;">🔄 Auto Translate</button></label>
           <input class="ck-input" id="fldNameAr" placeholder="باقة الورود الفاخرة" style="direction:rtl;">
         </div>
       </div>
@@ -2645,7 +2645,7 @@ body {
       </div>
       <div class="ck-form-row full">
         <div class="ck-form-group">
-          <label class="ck-form-label">وصف المنتج (عربي)</label>
+          <label class="ck-form-label">وصف المنتج (عربي) <button type="button" onclick="autoTranslate('fldDesc','fldDescAr')" style="background:none;border:1px solid rgba(200,184,138,0.3);color:var(--ck-champagne);font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;margin-left:6px;">🔄 Auto Translate</button></label>
           <textarea class="ck-textarea" id="fldDescAr" placeholder="باقة فاخرة مربوطة يدوياً…" style="direction:rtl;"></textarea>
         </div>
       </div>
@@ -5169,6 +5169,27 @@ function replaceHeroImage(n, input) {
 //  PRODUCT MODAL
 // ============================================================
 let selectedBadges = [];
+
+async function autoTranslate(fromId, toId) {
+  const text = document.getElementById(fromId).value.trim();
+  if (!text) { toast('Enter English text first', 'error'); return; }
+  const target = document.getElementById(toId);
+  target.value = 'Translating…';
+  try {
+    const res = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=en|ar');
+    const data = await res.json();
+    if (data.responseData && data.responseData.translatedText) {
+      target.value = data.responseData.translatedText;
+      toast('Translated ✓');
+    } else {
+      target.value = '';
+      toast('Translation failed — try manually', 'error');
+    }
+  } catch(e) {
+    target.value = '';
+    toast('Translation error — check internet', 'error');
+  }
+}
 
 function openAddModal() {
   selectedBadges = [];
