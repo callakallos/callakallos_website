@@ -6884,8 +6884,10 @@ async function loadVisitorStats() {
 (function trackVisit() {
   const today = localDate();
   const visitKey = 'ck_visited_' + today;
-  if (!sessionStorage.getItem(visitKey)) {
-    sessionStorage.setItem(visitKey, '1');
+  if (!localStorage.getItem(visitKey)) {
+    localStorage.setItem(visitKey, '1');
+    // Clean old visit keys
+    Object.keys(localStorage).forEach(k => { if (k.startsWith('ck_visited_') && k !== visitKey) localStorage.removeItem(k); });
     _fbDb.ref('ck-stats/totalVisits').transaction(v => (v || 0) + 1);
     _fbDb.ref('ck-stats/daily/' + today).transaction(v => (v || 0) + 1);
   }
