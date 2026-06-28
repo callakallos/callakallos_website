@@ -4051,6 +4051,7 @@ function productRows() {
           <span class="ck-table-thumb">${p.imgData?`<img src="${p.imgData}" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">`:p.emoji||'🌸'}</span>
           <div>
             <div style="font-weight:500;color:var(--ck-cream);">${p.name}</div>
+            <div style="font-size:10px;color:var(--ck-champagne);letter-spacing:0.06em;margin-top:2px;">${p.code || 'CK-'+String(p.id).padStart(4,'0')}</div>
             ${p.nameAr?`<div style="font-size:11px;color:rgba(212,184,150,0.4);direction:rtl;">${p.nameAr}</div>`:''}
           </div>
         </div>
