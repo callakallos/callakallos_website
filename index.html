@@ -2303,31 +2303,31 @@ body {
         <div class="ck-login-logo-text">Calla Kallos</div>
         <div class="ck-login-sub">ADMIN PORTAL</div>
       </div>
-      <div style="padding:var(--space-xl);">
+      <div style="padding:var(--space-xl);background:var(--ck-plum-dark);">
         <div style="margin-bottom:20px;">
-          <label class="ck-form-label" style="color:rgba(212,184,150,0.6);margin-bottom:10px;display:block;">Select User</label>
+          <label class="ck-form-label" style="color:rgba(247,237,216,0.6);margin-bottom:10px;display:block;">Select User</label>
           <div style="display:flex;gap:10px;">
-            <div id="userCardAdmin" onclick="selectLoginUser('admin')" style="flex:1;border:1px solid var(--ck-champagne);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;background:rgba(200,184,138,0.12);transition:all 0.2s;">
+            <div id="userCardAdmin" onclick="selectLoginUser('admin')" style="flex:1;border:2px solid var(--ck-champagne);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;background:rgba(200,184,138,0.12);transition:all 0.2s;">
               <div style="font-size:22px;margin-bottom:6px;">👑</div>
               <div style="font-size:12px;color:var(--ck-champagne);font-weight:600;letter-spacing:0.06em;">ADMIN</div>
-              <div style="font-size:10px;color:rgba(212,184,150,0.45);margin-top:3px;">Full access</div>
+              <div style="font-size:10px;color:rgba(247,237,216,0.5);margin-top:3px;">Full access</div>
             </div>
-            <div id="userCardFlorist" onclick="selectLoginUser('florist')" style="flex:1;border:1px solid rgba(200,184,138,0.25);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;background:transparent;transition:all 0.2s;">
+            <div id="userCardFlorist" onclick="selectLoginUser('florist')" style="flex:1;border:2px solid rgba(200,184,138,0.25);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;background:transparent;transition:all 0.2s;">
               <div style="font-size:22px;margin-bottom:6px;">🌸</div>
-              <div style="font-size:12px;color:rgba(212,184,150,0.6);font-weight:600;letter-spacing:0.06em;">FLORIST</div>
-              <div style="font-size:10px;color:rgba(212,184,150,0.35);margin-top:3px;">Limited access</div>
+              <div style="font-size:12px;color:rgba(247,237,216,0.7);font-weight:600;letter-spacing:0.06em;">FLORIST</div>
+              <div style="font-size:10px;color:rgba(247,237,216,0.4);margin-top:3px;">Limited access</div>
             </div>
           </div>
         </div>
         <input type="hidden" id="loginUser" value="admin">
         <div class="ck-form-group" style="margin-bottom:20px;">
-          <label class="ck-form-label" style="color:rgba(212,184,150,0.6);">Password</label>
-          <input class="ck-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+          <label class="ck-form-label" style="color:rgba(247,237,216,0.6);">Password</label>
+          <input class="ck-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="background:rgba(255,255,255,0.08);border-color:rgba(200,184,138,0.25);color:var(--ck-cream);">
         </div>
-        <button class="ck-btn ck-btn-primary" onclick="doLogin()" style="width:100%;justify-content:center;">Sign In →</button>
+        <button class="ck-btn ck-btn-primary" onclick="doLogin()" style="width:100%;justify-content:center;background:var(--ck-champagne);color:var(--ck-plum-dark);font-weight:600;">Sign In →</button>
         <div class="ck-login-err" id="loginErr">Incorrect password</div>
         <div style="margin-top:16px;text-align:center;">
-          <button onclick="showStore()" style="background:none;border:none;color:var(--ck-text-hint);font-size:12px;cursor:pointer;letter-spacing:0.04em;">← Back to store</button>
+          <button onclick="showStore()" style="background:none;border:none;color:rgba(247,237,216,0.4);font-size:12px;cursor:pointer;letter-spacing:0.04em;">← Back to store</button>
         </div>
       </div>
     </div>
