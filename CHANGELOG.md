@@ -1,0 +1,82 @@
+# Calla Kallos — Version History
+### callakallos.ae | Dubai's Luxury Florist
+
+---
+
+## v0.2 — 2026-06-28
+### Added
+- Visitor tracking (total, today, yesterday, weekly) on admin dashboard
+- One count per device per day using localStorage
+- Firebase `ck-stats` for visit data storage
+
+---
+
+## v0.1 — 2026-06-28
+### Added
+- Auto-translate English → Arabic on field exit (product name & description)
+- MyMemory translation API integration
+- Skips translation if Arabic field already has content
+- Version code display on admin dashboard
+
+---
+
+## v0.0 — 2026-06-28 (Initial Stable)
+### Store Features
+- Product catalog with category & occasion filtering
+- Product detail page with image gallery, description, qty selector
+- Multi-image product uploads with hover slideshow
+- Build Your Own Gift Box customizer with live pricing
+- Shopping cart with checkout flow
+- WhatsApp order integration with pre-filled messages
+- Bilingual support (English / Arabic)
+- Hero image slideshow (5 slots, admin-uploadable)
+- Corporate Gifting Portal (hidden, toggleable)
+- Coming Soon / Maintenance Mode banner (admin-toggleable)
+- Responsive design (mobile + desktop)
+
+### Admin Panel
+- Firebase Authentication (Admin + Florist roles)
+- Secret admin login (triple-click / long-press logo)
+- Sales Dashboard with revenue cards, 7-day chart, top products
+- Inventory status with low-stock alerts
+- Navigable order calendar with day detail view
+- Products management (add/edit/delete, product codes, visibility toggle)
+- Hide All / Show All products
+- Offers & Badges management
+- Orders management with Accept/Decline + WhatsApp notifications
+- Manual order entry for offline/phone orders
+- Invoice, Delivery Note, Gift Receipt PDF generator
+- Customer CRM (VIP/Regular/New grouping, order history, favourites)
+- Enquiries with WhatsApp & Email reply buttons
+- File Manager with product images grouped by product
+- 11 Admin Themes (Default, SAP Fiori, Midnight Blue, Charcoal Rose, Emerald Pro, Sunset Warm, Lavender Dream, Pure Noir, Deep Ocean, Modern SaaS Light, Modern SaaS Dark)
+- Activity Log (all admin operations tracked)
+- Settings: Store info, passwords, theme, hero images, payment, storage usage
+- Maintenance Mode with presets (Coming Soon, Under Maintenance, Holiday, Custom)
+- Gift Box section visibility toggle
+- Notification sound for new orders & enquiries
+- Toast notifications (top banner, 1.5s)
+
+### Integrations
+- Firebase Realtime Database (cross-device sync)
+- Firebase Authentication (email/password)
+- GitHub API (image storage)
+- GitHub Pages hosting
+- Custom domain: callakallos.ae
+- WhatsApp Business messaging
+- MyMemory Translation API
+
+### Removed
+- Wishlist/heart buttons (no user account system)
+- Arctic Snow theme
+- Cherry Blossom theme
+- Corporate Portal nav link (section hidden, toggleable)
+- Admin login button (replaced with secret logo gesture)
+
+---
+
+## Stable Checkpoints
+| Tag | Commit | Date | Description |
+|-----|--------|------|-------------|
+| v1.0-stable | f1e5d48 | 2026-06-24 | First stable release |
+| stable-v1.0-backup | f1e5d48 | 2026-06-24 | Backup branch (frozen) |
