@@ -2231,8 +2231,9 @@ body {
         <div>
           <h3 style="font-family:var(--font-display);font-size:20px;font-weight:400;color:var(--ck-plum-dark);margin-bottom:20px;">Send a Message</h3>
           <div style="display:flex;flex-direction:column;gap:12px;">
-            <input id="cqName" class="ck-input" placeholder="Your Name" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
-            <input id="cqContact" class="ck-input" placeholder="Email or Phone" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
+            <input id="cqName" class="ck-input" placeholder="Your Name *" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
+            <input id="cqEmail" class="ck-input" placeholder="Email Address *" type="email" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
+            <input id="cqPhone" class="ck-input" placeholder="WhatsApp Number (e.g. +971 50 000 0000)" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);">
             <select id="cqTopic" class="ck-select" style="background:white;border-color:rgba(46,59,31,0.15);color:var(--ck-text);padding:10px 14px;">
               <option value="">What are you enquiring about?</option>
               <option>Custom Arrangement</option>
@@ -5908,25 +5909,25 @@ async function saveRemoteConfig(updates) {
 // ============================================================
 function sendEnquiry() {
   const name    = (document.getElementById('cqName').value    || '').trim();
-  const contact = (document.getElementById('cqContact').value || '').trim();
+  const email   = (document.getElementById('cqEmail').value   || '').trim();
+  const phone   = (document.getElementById('cqPhone').value   || '').trim();
   const topic   = (document.getElementById('cqTopic').value   || '').trim();
   const message = (document.getElementById('cqMessage').value || '').trim();
-  if (!name || !contact || !message) {
-    toast('Please fill in your name, contact, and message', 'error'); return;
+  if (!name || !email || !message) {
+    toast('Please fill in your name, email, and message', 'error'); return;
   }
   const enq = {
     id: Date.now(),
     date: localDate(),
     time: new Date().toTimeString().slice(0,5),
-    name, contact, topic: topic || 'General', message,
+    name, email, phone, contact: email, topic: topic || 'General', message,
     read: false
   };
   enquiries.unshift(enq);
   if (_fbAuth.currentUser) persistMeta();
   else _fbDb.ref('ck-new-enquiries/' + enq.id).set(enq).catch(() => {});
   updateEnquiriesBadge(); updateOrdersBadge();
-  // Clear form
-  ['cqName','cqContact','cqMessage'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  ['cqName','cqEmail','cqPhone','cqMessage'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   document.getElementById('cqTopic').selectedIndex = 0;
   toast('Message sent! We\'ll be in touch shortly ✓');
 }
@@ -5953,6 +5954,18 @@ function markEnquiriesRead() {
   if (changed) { persistMeta(); updateEnquiriesBadge(); updateOrdersBadge(); }
 }
 
+function replyWhatsApp(phone, name, topic) {
+  const num = phone.replace(/[^0-9]/g, '');
+  const msg = '🌸 *Calla Kallos*\n\nHi ' + name + ',\nThank you for your enquiry about "' + topic + '".\n\n';
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function replyEmail(email, name, topic) {
+  const subject = 'Re: ' + topic + ' — Calla Kallos';
+  const body = 'Hi ' + name + ',\n\nThank you for your enquiry about "' + topic + '".\n\n\nBest regards,\nCalla Kallos\ncallakallos.ae';
+  window.open('mailto:' + email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body));
+}
+
 function deleteEnquiry(id) {
   const enq = enquiries.find(e => e.id === id);
   enquiries = enquiries.filter(e => e.id !== id);
@@ -5973,23 +5986,30 @@ function toggleEnquiryRead(id) {
 
 function enquiriesHTML() {
   const topicColor = { 'Custom Arrangement':'#7A5C8A','Wedding / Event':'#C08030','Corporate Order':'#4A7C59','Delivery Query':'#4A6A8A','General':'#888','Other':'#888' };
-  const rows = enquiries.length ? enquiries.map(e => `
+  const rows = enquiries.length ? enquiries.map(e => {
+    const email = e.email || e.contact || '';
+    const phone = (e.phone || '').replace(/[^0-9+]/g, '');
+    return `
     <div style="background:rgba(46,59,31,${e.read?'0.08':'0.18'});border:1px solid rgba(200,184,138,${e.read?'0.1':'0.25'});border-radius:8px;padding:18px 20px;margin-bottom:12px;position:relative;">
       ${!e.read ? '<span style="position:absolute;top:16px;right:56px;width:8px;height:8px;background:#C04040;border-radius:50%;"></span>' : ''}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="font-weight:500;color:var(--ck-cream);font-size:14px;">${e.name}</span>
-          <span style="font-size:12px;color:rgba(212,184,150,0.6);">${e.contact}</span>
+          ${email ? '<span style="font-size:12px;color:rgba(212,184,150,0.6);">✉ '+email+'</span>' : ''}
+          ${e.phone ? '<span style="font-size:12px;color:rgba(212,184,150,0.6);">📱 '+e.phone+'</span>' : ''}
           <span style="font-size:11px;background:rgba(${e.topic==='Wedding / Event'?'192,128,48':'74,124,89'},0.2);color:${topicColor[e.topic]||'#888'};padding:2px 8px;border-radius:3px;letter-spacing:.05em;">${e.topic}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span style="font-size:11px;color:rgba(212,184,150,0.35);">${e.date} ${e.time}</span>
+          ${phone ? '<button onclick="replyWhatsApp(\''+phone.replace(/'/g,"\\'")+'\',\''+e.name.replace(/'/g,"\\'")+'\',\''+e.topic.replace(/'/g,"\\'")+'\')\" style="padding:3px 10px;font-size:11px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);color:#25D366;border-radius:3px;cursor:pointer;">💬 WhatsApp</button>' : ''}
+          ${email ? '<button onclick="replyEmail(\''+email.replace(/'/g,"\\'")+'\',\''+e.name.replace(/'/g,"\\'")+'\',\''+e.topic.replace(/'/g,"\\'")+'\')\" style="padding:3px 10px;font-size:11px;background:rgba(100,160,255,0.1);border:1px solid rgba(100,160,255,0.25);color:#4DA3FF;border-radius:3px;cursor:pointer;">✉ Email</button>' : ''}
           <button onclick="toggleEnquiryRead(${e.id})" style="padding:3px 10px;font-size:11px;background:rgba(200,184,138,0.1);border:1px solid rgba(200,184,138,0.2);color:rgba(212,184,150,0.8);border-radius:3px;cursor:pointer;">${e.read?'Mark Unread':'Mark Read'}</button>
           <button class="ck-admin-btn-danger" onclick="deleteEnquiry(${e.id})" style="padding:3px 10px;font-size:11px;">Delete</button>
         </div>
       </div>
       <p style="margin:0;font-size:13px;color:rgba(247,237,216,0.75);line-height:1.6;white-space:pre-wrap;">${e.message}</p>
-    </div>`).join('')
+    </div>`;
+  }).join('')
   : '<div style="text-align:center;padding:48px;color:rgba(212,184,150,0.3);font-size:14px;">No enquiries yet</div>';
 
   return `
