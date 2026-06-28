@@ -3,6 +3,18 @@
 
 ---
 
+## v0.8 — 2026-06-28
+### Added
+- Separate "📊 Export Excel" button — generates .xls file with styled header
+- Separate "📄 PDF Report" button — professional printable report
+- Order action buttons (Accept/Decline/Save/Delete) now have hover lift + shadow animation
+
+### Fixed
+- Order table row no longer highlights on hover (was covering status colors)
+- Action buttons now use proper CSS classes instead of inline styles
+
+---
+
 ## v0.7 — 2026-06-28
 ### Changed
 - All admin buttons now have subtle hover animation (lift + shadow)

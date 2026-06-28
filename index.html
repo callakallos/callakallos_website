@@ -1123,6 +1123,21 @@ body {
 }
 .ck-admin-btn-danger:hover { background: rgba(160,48,48,0.5); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(160,48,48,0.2); }
 .ck-admin-btn-danger:active { transform: translateY(0); box-shadow: none; }
+.ck-order-btn {
+  padding: 6px 0;
+  font-size: 11px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.2s ease;
+}
+.ck-order-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.15); filter: brightness(1.1); }
+.ck-order-btn:active { transform: translateY(0); box-shadow: none; }
+.ck-order-btn-accept { background: rgba(74,124,89,0.15); color: #4A7C59; font-weight: 500; }
+.ck-order-btn-decline { background: rgba(192,64,64,0.1); color: #C04040; }
+.ck-order-btn-save { background: rgba(200,184,138,0.12); color: var(--ck-champagne); font-weight: 500; }
+.ck-order-btn-delete { background: rgba(192,64,64,0.08); color: #C04040; }
 
 /* Product table */
 .ck-table-scroll { max-height: 550px; overflow-y: auto; }
@@ -1150,7 +1165,7 @@ body {
   border-bottom: 1px solid rgba(212,184,150,0.06);
   vertical-align: middle;
 }
-.ck-product-table tr:hover td { background: rgba(212,184,150,0.04); }
+.ck-product-table:not(#ordersTable) tr:hover td { background: rgba(212,184,150,0.04); }
 .ck-product-table tr:last-child td { border-bottom: none; }
 .ck-table-thumb {
   width: 40px;
@@ -2715,7 +2730,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '0.7';
+const CK_VERSION = '0.8';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -4419,9 +4434,10 @@ function ordersHTML() {
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
       <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);">Orders</h2>
-      <div style="display:flex;gap:8px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="ck-admin-btn" onclick="openManualOrderModal()">+ Add Manual Order</button>
-        <button class="ck-admin-btn-ghost" onclick="exportOrdersCSV()" style="padding:6px 14px;font-size:11px;">⬇ Export to Excel</button>
+        <button class="ck-admin-btn-ghost" onclick="exportOrdersExcel()" style="padding:6px 14px;font-size:11px;">📊 Export Excel</button>
+        <button class="ck-admin-btn-ghost" onclick="exportOrdersPDF()" style="padding:6px 14px;font-size:11px;">📄 PDF Report</button>
       </div>
     </div>
     <div class="ck-admin-panel-block" style="margin-bottom:16px;">
@@ -4546,11 +4562,11 @@ function renderOrdersTable() {
       <td>
         <div style="display:flex;flex-direction:column;gap:4px;align-items:stretch;min-width:90px;">
         ${o.status === 'Pending' ? `
-          <button onclick="acceptOrder(${o.id})" style="padding:6px 0;font-size:11px;border:none;border-radius:6px;cursor:pointer;background:rgba(74,124,89,0.15);color:#4A7C59;font-weight:500;">✓ Accept</button>
-          <button onclick="declineOrder(${o.id})" style="padding:6px 0;font-size:11px;border:none;border-radius:6px;cursor:pointer;background:rgba(192,64,64,0.1);color:#C04040;">✕ Decline</button>
+          <button class="ck-order-btn ck-order-btn-accept" onclick="acceptOrder(${o.id})">✓ Accept</button>
+          <button class="ck-order-btn ck-order-btn-decline" onclick="declineOrder(${o.id})">✕ Decline</button>
         ` : `
-          <button onclick="saveOrderStatus(${o.id})" style="padding:6px 0;font-size:11px;border:none;border-radius:6px;cursor:pointer;background:rgba(200,184,138,0.12);color:var(--ck-champagne);font-weight:500;">💾 Save</button>
-          <button onclick="deleteOrder(${o.id})" style="padding:6px 0;font-size:11px;border:none;border-radius:6px;cursor:pointer;background:rgba(192,64,64,0.08);color:#C04040;">🗑 Delete</button>
+          <button class="ck-order-btn ck-order-btn-save" onclick="saveOrderStatus(${o.id})">💾 Save</button>
+          <button class="ck-order-btn ck-order-btn-delete" onclick="deleteOrder(${o.id})">🗑 Delete</button>
         `}
           <select class="ck-select" onchange="generateDoc(${o.id},this.value);this.selectedIndex=0;" style="padding:4px 6px;font-size:10px;border-radius:6px;">
             <option value="">🖨 Print…</option>
@@ -4816,7 +4832,33 @@ function saveManualOrder() {
   toast('Manual order #' + orderId + ' added ✓');
 }
 
-function exportOrdersCSV() {
+function exportOrdersExcel() {
+  const rows = orders.map(o => `<tr>
+    <td>#${o.id}</td><td>${o.date}</td><td>${o.time||''}</td><td>${o.customer}</td>
+    <td>${o.email||''}</td><td>${o.phone||''}</td><td>${(o.product||'').replace(/</g,'&lt;')}</td>
+    <td>${o.amount||0}</td><td>${(o.location||'').replace(/</g,'&lt;')}</td>
+    <td>${o.note||''}</td><td>${o.status}</td></tr>`).join('');
+
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+<head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+<x:Name>Orders</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+<body><table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;">
+<tr style="background:#1E293B;color:#fff;font-weight:bold;">
+<td>Order #</td><td>Date</td><td>Time</td><td>Customer</td><td>Email</td><td>Phone</td>
+<td>Product</td><td>Amount (AED)</td><td>Location</td><td>Note</td><td>Status</td></tr>
+${rows}
+</table></body></html>`;
+
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Calla_Kallos_Orders_' + localDate() + '.xls';
+  a.click();
+  toast('Excel exported ✓');
+}
+
+function exportOrdersPDF() {
   const totalAmount = orders.reduce((s,o) => s + (o.amount||0), 0);
   const delivered = orders.filter(o => o.status === 'Delivered');
   const deliveredAmount = delivered.reduce((s,o) => s + (o.amount||0), 0);
