@@ -2711,6 +2711,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
+const CK_VERSION = '0.0';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -3803,7 +3804,10 @@ function dashboardHTML() {
   const monthName = now.toLocaleString('en', { month: 'long', year: 'numeric' });
 
   return `
-    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin-bottom:24px;">${greeting}, ${userName} 🌸</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--ck-champagne);margin:0;">${greeting}, ${userName} 🌸</h2>
+      <span style="font-size:10px;color:rgba(212,184,150,0.3);letter-spacing:0.08em;border:1px solid rgba(212,184,150,0.1);padding:3px 10px;border-radius:4px;">v${CK_VERSION}</span>
+    </div>
 
     ${isFlorist ? '' : `
     <!-- Revenue Cards -->
