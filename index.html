@@ -4748,6 +4748,20 @@ function settingsHTML() {
       </div>
     </div>
 
+    <!-- Section Visibility -->
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">📦 Section Visibility</span></div>
+      <div style="padding:20px;max-width:700px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:500;">🎁 Gift Box Builder</div>
+            <div style="font-size:12px;color:rgba(212,184,150,0.5);margin-top:2px;">Show "Build Your Own Gift Box" section on main page</div>
+          </div>
+          <button id="giftboxToggleBtn" onclick="toggleGiftBox()" style="padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;border:none;transition:all 0.2s;"></button>
+        </div>
+      </div>
+    </div>
+
     <!-- Storage Usage -->
     <div class="ck-admin-panel-block" style="margin-bottom:20px;">
       <div class="ck-panel-header"><span class="ck-panel-title">💾 Storage Usage</span></div>
@@ -5241,6 +5255,7 @@ function populateSettingsInputs() {
   set('settingGhToken',    s.ghToken || localStorage.getItem('ck_gh_token') || '');
   loadStorageUsage();
   populateMaintenanceInputs();
+  updateGiftBoxBtn();
 }
 
 async function loadStorageUsage() {
@@ -5445,6 +5460,30 @@ function populateMaintenanceInputs() {
   updateMaintPreview();
 }
 
+function toggleGiftBox() {
+  storeSettings.giftBoxEnabled = !storeSettings.giftBoxEnabled;
+  applyGiftBoxVisibility();
+  persistMeta();
+  _fbDb.ref('ck-config/giftBoxEnabled').set(!!storeSettings.giftBoxEnabled).catch(() => {});
+  updateGiftBoxBtn();
+  logActivity('settings_save', storeSettings.giftBoxEnabled ? 'Enabled Gift Box section' : 'Disabled Gift Box section');
+  toast(storeSettings.giftBoxEnabled ? 'Gift Box section enabled ✓' : 'Gift Box section hidden ✓');
+}
+
+function applyGiftBoxVisibility() {
+  const el = document.getElementById('section-giftbox');
+  if (el) el.style.display = storeSettings.giftBoxEnabled ? '' : 'none';
+}
+
+function updateGiftBoxBtn() {
+  const btn = document.getElementById('giftboxToggleBtn');
+  if (!btn) return;
+  const on = !!storeSettings.giftBoxEnabled;
+  btn.textContent = on ? '🟢 Enabled — Click to Disable' : '🔴 Disabled — Click to Enable';
+  btn.style.background = on ? 'rgba(74,124,89,0.15)' : 'rgba(192,64,64,0.15)';
+  btn.style.color = on ? '#4A7C59' : '#C04040';
+}
+
 function applyStoreSettings() {
   const s = storeSettings;
   const fp = document.getElementById('footerPhone');
@@ -5469,6 +5508,7 @@ function applyStoreSettings() {
     }
   }
   applyMaintenanceBanner();
+  applyGiftBoxVisibility();
 }
 
 // ============================================================
@@ -5905,6 +5945,7 @@ async function loadRemoteConfig() {
     if (cfg.maintenanceType) storeSettings.maintenanceType = cfg.maintenanceType;
     if (cfg.maintenanceTitle) storeSettings.maintenanceTitle = cfg.maintenanceTitle;
     if (cfg.maintenanceMsg) storeSettings.maintenanceMsg = cfg.maintenanceMsg;
+    if (cfg.giftBoxEnabled !== undefined) storeSettings.giftBoxEnabled = cfg.giftBoxEnabled;
     applyStoreSettings();
   } catch(e) { /* offline — use localStorage fallback */ }
 }
