@@ -2711,7 +2711,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '0.4';
+const CK_VERSION = '0.5';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -4453,8 +4453,8 @@ function ordersHTML() {
         <table class="ck-product-table" id="ordersTable">
           <thead>
             <tr>
-              <th>#</th><th>Date & Time</th><th>Customer</th><th>Email</th><th>Phone</th>
-              <th>Product</th><th>Amount</th><th>Delivery Location</th><th>Note</th><th>Status</th><th>Save</th>
+              <th>#</th><th>Date</th><th>Customer</th>
+              <th>Product</th><th>Amount</th><th>Note</th><th>Status</th><th>Actions</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody"></tbody>
@@ -4517,43 +4517,41 @@ function renderOrdersTable() {
     const isRegular = o.orderCount >= 3;
     const sm = statusMeta[o.status] || statusMeta.Pending;
     const selOpts = statusOpts.map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
+    const custTitle = `${o.customer}\n📧 ${o.email||'—'}\n📱 ${o.phone||'—'}\n📍 ${o.location||'—'}`;
     return `<tr style="background:${sm.bg};border-left:3px solid ${sm.border};">
-      <td>#${o.id}</td>
-      <td style="white-space:nowrap;">${o.date}<br><span style="font-size:11px;color:rgba(212,184,150,0.4);">${o.time}</span></td>
-      <td>
-        <div style="font-weight:500;color:var(--ck-cream);">${o.customer}</div>
-        ${isRegular ? `<span style="font-size:10px;background:var(--ck-champagne);color:var(--ck-plum-dark);padding:1px 6px;border-radius:2px;letter-spacing:.06em;">REGULAR ×${o.orderCount}</span>` : ''}
+      <td style="font-size:12px;">#${o.id}</td>
+      <td style="white-space:nowrap;font-size:12px;">${o.date}<br><span style="font-size:10px;color:rgba(212,184,150,0.35);">${o.time}</span></td>
+      <td title="${custTitle.replace(/"/g,'&quot;')}">
+        <div style="font-weight:500;font-size:13px;">${o.customer}</div>
+        <div style="font-size:10px;color:rgba(212,184,150,0.45);">${o.phone||''} ${o.email?'· '+o.email:''}</div>
+        ${o.location ? `<div style="font-size:10px;color:rgba(212,184,150,0.3);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📍 ${o.location}</div>` : ''}
+        ${isRegular ? `<span style="font-size:9px;background:var(--ck-champagne);color:var(--ck-plum-dark);padding:1px 5px;border-radius:2px;">REGULAR ×${o.orderCount}</span>` : ''}
       </td>
-      <td style="font-size:12px;">${o.email}</td>
-      <td style="white-space:nowrap;">${o.phone}</td>
-      <td style="font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(o.product||'').replace(/"/g,'&quot;')}${o.productDetails ? '\n\n' + o.productDetails.replace(/"/g,'&quot;') : ''}">${o.product}</td>
-      <td style="white-space:nowrap;">AED ${o.amount}</td>
-      <td style="font-size:12px;max-width:160px;">${o.location}</td>
-      <td style="font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${o.note?'color:#C08030;':'color:rgba(212,184,150,0.25);'}" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note || '—'}</td>
+      <td style="font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(o.product||'').replace(/"/g,'&quot;')}">${o.product}</td>
+      <td style="white-space:nowrap;font-weight:500;">AED ${o.amount}</td>
+      <td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${o.note?'color:#C08030;':'color:rgba(212,184,150,0.2);'}" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note || '—'}</td>
       <td>
-        <div style="display:inline-flex;align-items:center;gap:6px;background:${sm.bg};border:1px solid ${sm.border};border-radius:4px;padding:3px 8px;margin-bottom:6px;white-space:nowrap;">
-          <span style="color:${sm.color};font-size:12px;">${sm.icon} ${o.status}</span>
+        <div style="display:inline-flex;align-items:center;gap:4px;background:${sm.bg};border:1px solid ${sm.border};border-radius:4px;padding:2px 6px;margin-bottom:4px;white-space:nowrap;">
+          <span style="color:${sm.color};font-size:11px;">${sm.icon} ${o.status}</span>
         </div><br>
-        <select class="ck-select" id="status_${o.id}" style="padding:4px 8px;font-size:12px;width:130px;">
+        <select class="ck-select" id="status_${o.id}" style="padding:3px 6px;font-size:11px;width:110px;">
           ${selOpts}
         </select>
       </td>
       <td style="white-space:nowrap;">
         ${o.status === 'Pending' ? `
-          <button class="ck-admin-btn" onclick="acceptOrder(${o.id})" style="padding:5px 12px;font-size:11px;">✓ Accept</button>
-          <button class="ck-admin-btn-danger" onclick="declineOrder(${o.id})" style="padding:5px 10px;font-size:11px;margin-left:4px;">✕ Decline</button>
+          <button class="ck-admin-btn" onclick="acceptOrder(${o.id})" style="padding:4px 10px;font-size:10px;">✓ Accept</button>
+          <button class="ck-admin-btn-danger" onclick="declineOrder(${o.id})" style="padding:4px 8px;font-size:10px;margin-left:3px;">✕</button>
         ` : `
-          <button class="ck-admin-btn" onclick="saveOrderStatus(${o.id})" style="padding:5px 12px;font-size:11px;">Save</button>
-          <button class="ck-admin-btn-danger" onclick="deleteOrder(${o.id})" style="padding:5px 10px;font-size:11px;margin-left:4px;">Delete</button>
+          <button class="ck-admin-btn" onclick="saveOrderStatus(${o.id})" style="padding:4px 10px;font-size:10px;">Save</button>
+          <button class="ck-admin-btn-danger" onclick="deleteOrder(${o.id})" style="padding:4px 8px;font-size:10px;margin-left:3px;">✕</button>
         `}
-        <div style="margin-top:6px;">
-          <select class="ck-select" onchange="generateDoc(${o.id},this.value);this.selectedIndex=0;" style="padding:3px 6px;font-size:10px;width:110px;">
-            <option value="">🖨 Print…</option>
-            <option value="invoice">📄 Invoice</option>
-            <option value="delivery">📦 Delivery Note</option>
-            <option value="gift">🎁 Gift Receipt</option>
-          </select>
-        </div>
+        <select class="ck-select" onchange="generateDoc(${o.id},this.value);this.selectedIndex=0;" style="padding:2px 4px;font-size:9px;width:80px;margin-top:4px;">
+          <option value="">🖨 Print</option>
+          <option value="invoice">📄 Invoice</option>
+          <option value="delivery">📦 Delivery</option>
+          <option value="gift">🎁 Gift</option>
+        </select>
       </td>
     </tr>`;
   }).join('');

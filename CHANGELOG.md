@@ -3,6 +3,15 @@
 
 ---
 
+## v0.5 — 2026-06-28
+### Changed
+- Orders table compacted — removed separate Email, Phone, Location columns
+- Customer column now shows name + phone + email + location in one cell (hover for full details)
+- Smaller buttons, tighter spacing, no horizontal scroll needed
+- Print dropdown made more compact
+
+---
+
 ## v0.4 — 2026-06-28
 ### Fixed
 - Top banner now shows "Florist" instead of "Admin" when logged in as florist
