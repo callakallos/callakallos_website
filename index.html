@@ -2711,7 +2711,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '0.1';
+const CK_VERSION = '0.2';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -3669,7 +3669,7 @@ function adminTab(tab) {
     el.classList.toggle('active', tabs[i]===tab);
   });
   const main = document.getElementById('adminMain');
-  if (tab==='dashboard') { main.innerHTML = dashboardHTML(); renderOrderCalendar(); }
+  if (tab==='dashboard') { main.innerHTML = dashboardHTML(); renderOrderCalendar(); loadVisitorStats(); }
   else if (tab==='products') main.innerHTML = productsHTML();
   else if (tab==='offers') main.innerHTML = offersHTML();
   else if (tab==='orders') { main.innerHTML = ordersHTML(); renderOrdersTable(); }
@@ -3818,12 +3818,20 @@ function dashboardHTML() {
       <div class="ck-stat-card"><div class="ck-stat-label">This Month</div><div class="ck-stat-val">AED ${monthlyRev.toLocaleString()}</div><div class="ck-stat-sub">${monthName}</div></div>
     </div>`}
 
-    <!-- Order Status Cards -->
+    <!-- Order Status + Visitors -->
     <div class="ck-admin-stats" style="margin-top:12px;">
       <div class="ck-stat-card"><div class="ck-stat-label">Products</div><div class="ck-stat-val">${products.length}</div><div class="ck-stat-sub">Active listings</div></div>
       <div class="ck-stat-card"><div class="ck-stat-label">Pending / Preparing</div><div class="ck-stat-val" style="color:#C8B88A;">${pendingCount}</div><div class="ck-stat-sub">Needs action</div></div>
       <div class="ck-stat-card"><div class="ck-stat-label">In Transit</div><div class="ck-stat-val" style="color:#C08030;">${transitCount}</div><div class="ck-stat-sub">On the way</div></div>
       <div class="ck-stat-card"><div class="ck-stat-label">Delivered</div><div class="ck-stat-val" style="color:#4A7C59;">${deliveredCount}</div><div class="ck-stat-sub">Completed</div></div>
+    </div>
+
+    <!-- Visitor Stats -->
+    <div class="ck-admin-stats" style="margin-top:12px;">
+      <div class="ck-stat-card" id="statTotalVisits"><div class="ck-stat-label">👀 Total Visits</div><div class="ck-stat-val">—</div><div class="ck-stat-sub">Loading…</div></div>
+      <div class="ck-stat-card" id="statTodayVisits"><div class="ck-stat-label">📊 Today</div><div class="ck-stat-val">—</div><div class="ck-stat-sub">Loading…</div></div>
+      <div class="ck-stat-card" id="statYesterdayVisits"><div class="ck-stat-label">📈 Yesterday</div><div class="ck-stat-val">—</div><div class="ck-stat-sub">Loading…</div></div>
+      <div class="ck-stat-card" id="statWeekVisits"><div class="ck-stat-label">📅 This Week</div><div class="ck-stat-val">—</div><div class="ck-stat-sub">Loading…</div></div>
     </div>
 
     ${isFlorist ? '' : `
@@ -6833,6 +6841,54 @@ renderProducts();
   const gotGit = await loadDataJson();
   if (!gotGit) await loadRemoteData();
   _fbStartRtListener();
+})();
+
+// ============================================================
+//  VISITOR TRACKING
+// ============================================================
+async function loadVisitorStats() {
+  try {
+    const today = localDate();
+    const yesterday = localDate(new Date(Date.now() - 864e5));
+
+    const totalSnap = await _fbDb.ref('ck-stats/totalVisits').once('value');
+    const totalVisits = totalSnap.val() || 0;
+
+    const todaySnap = await _fbDb.ref('ck-stats/daily/' + today).once('value');
+    const todayVisits = todaySnap.val() || 0;
+
+    const yesterdaySnap = await _fbDb.ref('ck-stats/daily/' + yesterday).once('value');
+    const yesterdayVisits = yesterdaySnap.val() || 0;
+
+    let weekVisits = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = localDate(new Date(Date.now() - i * 864e5));
+      const snap = await _fbDb.ref('ck-stats/daily/' + d).once('value');
+      weekVisits += (snap.val() || 0);
+    }
+
+    const diff = todayVisits - yesterdayVisits;
+    const diffStr = diff > 0 ? '↑ ' + diff + ' from yesterday' : diff < 0 ? '↓ ' + Math.abs(diff) + ' from yesterday' : 'Same as yesterday';
+
+    const el1 = document.getElementById('statTotalVisits');
+    const el2 = document.getElementById('statTodayVisits');
+    const el3 = document.getElementById('statYesterdayVisits');
+    const el4 = document.getElementById('statWeekVisits');
+    if (el1) el1.innerHTML = '<div class="ck-stat-label">👀 Total Visits</div><div class="ck-stat-val">' + totalVisits.toLocaleString() + '</div><div class="ck-stat-sub">All time</div>';
+    if (el2) el2.innerHTML = '<div class="ck-stat-label">📊 Today</div><div class="ck-stat-val">' + todayVisits + '</div><div class="ck-stat-sub">' + diffStr + '</div>';
+    if (el3) el3.innerHTML = '<div class="ck-stat-label">📈 Yesterday</div><div class="ck-stat-val">' + yesterdayVisits + '</div><div class="ck-stat-sub">' + yesterday + '</div>';
+    if (el4) el4.innerHTML = '<div class="ck-stat-label">📅 This Week</div><div class="ck-stat-val">' + weekVisits + '</div><div class="ck-stat-sub">Last 7 days</div>';
+  } catch(e) {}
+}
+
+(function trackVisit() {
+  const today = localDate();
+  const visitKey = 'ck_visited_' + today;
+  if (!sessionStorage.getItem(visitKey)) {
+    sessionStorage.setItem(visitKey, '1');
+    _fbDb.ref('ck-stats/totalVisits').transaction(v => (v || 0) + 1);
+    _fbDb.ref('ck-stats/daily/' + today).transaction(v => (v || 0) + 1);
+  }
 })();
 
 // Customer image slideshow — refresh from GitHub with cache buster
