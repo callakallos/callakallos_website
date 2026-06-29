@@ -3,6 +3,21 @@
 
 ---
 
+## v1.0 — 2026-06-28
+### Added
+- IP address and location tracking in Activity Log (via ipapi.co)
+- Device, IP, and location badges shown on each log entry
+- Date shown alongside time in log entries
+- Activity Log PDF export — professional report with summary cards, confidential footer
+- Unique IPs count in report
+
+### Changed
+- Excel report now has branded company header (Calla Kallos logo bar, date, totals row)
+- Phone columns use text format in Excel (no scientific notation)
+- Activity log search now includes IP and location data
+
+---
+
 ## v0.9 — 2026-06-28
 ### Added
 - "Ready for Delivery" status between Preparing and In Transit
