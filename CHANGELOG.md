@@ -3,6 +3,20 @@
 
 ---
 
+## v0.9 — 2026-06-28
+### Added
+- "Ready for Delivery" status between Preparing and In Transit
+- Delivery boy WhatsApp number field on Ready for Delivery orders
+- "📲 Notify Rider" button — sends order details to delivery boy via WhatsApp
+- Delivery Boy # column in Excel export
+
+### Changed
+- PDF Report button hidden for florist users
+- Excel phone columns use text format (no scientific notation)
+- saveOrderStatus now saves delivery boy number and re-renders table
+
+---
+
 ## v0.8 — 2026-06-28
 ### Added
 - Separate "📊 Export Excel" button — generates .xls file with styled header

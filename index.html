@@ -2730,7 +2730,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '0.8';
+const CK_VERSION = '0.9';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -4437,7 +4437,7 @@ function ordersHTML() {
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="ck-admin-btn" onclick="openManualOrderModal()">+ Add Manual Order</button>
         <button class="ck-admin-btn-ghost" onclick="exportOrdersExcel()" style="padding:6px 14px;font-size:11px;">📊 Export Excel</button>
-        <button class="ck-admin-btn-ghost" onclick="exportOrdersPDF()" style="padding:6px 14px;font-size:11px;">📄 PDF Report</button>
+        ${currentRole !== 'florist' ? '<button class="ck-admin-btn-ghost" onclick="exportOrdersPDF()" style="padding:6px 14px;font-size:11px;">📄 PDF Report</button>' : ''}
       </div>
     </div>
     <div class="ck-admin-panel-block" style="margin-bottom:16px;">
@@ -4525,13 +4525,14 @@ function renderOrdersTable() {
   if (!tbody) return;
 
   const statusMeta = {
-    Delivered:    { color:'#4A7C59', bg:'rgba(74,124,89,0.12)',  border:'rgba(74,124,89,0.25)',  icon:'✓' },
-    'In Transit': { color:'#C08030', bg:'rgba(192,128,48,0.12)', border:'rgba(192,128,48,0.25)', icon:'🚚' },
-    Preparing:    { color:'#B8860B', bg:'rgba(184,134,11,0.1)',  border:'rgba(184,134,11,0.22)', icon:'⏳' },
-    Pending:      { color:'#8899AA', bg:'rgba(136,153,170,0.08)',border:'rgba(136,153,170,0.18)',icon:'🕐' },
-    Cancelled:    { color:'#C04040', bg:'rgba(192,64,64,0.1)',   border:'rgba(192,64,64,0.22)',  icon:'✕' },
+    Delivered:           { color:'#4A7C59', bg:'rgba(74,124,89,0.12)',  border:'rgba(74,124,89,0.25)',  icon:'✓' },
+    'In Transit':        { color:'#C08030', bg:'rgba(192,128,48,0.12)', border:'rgba(192,128,48,0.25)', icon:'🚚' },
+    'Ready for Delivery':{ color:'#0A6ED1', bg:'rgba(10,110,209,0.1)',  border:'rgba(10,110,209,0.25)', icon:'📦' },
+    Preparing:           { color:'#B8860B', bg:'rgba(184,134,11,0.1)',  border:'rgba(184,134,11,0.22)', icon:'⏳' },
+    Pending:             { color:'#8899AA', bg:'rgba(136,153,170,0.08)',border:'rgba(136,153,170,0.18)',icon:'🕐' },
+    Cancelled:           { color:'#C04040', bg:'rgba(192,64,64,0.1)',   border:'rgba(192,64,64,0.22)',  icon:'✕' },
   };
-  const statusOpts = ['Pending','Preparing','In Transit','Delivered','Cancelled'];
+  const statusOpts = ['Pending','Preparing','Ready for Delivery','In Transit','Delivered','Cancelled'];
 
   tbody.innerHTML = list.map(o => {
     const isRegular = o.orderCount >= 3;
@@ -4568,6 +4569,12 @@ function renderOrdersTable() {
           <button class="ck-order-btn ck-order-btn-save" onclick="saveOrderStatus(${o.id})">💾 Save</button>
           <button class="ck-order-btn ck-order-btn-delete" onclick="deleteOrder(${o.id})">🗑 Delete</button>
         `}
+        ${o.status === 'Ready for Delivery' ? `
+          <div style="margin-top:2px;">
+            <input class="ck-input" id="delBoy_${o.id}" value="${o.deliveryBoyPhone||''}" placeholder="Delivery boy #" style="padding:3px 6px;font-size:10px;width:100%;margin-bottom:3px;">
+            <button class="ck-order-btn" onclick="notifyDeliveryBoy(${o.id})" style="background:rgba(37,211,102,0.15);color:#25D366;width:100%;">📲 Notify Rider</button>
+          </div>
+        ` : ''}
           <select class="ck-select" onchange="generateDoc(${o.id},this.value);this.selectedIndex=0;" style="padding:4px 6px;font-size:10px;border-radius:6px;">
             <option value="">🖨 Print…</option>
             <option value="invoice">📄 Invoice</option>
@@ -4589,8 +4596,32 @@ function saveOrderStatus(id) {
   if (o) {
     o.status = sel.value;
     if (sel.value === 'Delivered') o.deliveredDate = localDate();
-    persistMeta(); logActivity('order_status', `Order #${id} → ${sel.value}`); toast('Order #'+id+' status updated ✓');
+    const delBoyInput = document.getElementById('delBoy_'+id);
+    if (delBoyInput) o.deliveryBoyPhone = delBoyInput.value.trim();
+    persistMeta(); renderOrdersTable(); logActivity('order_status', `Order #${id} → ${sel.value}`); toast('Order #'+id+' status updated ✓');
   }
+}
+
+function notifyDeliveryBoy(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  const input = document.getElementById('delBoy_'+id);
+  const phone = input ? input.value.trim() : (o.deliveryBoyPhone || '');
+  if (!phone) { toast('Enter delivery boy number first', 'error'); return; }
+  o.deliveryBoyPhone = phone;
+  persistMeta();
+  const num = normalizePhone(phone);
+  let msg = `📦 *Calla Kallos — Delivery Assignment*\n\n`;
+  msg += `*Order #:* ${o.id}\n`;
+  msg += `*Customer:* ${o.customer}\n`;
+  msg += `*Phone:* ${o.phone}\n`;
+  msg += `*Items:* ${o.product}\n`;
+  msg += `*Delivery to:* ${o.location}\n`;
+  if (o.note) msg += `*Note:* ${o.note}\n`;
+  msg += `\nPlease pick up and deliver. Thank you! 🌸`;
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+  logActivity('order_status', `Notified delivery boy for order #${id}`);
+  toast('Delivery boy notified ✓');
 }
 
 function acceptOrder(id) {
@@ -4835,9 +4866,9 @@ function saveManualOrder() {
 function exportOrdersExcel() {
   const rows = orders.map(o => `<tr>
     <td>#${o.id}</td><td>${o.date}</td><td>${o.time||''}</td><td>${o.customer}</td>
-    <td>${o.email||''}</td><td>${o.phone||''}</td><td>${(o.product||'').replace(/</g,'&lt;')}</td>
+    <td>${o.email||''}</td><td style="mso-number-format:'\\@'">${o.phone||''}</td><td>${(o.product||'').replace(/</g,'&lt;')}</td>
     <td>${o.amount||0}</td><td>${(o.location||'').replace(/</g,'&lt;')}</td>
-    <td>${o.note||''}</td><td>${o.status}</td></tr>`).join('');
+    <td>${o.note||''}</td><td>${o.status}</td><td style="mso-number-format:'\\@'">${o.deliveryBoyPhone||''}</td></tr>`).join('');
 
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
 <head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
@@ -4846,7 +4877,7 @@ function exportOrdersExcel() {
 <body><table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;">
 <tr style="background:#1E293B;color:#fff;font-weight:bold;">
 <td>Order #</td><td>Date</td><td>Time</td><td>Customer</td><td>Email</td><td>Phone</td>
-<td>Product</td><td>Amount (AED)</td><td>Location</td><td>Note</td><td>Status</td></tr>
+<td>Product</td><td>Amount (AED)</td><td>Location</td><td>Note</td><td>Status</td><td>Delivery Boy #</td></tr>
 ${rows}
 </table></body></html>`;
 
