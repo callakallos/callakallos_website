@@ -2730,7 +2730,7 @@ body {
 // ============================================================
 //  DATA STORE
 // ============================================================
-const CK_VERSION = '1.0';
+const CK_VERSION = '1.1';
 let lang = 'en';
 let cart = [];
 let products = [
@@ -5075,6 +5075,24 @@ function settingsHTML() {
       </div>
     </div>
 
+    <!-- Data Backup -->
+    <div class="ck-admin-panel-block" style="margin-bottom:20px;">
+      <div class="ck-panel-header"><span class="ck-panel-title">💾 Data Backup</span></div>
+      <div style="padding:20px;max-width:700px;">
+        <p style="font-size:12px;color:rgba(212,184,150,0.5);margin-bottom:16px;">Download a complete backup of all your business data. We recommend backing up weekly.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <button class="ck-admin-btn" onclick="downloadFullBackup()">📥 Download Full Backup (JSON)</button>
+          <button class="ck-admin-btn-ghost" onclick="exportOrdersExcel()" style="padding:6px 14px;font-size:11px;">📊 Orders Excel</button>
+          <button class="ck-admin-btn-ghost" onclick="exportActivityPDF()" style="padding:6px 14px;font-size:11px;">📋 Activity Log PDF</button>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="ck-form-label" style="margin-bottom:8px;display:block;">Restore from Backup</label>
+          <input type="file" id="restoreBackupInput" accept=".json" onchange="restoreBackup(this)" style="font-size:12px;color:rgba(212,184,150,0.6);">
+        </div>
+        <div id="lastBackupInfo" style="font-size:11px;color:rgba(212,184,150,0.3);"></div>
+      </div>
+    </div>
+
     <!-- Storage Usage -->
     <div class="ck-admin-panel-block" style="margin-bottom:20px;">
       <div class="ck-panel-header"><span class="ck-panel-title">💾 Storage Usage</span></div>
@@ -5590,7 +5608,78 @@ function populateSettingsInputs() {
   set('settingGhToken',    s.ghToken || localStorage.getItem('ck_gh_token') || '');
   loadStorageUsage();
   populateMaintenanceInputs();
+  const lastBackup = localStorage.getItem('ck_last_backup');
+  const backupInfo = document.getElementById('lastBackupInfo');
+  if (backupInfo) backupInfo.textContent = lastBackup ? '✓ Last backup: ' + lastBackup : 'No backup taken yet';
   updateGiftBoxBtn();
+}
+
+async function downloadFullBackup() {
+  try {
+    toast('Preparing backup…');
+    const dataSnap = await _fbDb.ref('ck-data').once('value');
+    const configSnap = await _fbDb.ref('ck-config').once('value');
+    const logsSnap = await _fbDb.ref('ck-activity-log').orderByChild('timestamp').limitToLast(500).once('value');
+    const statsSnap = await _fbDb.ref('ck-stats').once('value');
+
+    const backup = {
+      _backup: {
+        date: localDate(),
+        time: new Date().toTimeString().slice(0, 8),
+        version: CK_VERSION,
+        site: 'callakallos.ae',
+      },
+      data: dataSnap.val() || {},
+      config: configSnap.val() || {},
+      activityLog: logsSnap.val() || {},
+      stats: statsSnap.val() || {},
+    };
+
+    const json = JSON.stringify(backup, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'CallaKallos_Backup_' + localDate() + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    localStorage.setItem('ck_last_backup', localDate() + ' ' + new Date().toTimeString().slice(0,5));
+    const info = document.getElementById('lastBackupInfo');
+    if (info) info.textContent = '✓ Last backup: ' + localDate() + ' ' + new Date().toTimeString().slice(0,5);
+
+    logActivity('data_sync', 'Downloaded full backup');
+    toast('Backup downloaded ✓');
+  } catch(e) {
+    toast('Backup failed: ' + e.message, 'error');
+  }
+}
+
+function restoreBackup(input) {
+  if (!input.files || !input.files[0]) return;
+  if (!confirm('⚠ This will OVERWRITE all current data with the backup. Are you sure?')) { input.value = ''; return; }
+
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.data && !backup._backup) {
+        toast('Invalid backup file', 'error'); return;
+      }
+
+      toast('Restoring backup…');
+
+      if (backup.data) await _fbDb.ref('ck-data').set(backup.data);
+      if (backup.config) await _fbDb.ref('ck-config').set(backup.config);
+
+      logActivity('data_sync', 'Restored backup from ' + (backup._backup?.date || 'unknown'));
+      toast('Backup restored ✓ — refreshing…');
+      setTimeout(() => location.reload(), 1500);
+    } catch(err) {
+      toast('Restore failed: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(input.files[0]);
+  input.value = '';
 }
 
 async function loadStorageUsage() {

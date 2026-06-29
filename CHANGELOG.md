@@ -3,6 +3,15 @@
 
 ---
 
+## v1.1 — 2026-06-28
+### Added
+- Full Data Backup — download all data (orders, products, config, activity log, stats) as JSON
+- Restore from Backup — upload a backup file to overwrite all data (with confirmation)
+- Last backup date shown in Settings
+- Quick access to Orders Excel and Activity Log PDF from backup panel
+
+---
+
 ## v1.0 — 2026-06-28
 ### Added
 - IP address and location tracking in Activity Log (via ipapi.co)
