@@ -3,6 +3,14 @@
 
 ---
 
+## v1.2 — 2026-06-28
+### Changed
+- Migrated Firebase backend from `callakallos` project to `callakallos-v2` (sister's account)
+- New Firebase config: authDomain, databaseURL, projectId, storageBucket, appId all updated
+- Old Firebase project can now be safely deleted after data restore + verification
+
+---
+
 ## v1.1 — 2026-06-28
 ### Added
 - Full Data Backup — download all data (orders, products, config, activity log, stats) as JSON
